@@ -5,7 +5,7 @@ Version 1 — 6 novembre 2026. Complément de `Univers.md` (le monde, les factio
 Les comportements déjà codés : `Melee`, `Ranged`, `Boss`, `Kamikaze`, `Thief`, `Prop`. Les affixes d'élite déjà codés : RAPIDE, BLINDÉ, EXPLOSIF, VAMPIRE, INVOCATEUR. Les lignes marquées **(existe)** sont des assets actuels à renommer. Tout le reste est listé par priorité en section 5. Les chiffres (dégâts, délais) sont des ordres de grandeur ; l'équilibrage reste dans `Balance.md` et `Pacing.md`.
 
 Sommaire
-0. Les huit règles qui font qu'un ennemi est « pro »
+0. Les neuf règles qui font qu'un ennemi est « pro »
 1. Les six rôles
 2. Lire de dessus : la bosse et les silhouettes
 3. Le catalogue (Ambrés, animaux, Charognards, Fervents, ARKHE, élites, Souches, props)
@@ -14,7 +14,7 @@ Sommaire
 
 ---
 
-## 0. Les huit règles
+## 0. Les neuf règles
 
 1. **Une attaque, un signal, une parade.** Toute attaque qui n'est pas un simple contact a un télégraphe visible d'au moins 0,5 s (gonflement, cercle au sol, ligne au sol, lueur, posture) et un son dédié. Le joueur meurt de ses erreurs, jamais d'une surprise.
 2. **Un rôle par ennemi.** Six rôles (section 1). Un ennemi n'en cumule pas deux. Une élite ajoute un accent, pas un rôle.
@@ -24,6 +24,7 @@ Sommaire
 6. **Même ennemi, autre peau.** Trois textures par type et des variantes par carte : la variété perçue double sans une ligne de code.
 7. **Pas de dégâts hors écran.** Les tireurs ne tirent qu'à l'écran (déjà codé). Un saut atterrit là où tu étais au départ du saut. Une attrape se casse.
 8. **Des plafonds.** Contrôle : 2 à l'écran. Attrapes : 1. Tireurs : 6. Au-delà, le jeu devient illisible, pas difficile.
+9. **Imprévisible avant, lisible pendant.** Le joueur ne doit jamais pouvoir prédire **quand**, **quoi** ni **d'où** arrive une Crue. Mais une fois qu'elle arrive, il voit d'où elle vient 1,5 s avant le premier ennemi. L'imprévu fait l'adrénaline ; l'injustice fait désinstaller.
 
 ---
 
@@ -38,7 +39,7 @@ Sommaire
 | **Contrôle** | change la vague : appelle, accélère, attrape, régénère | Hurleur, Berger, Accrocheur, Greffé, élites INVOCATEUR et VAMPIRE | 1 ou 2 unités, jamais plus |
 | **Opportunité** | récompense l'agressivité | Pilleur, Porteur, Cristallisé, Caisse, Baril, Prime | sur minuterie |
 
-Une vague qui ne contient que de la Pression est ennuyeuse. Une vague avec trois unités de Contrôle est injuste. Le `RunDirector` compose : flux = Pression ; Crue (anneau) = Pression + Kystes + une Masse ; Assaut (colonne) = Pression + Perçage + une unité de Contrôle.
+Une vague qui ne contient que de la Pression est ennuyeuse. Une vague avec trois unités de Contrôle est injuste. Les parts ci-dessus sont celles du palier 3 ; elles bougent avec la montée (4.3 b). Le flux permanent reste de la Pression avec un Cracheur de temps en temps ; les Crues, elles, sont tirées au sort (4.3).
 
 ---
 
@@ -267,17 +268,102 @@ L'ordre compte plus que les minutes exactes. Une nouveauté toutes les 90 s envi
 | 10 Les Galeries | Résurgences partout, Cristallisés | nuages de sève, effondrements | La Résurgence Mère |
 | 11 Le Berceau | tout ARKHE | tout | Greffé Prime |
 
-### 4.3 Composition des vagues
+### 4.3 Les Crues : tirage, variété, montée
 
-| Vague | Composition | Lecture en jeu |
-|---|---|---|
-| Flux | Pression seule, un Cracheur de temps en temps | le fond permanent |
-| **Crue** (anneau, vagues impaires) | Pression + 10 % de Kystes + une Masse après la minute 3 | « CRUE ! », la marée |
-| **Assaut** (colonne, vagues paires) | Pression + Perçage (Cracheurs, Fusiliers) + une unité de Contrôle | « ASSAUT ! », par devant |
-| **Nuée** | rats seulement, en phase de montée | « NUÉE ! » |
-| **Veine d'ambre** | Cristallisés | « VEINE D'AMBRE ! », la paye |
-| **Escorte de Souche** | le boss + son escorte, flux réduit | « SOUCHE ! » |
-| **Vague mixte** (à partir de la minute 9 ou du chapitre 9) | un Berger + les Ambrés qu'il fait émerger + deux Martyrs | les Fervents |
+Ce que fait le code aujourd'hui : les pics alternent strictement anneau (vagues impaires) et colonne (vagues paires), toutes les 50 s pile, et la composition est par positions fixes (un coureur tous les 3, une brute tous les 9, un Kyste tous les 11). Un joueur attentif sait au bout de trois parties ce qui arrive, quand, et d'où. L'escalade n'est que numérique (plus de PV, plus d'ennemis) : la **nature** des vagues ne change jamais. Voilà ce qui remplace ça.
+
+**Le principe en trois phrases.** Une Crue, c'est une **forme** (d'où et comment ils arrivent) tirée au sort, un **fond** (qui) tiré par budgets de rôles, et une fois sur trois un **thème**. Rien n'est fixé à l'avance, mais tout est tiré dans un sac qui se remplit avec le temps : c'est la **montée**. Et tout ce qui est tiré s'annonce 1,5 s avant par une lueur au bord de l'écran, du côté d'où ça vient.
+
+#### a) La forme : neuf formations
+
+| Formation | Comment ils arrivent | Ce que ça force | Palier | Poids | Bannière |
+|---|---|---|---|---|---|
+| **Anneau** | tout autour de l'écran (la horde actuelle) | choisir une brèche | 1 | 3 | « CRUE ! » |
+| **Colonne** | une colonne dense : devant toi 60 %, de côté 25 %, dans ton dos 15 % (l'assaut actuel, mais la direction est tirée) | trancher dedans | 1 | 3 | « ASSAUT ! » |
+| **Rafale** | trois salves d'un tiers chacune, à 4 s d'intervalle, de trois directions différentes | se replacer trois fois | 2 | 2 | « RAFALE ! » |
+| **Tenaille** | deux colonnes, de deux côtés opposés | sortir par le côté | 3 | 2 | « TENAILLE ! » |
+| **Pluie de Kystes** | 8 à 20 Kystes posés au bord, puis des Fiévreux derrière pour te pousser dedans | déclencher la chaîne au bon moment | 3 | 1 | « KYSTES ! » |
+| **Marée** | tout un bord de l'écran avance comme un mur, deux rangs de profondeur, lent | bouger latéralement pendant 20 s | 4 | 2 | « MARÉE ! » |
+| **Chasse** | que du rapide (Fiévreux, Meute, Bondisseurs) venant de ton dos, plus un Hurleur | se retourner et tenir | 5 | 2 | « CHASSE ! » |
+| **Nids** | deux ou trois Résurgences posées au bord, qui pompent des Fiévreux pendant 20 s | aller les détruire (coffre) ou tenir | 6 | 1 | « RÉSURGENCE ! » |
+| **Vague mixte** | un Berger qui fait émerger, deux Martyrs, des Fervents | tuer la cloche | 5, et seulement là où il y a des Fervents | 1 | « LES CLOCHES ! » |
+
+Tirage pondéré parmi les formations débloquées au palier courant, en excluant la précédente.
+
+#### b) Le fond : des budgets de rôles, pas des positions
+
+Chaque Crue reçoit un budget par rôle qui dépend du palier. Chaque place est ensuite piochée dans le **pool débloqué** de ce rôle, avec les poids du flux (`Pick`). Deux Crues au même palier n'ont donc jamais le même fond : une Colonne de palier 4 peut être Fiévreux + Cracheurs + une Masse, la suivante Ambrés + Fusiliers + un Bouclier.
+
+| Palier | Pression | Mur | Perçage | Déni | Contrôle |
+|---|---|---|---|---|---|
+| 1 | 85 % | 5 % | 10 % | 0 | 0 |
+| 2 | 80 % | 5 % | 10 % | 5 % | 0 |
+| 3 | 70 % | 10 % | 12 % | 8 % | 1 unité |
+| 4 | 65 % | 10 % | 15 % | 10 % | 1 unité |
+| 5 | 60 % | 10 % | 18 % | 12 % | 2 unités |
+| 6 | 58 % | 12 % | 18 % | 12 % | 2 unités |
+| 7 et plus | 55 % | 12 % | 20 % | 13 % | 2 unités |
+
+Chaque formation applique son accent par-dessus : l'Anneau ajoute du Déni, la Colonne du Perçage, la Marée du Mur, la Chasse ne prend que de la Pression rapide.
+
+#### c) Le thème : une Crue sur trois a une dominante
+
+| Thème | Contenu | Palier | Bannière |
+|---|---|---|---|
+| Crue de Fiévreux | que des Fiévreux, −30 % de PV, +50 % de nombre | 2 | « CRUE DE FIÉVREUX ! » |
+| Veine d'ambre | des Cristallisés (existe) | 2 | « VEINE D'AMBRE ! » |
+| Crue de Kystes | la moitié de Kystes | 3 | « CRUE DE KYSTES ! » |
+| Crue de Cracheurs | un anneau de Cracheurs : il faut aller au contact | 4 | « CRUE DE CRACHEURS ! » |
+| Crue de Masses | que des Masses, nombre divisé par trois | 4 | « CRUE DE MASSES ! » |
+| Crue de Colonies | des Colonies : la Crue se dédouble quand on la tue | 5 | « CRUE DE COLONIES ! » |
+| Nuée | des rats (existe, en phase de montée) | 1 | « NUÉE ! » |
+
+Jamais le même thème deux fois de suite. Les thèmes sont les Crues dont on se souvient : « la fois où quarante Kystes sont arrivés ». Au-delà d'une sur trois, elles deviennent la norme et ne surprennent plus.
+
+#### d) La montée : huit paliers de danger
+
+Tous les 150 s en survie infinie (en campagne, plafonné par l'étape). Chaque palier ajoute une **règle**, pas seulement des chiffres. Le nom s'affiche sous le chrono : le joueur voit le jeu changer de nature.
+
+| Palier | Temps | Nom | Ce qui change |
+|---|---|---|---|
+| 1 | 0:00 | **Suintement** | Anneau, Colonne. Silence de l'accalmie 5 s. |
+| 2 | 2:30 | **Montée** | + Rafale. Thèmes possibles (Fiévreux, Veine). Silence 4 s. |
+| 3 | 5:00 | **Crue** | + Tenaille, Pluie de Kystes. Une unité de Contrôle par Crue. Le pic dure 14 s. |
+| 4 | 7:30 | **Débordement** | + Marée. Thèmes Masses, Cracheurs. Silence 3 s. 15 % des pics sont **doubles** (deux formations à 5 s d'écart). |
+| 5 | 10:00 | **Déferlante** | + Chasse, Vague mixte. Deux unités de Contrôle. Un Alpha dans chaque Crue. L'accalmie passe de 0,3× à 0,45×. |
+| 6 | 12:30 | **Submersion** | + Nids. Silence 2 s. 30 % de pics doubles. Pic 16 s. |
+| 7 | 15:00 | **Noyade** | Tout est débloqué. L'escorte des Souches double. Pression 55 %. |
+| 8 | 17:30 | **Apocalypse** | +12 % de nombre et de PV par palier supplémentaire, tous les 150 s, sans fin. |
+
+Par-dessus, les leviers existants continuent de monter : nombre par minute, PV et dégâts par minute, débit du flux, affixes d'élite, mélange du flux.
+
+#### e) Les règles anti-pattern
+
+- Le pic ne tombe jamais à la seconde près : son moment bouge de ±6 s à chaque vague.
+- Jamais la même formation deux fois de suite, jamais le même thème deux fois de suite.
+- La direction d'une Colonne, d'une Tenaille ou d'une Marée est tirée, jamais déduite de la précédente.
+- Un pic double n'enchaîne jamais deux Anneaux.
+- Les Crues à thème ne dépassent pas une sur trois.
+- Le seul pattern volontaire est **la Souche** : elle tombe sur son minuteur, elle est annoncée, et c'est au joueur de s'y préparer. C'est l'horloge que le joueur garde en tête pendant que tout le reste bouge.
+
+#### f) L'équité
+
+- Lueur au bord de l'écran 1,5 s avant le premier ennemi, du côté d'où ils viennent, dans la couleur de la source.
+- Les plafonds de 4.5 s'appliquent aux Crues : pas plus de deux Contrôles, six tireurs, un Accrocheur.
+- Dans l'Appel du jour et la météo de la Crue, tous les tirages (forme, fond, thème, direction, moment) viennent de la graine du mode (`RunConfig.Seed`) : même Crue pour tout le monde, c'est ce qui rend le classement juste. Ailleurs, hasard pur.
+- Le silence de l'accalmie ne descend jamais sous 2 s : le combo peut toujours casser, l'écran peut toujours respirer.
+- La Crue de Cracheurs ne tombe jamais en pic double. La Chasse ne tombe jamais pendant une Souche.
+
+#### g) Ce que ça change dans le `RunDirector`
+
+- `WaveIndex % 2` devient un tirage pondéré de formation parmi celles débloquées, en excluant la précédente.
+- Les positions fixes de `SpawnHorde` et `SpawnAssault` (`i % 3`, `i % 9`, `i % 11`, `i % 4`) deviennent un tirage par budget de rôles, chaque place piochée dans le pool du rôle avec les poids du flux.
+- Un `DangerTier` calculé depuis les minutes (survie) ou l'étape (campagne) pilote les débloquages, les budgets, `lullSilence`, `peakTime`, `lullMult`, les pics doubles et le nom sous le chrono.
+- Le début du pic est jitté de ±6 s autour de `buildTime`.
+- Un `System.Random` initialisé avec `RunConfig.Seed` quand il est non nul, pour tous les tirages de Crue.
+- Un effet de bord lumineux 1,5 s avant (`GameFX`), et une bannière par formation et par thème.
+
+Les autres vagues ne changent pas : la **Nuée**, la **Veine d'ambre**, le **Pilleur** restent en phase de montée sur leurs minuteurs, l'**escorte de Souche** accompagne le boss, flux réduit.
 
 ### 4.4 Variantes de peau par carte
 
