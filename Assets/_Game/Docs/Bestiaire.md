@@ -380,7 +380,8 @@ Même mesh, autre texture, parfois un accessoire. C'est la façon la moins chèr
 | La Forêt | mousse, chasseurs | |
 | Le Barrage | trempés, draps blancs des Fervents convertis trop tard | |
 | Les Galeries | plus cristallisés, plus lumineux | la seule carte où l'ambre domine |
-| Saison de Crue | tout le monde a de la boue fraîche | |
+| Jour de Crue (`Univers.md` 6.8) | tout le monde a de la boue fraîche, trempés | Cristallisés ×3, Kystes +50 %, Rampants dans l'eau |
+| Saison de Crue (automne) | boue fraîche, résurgences partout | la variante saisonnière |
 
 ### 4.5 Plafonds de simultanéité (équité et lisibilité)
 

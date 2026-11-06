@@ -286,7 +286,7 @@ Le confort du camp est le vrai but de l'or : l'eau filtrée, la chaleur, les lit
 - **Missions** = **contrats** captés par la Radio : « la Gare entend qu'un Cristallisé traîne au métro », « REGEN largue des caisses à l'entrepôt ce soir ».
 - **Classement** = **le Registre des Passeurs**, le cahier tenu par Irena, affiché au mur du restaurant. Les titres et tenues des joueurs y figurent : c'est la vitrine des cosmétiques.
 - **Défi du jour** = **l'Appel du jour** : une fréquence captée le matin, même sortie pour tous les Passeurs de tous les relais.
-- **Défi hebdo** = **la météo de la Crue** : la nappe de la semaine favorise un élément (eau haute = électricité, sécheresse = feu, etc.).
+- **Défi hebdo** = remplacé par **les Jours de Crue** (6.8) : deux fois par semaine, l'eau monte, la carte change, un classement s'ouvre, le Batelier accoste. C'est le rendez-vous du jeu.
 - **Menaces (NG+)** = **conditions de sortie** que le Passeur accepte avant de partir : saison de Crue dense, Ambrés enragés, etc. Le Registre tient des pages séparées.
 - **Campagne** = **la carte d'Ostrov** que le Relais reconstitue sortie après sortie, du sud vers le nord, vers le Berceau. C'est aussi une enquête (7.6).
 - **Étoiles** = ce que le camp apprend d'une zone (durée tenue, pas de blessure grave, boss abattu).
@@ -356,6 +356,66 @@ Règle : une tenue est soit **une tenue de Passeur crédible**, soit **un costum
 | Fondateur | la tenue de parade de l'Opéra d'Ostrov, portée par celui qui a fondé le Relais |
 
 Les titres actuels rentrent tous. Futurs titres liés au lore : Passeur de première, Guichetier, Fervent repenti, Sujet 08, Liquidateur.
+
+### 6.8 Les Jours de Crue (le rendez-vous de la semaine)
+
+**L'idée.** Deux jours par semaine, l'eau monte. Ce jour-là, la carte est inondée, une règle change le jeu, un classement s'ouvre et se referme à minuit, et un marchand qu'on ne voit jamais autrement accoste au Relais. Le reste de la semaine, le Cordon est « à sec » : on joue la Classique, l'Appel du jour, la campagne. La Crue n'est pas un mode de plus : c'est **un rendez-vous**. On sait quand elle vient, on sait qu'elle repart, on sait qu'on ne reverra pas la même.
+
+**Pourquoi l'eau monte le mercredi et le dimanche (le lore).** Le barrage de Stronje est tenu par l'armée. Pour garder le lac sous la cote de sécurité, le Colonel fait ouvrir les vannes deux fois par semaine, le mercredi et le dimanche à 6 h. Le lâcher d'eau pousse la nappe, et toutes les résurgences du Cordon remontent en même temps. Les Guichets vendent l'horaire, Irena l'annonce la veille au soir. Un planning administratif règle l'apocalypse : c'est exactement le ton du Cordon. Le premier dimanche du mois, le barrage fait un lâcher complet : **la Grande Crue**.
+
+**Pourquoi ces deux jours.** Le mercredi est le milieu de semaine et l'après-midi des ados ; le dimanche est le jour de tout le monde. Trois ou quatre jours entre deux Crues : assez pour que chacune reste un événement, pas assez pour l'oublier. Un seul jour par semaine, c'est trop rare ; tous les trois jours sans jour fixe, ça ne crée pas d'habitude. L'habitude vient du jour fixe.
+
+**Le rythme d'une Crue.**
+
+| Moment | Ce qui se passe |
+|---|---|
+| La veille au soir (mardi, samedi, dès 18 h) | Irena annonce la Crue et sa Dominante : « Les vannes s'ouvrent demain à 6 h. L'eau monte avec la foudre. » Au Relais, l'eau arrive au pied de la palissade, la barque du Batelier est amarrée à l'auvent, son stock est visible mais fermé. |
+| Le Jour de Crue (de 0 h à 24 h, heure locale) | les cartes sont inondées, la Dominante est active, le Registre de Crue est ouvert, le Batelier vend, les Trouvailles tombent deux fois plus. |
+| Le lendemain | l'eau redescend, le Registre de Crue est figé, les titres et l'ambre pur de classement sont distribués au premier lancement, le Batelier est reparti avec la décrue. |
+| Le premier dimanche du mois : la Grande Crue | deux Dominantes au lieu d'une, le stock rare du Batelier, et la clôture du Registre de saison (le mois). |
+
+**Ce qui change en jeu un Jour de Crue.**
+
+| Quoi | Comment |
+|---|---|
+| La carte | même géométrie, variante inondée : l'eau sur les points bas, les résurgences qui pulsent au bord, la brume, la Ligne qui ruisselle. Cristallisés ×3, Kystes +50 %, Rampants dans l'eau sur les cartes qui en ont. |
+| La Dominante | **une** règle, tirée de la date (identique pour tout le monde), annoncée la veille. Elle change ce qui est bon : le stuff optimal n'est pas le même d'une Crue à l'autre, c'est la méta qui tourne. Toujours symétrique (un bonus, une contrainte), jamais de puissance permanente. |
+| Le Registre de Crue | une page de classement par Crue, ouverte le jour même, figée à minuit. Essais illimités, le meilleur score compte : c'est une journée de compétition, pas un coup unique comme l'Appel du jour. |
+| Le Batelier | un marchand qui remonte la Vorna quand l'eau est assez haute, et repart avec la décrue. Il ne vend **que** du cosmétique, des titres, des Trouvailles repêchées et des matériaux pour le camp. Jamais de puissance. Son stock tourne à chaque Crue. |
+| L'ambre pur | sa monnaie. Elle ne tombe **que** les Jours de Crue (les Cristallisés en lâchent), elle est plafonnée par jour (300), et le classement en donne par tranche de rang. Le plafond fait que personne ne gagne en jouant douze heures : il faut jouer bien, et revenir. |
+| Le Relais | l'eau au pied de la palissade, la barque, Irena qui parle de la Crue. La production du camp ne change pas (équité). |
+
+**Les Dominantes (le pool de départ, douze).** Toujours un bonus et une contrainte, pour que la méta tourne sans qu'une Crue soit « la facile ».
+
+| Dominante | Règle | Ce que ça pousse |
+|---|---|---|
+| Eau haute | électricité +40 %, feu −30 % | Tesla, Fil de cuivre |
+| Brume | portée des tireurs ennemis −40 %, Fiévreux +15 % de vitesse | corps à corps, lames |
+| Nuit de Crue | éclats ×1,5, Cristallisés partout, Souches +25 % de PV | monter vite, gros stuff |
+| Marée noire | poison +40 %, soins −30 % | gaz, acide, jouer propre |
+| Eaux froides | joueur −10 % de vitesse, Masses −25 % de PV | zones, explosions |
+| Veine | or ×2, Pilleurs ×3, Crues +20 % de nombre | le camp, la chasse |
+| Résurgences | nids partout, coffres ×2 | aller détruire, scie |
+| Rafales | la formation Rafale trois fois plus fréquente, Hurleurs −50 % | mobilité, cônes |
+| Crue de Kystes | la moitié des Crues sont des Kystes, « Cadavres explosifs » offert au départ | chaînes, feu |
+| Lames | lames et scies +30 %, balles −20 % | Machettes, Scie |
+| Poudre | balles et grenades +30 %, lames −20 % | Revolver, Fusil |
+| Brouillage | pas d'annonce de Souche ni de direction de Crue, mais éclats ×1,3 | attention, mémoire |
+
+**Le Registre de saison.** Chaque mois, la somme des quatre meilleures Crues du joueur. Clos à la Grande Crue. Il donne le titre permanent de la saison (« Passeur de novembre ») et l'objet rare du Batelier. C'est le classement qui fait revenir toute la semaine : une Crue ratée, c'est une des quatre.
+
+**Ce que le Batelier vend (et ne vend pas).** Des tenues de Crue qu'on ne trouve nulle part ailleurs (le Batelier, le Noyé, le Fervent repenti, l'Éclusier), des titres, des Trouvailles qu'il a « repêchées » (les documents manquants d'un dossier, un par Crue), des lots de matériaux pour le camp (de l'or), et un **Lot repêché** par Crue : un cosmétique au hasard pour pas cher. Jamais une arme, un passif, un boost, une relance. Une pub récompensée au Relais peut donner +50 d'ambre pur une fois par Crue : ça n'achète que du cosmétique, ça respecte la règle.
+
+**Pourquoi ça fait revenir.**
+- Un jour fixe crée une habitude ; une annonce la veille crée une attente.
+- Un marchand qui repart crée la rareté ; un stock qui tourne crée le « je reviendrai pour celui-là ».
+- Une Dominante par Crue renouvelle la méta sans rien ajouter au jeu : les mêmes armes, un autre meilleur stuff.
+- Un classement par Crue remet tout le monde à zéro deux fois par semaine ; une saison garde le fil.
+- Tout est écrit dans le lore : le barrage, les vannes, le Batelier, les documents que l'eau remonte.
+
+**L'équité.** Tout est tiré de la date : même carte, même Dominante, même stock pour tous. L'ambre pur est plafonné et n'achète rien qui joue. La Classique reste à sec même un Jour de Crue : son Registre est permanent, il doit rester comparable d'un jour à l'autre. La Dominante Brouillage est la seule qui retire de l'information, et elle le paie en éclats.
+
+**Ce qu'il faut coder.** Un mode `Crue` dans `GameModes`, disponible quand le jour local est mercredi ou dimanche (plus une clé de dev), `BoardId` = `crue_AAAAMMJJ`, graine tirée de la date, la Dominante choisie par la graine comme les Menaces de l'Appel du jour ; un drapeau « inondé » dans `RunConfig` lu par le décor et les effets ; l'ambre pur et son plafond du jour dans la sauvegarde méta ; une section Batelier dans la boutique, visible la veille, active le jour ; les lignes d'Irena dans l'annonce d'avant-partie ; le Registre de saison qui agrège les meilleures Crues du mois.
 
 ---
 
@@ -451,6 +511,9 @@ Une ligne au départ, une ligne à l'arrivée, parfois une au milieu. Jamais plu
 | Départ, survie infinie | « Pas de contrat aujourd'hui. Tu rentres quand tu rentres. » |
 | Départ, Appel du jour | « J'ai capté une fréquence REGEN au métro cette nuit. Tout le monde l'a entendue. Premier arrivé. » |
 | Départ, Menaces | « Tu as lu les conditions. Je les ai écrites dans le Registre, à côté de ton nom. » |
+| Veille de Crue | « Les vannes de Stronje s'ouvrent demain à 6 h. L'eau monte avec la foudre. Dors. » |
+| Départ, Jour de Crue | « L'eau est partout. Le Batelier est à l'auvent, il repart avec la décrue. Tu as jusqu'à minuit. » |
+| Lendemain de Crue | « Elle redescend. Le Registre est fermé. Tu es dixième. Je l'ai écrit à l'encre. » |
 | Souche | « C'est lui. Le Boucher. Tu le sens à l'odeur de croûte brûlée. » |
 | Crue | « Ça monte. Bouge. » |
 | Mort | « Passeur ? Passeur, réponds. … On a ton signal. On vient te chercher. » |
@@ -483,7 +546,8 @@ Chaque chapitre apporte un morceau de réponse, un nouveau repère visible, et d
 - **Partie → Trouvaille.** « Il me manque deux documents du dossier Crue. »
 - **Chapitre → réponse.** « Je veux voir la Brèche. »
 - **Jour → Appel.** « Qu'est-ce qu'Irena a capté ce matin ? »
-- **Saison → Crue.** « Les résurgences reviennent, les Cristallisés aussi. »
+- **Mercredi, dimanche → Crue.** « Quelle Dominante demain ? Qu'est-ce que le Batelier a repêché ? »
+- **Mois → Saison.** « Il me faut une quatrième bonne Crue avant la Grande. »
 - **Fin → NG+.** « Maintenant ils savent que je sais. »
 
 ---
@@ -690,7 +754,12 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 | Les Bassins, la Brèche, la Dalle, le Désert d'ambre | l'origine visible de la Crue |
 | La Ligne, la Croûte | la marque de la Crue sur les murs et dans les rues |
 | La Crue | la catastrophe (Jour 0) ; aussi une horde (« CRUE ! ») |
-| La saison de Crue | l'automne, quand la nappe remonte |
+| Les Jours de Crue | le mercredi et le dimanche, quand le barrage de Stronje lâche ses vannes : cartes inondées, Dominante, Registre de Crue, Batelier (6.8) |
+| La Grande Crue | le premier dimanche du mois : lâcher complet, deux Dominantes, clôture de la saison |
+| La Dominante | la règle du jour de Crue, un bonus et une contrainte, tirée de la date |
+| Le Batelier, l'ambre pur | le marchand des Jours de Crue et sa monnaie, qui n'achète que du cosmétique |
+| Le Registre de Crue, le Registre de saison | le classement d'un Jour de Crue (figé à minuit), et la somme des quatre meilleures Crues du mois |
+| La saison de Crue | l'automne, quand la nappe remonte d'elle-même : la variante saisonnière des cartes |
 | Le Colonel | le chef de la ligne, jamais vu |
 | Les Guichets | les soldats corrompus qui commercent |
 | Les Ambrés | les infectés (mot des Passeurs) ; « Gueules » pour les Charognards, « Éveillés » pour les Fervents, « sujets IR » pour REGEN |
@@ -708,7 +777,7 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 | Le Relais 17 | le camp ; Irena, Baz, Doc Vesna, Mila, Pavo, Dušan |
 | L'injecteur (R-4), les éclats, une dose | l'XP et les niveaux |
 | Un échantillon | une relique |
-| Le Registre | le classement ; l'Appel du jour, la météo de la Crue, les conditions de sortie : les modes |
+| Le Registre | le classement ; l'Appel du jour, les Jours de Crue, les conditions de sortie : les modes |
 | Le Carnet, la Plaque, le Guichet, les Contrats | codex, profil, boutique, missions |
 | Trouvaille, Dossier | un document ramassé, et la collection qu'il complète |
 | Maskarada | la boutique de déguisements de la Galeria, source de toutes les tenues fantaisie |
