@@ -1,0 +1,1941 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 10
+  m_Fog: 1
+  m_FogColor: {r: 0.07, g: 0.07, b: 0.08, a: 1}
+  m_FogMode: 1
+  m_FogDensity: 0.01
+  m_LinearFogStart: 24
+  m_LinearFogEnd: 48
+  m_AmbientSkyColor: {r: 0.28, g: 0.27, b: 0.3, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 2
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 2
+    m_PVRDenoiserTypeIndirect: 2
+    m_PVRDenoiserTypeAO: 2
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 1
+    m_PVRFilteringGaussRadiusAO: 1
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 3
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    buildHeightMesh: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &339696196
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 339696197}
+  - component: {fileID: 339696199}
+  - component: {fileID: 339696198}
+  m_Layer: 0
+  m_Name: Gas Cloud
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &339696197
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339696196}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 682253628}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &339696198
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339696196}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: cb4cc56f5263a1341b16a88dc485bf34, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &339696199
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339696196}
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &536211630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 536211631}
+  - component: {fileID: 536211633}
+  - component: {fileID: 536211632}
+  m_Layer: 0
+  m_Name: Body
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &536211631
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536211630}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 0.8, y: 1, z: 0.8}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1185530577}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &536211632
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536211630}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 0858cbbc400ab864e897d05d78116e02, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &536211633
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536211630}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &623479655
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 623479658}
+  - component: {fileID: 623479657}
+  - component: {fileID: 623479656}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &623479656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623479655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.InputSystemUIInputModule
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
+--- !u!114 &623479657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623479655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &623479658
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623479655}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &662383661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 662383663}
+  - component: {fileID: 662383662}
+  m_Layer: 0
+  m_Name: Post FX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &662383662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 662383661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: e305a90ad00c27849bf64df2877ce813, type: 2}
+--- !u!4 &662383663
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 662383661}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &682253627
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 682253628}
+  - component: {fileID: 682253645}
+  - component: {fileID: 682253644}
+  - component: {fileID: 682253643}
+  - component: {fileID: 682253642}
+  - component: {fileID: 682253641}
+  - component: {fileID: 682253640}
+  - component: {fileID: 682253639}
+  - component: {fileID: 682253638}
+  - component: {fileID: 682253637}
+  - component: {fileID: 682253636}
+  - component: {fileID: 682253635}
+  - component: {fileID: 682253634}
+  - component: {fileID: 682253633}
+  - component: {fileID: 682253632}
+  - component: {fileID: 682253631}
+  - component: {fileID: 682253630}
+  - component: {fileID: 682253629}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &682253628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1185530577}
+  - {fileID: 339696197}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &682253629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1ddcf69be120a54abf183aa7b8cf6fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.SawWeapon
+  displayName: Scie circulaire
+  color: {r: 1, g: 0.35, b: 0.4, a: 1}
+  unlockCost: 0
+  sawPrefab: {fileID: 5480849161764882947, guid: 5b9fca7f553ef4848adfe0336ea504e2, type: 3}
+  speed: 15
+  knockback: 4
+  evoSaws: 5
+  evoDamage: 32
+  evoRange: 10
+  evoSize: 1.5
+  evoCooldown: 1.1
+  levels:
+  - text: Une scie qui part et revient en tranchant tout.
+    saws: 1
+    damage: 14
+    range: 7
+    size: 0.7
+    cooldown: 1.55
+  - text: +1 scie
+    saws: 2
+    damage: 14
+    range: 7
+    size: 0.7
+    cooldown: 1.5
+  - text: "D\xE9g\xE2ts +45%, scies plus grandes"
+    saws: 2
+    damage: 20
+    range: 8
+    size: 0.85
+    cooldown: 1.35
+  - text: +1 scie, recharge rapide
+    saws: 3
+    damage: 21
+    range: 8
+    size: 0.85
+    cooldown: 1.2
+  - text: "D\xE9g\xE2ts +40%, port\xE9e et taille max"
+    saws: 3
+    damage: 30
+    range: 9
+    size: 1
+    cooldown: 1.1
+--- !u!114 &682253630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcc5d1a59c986f04abee7a21230627c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.GrenadeWeapon
+  displayName: Grenades
+  color: {r: 0.78, g: 0.72, b: 0.45, a: 1}
+  unlockCost: 0
+  grenadePrefab: {fileID: 5879791708859941085, guid: 75a5dad9e2ea03547aaefe68d29f272c, type: 3}
+  range: 10
+  flightTime: 0.6
+  knockback: 10
+  evoGrenades: 3
+  evoDamage: 75
+  evoRadius: 3.4
+  evoCooldown: 1.6
+  evoBomblets: 5
+  evoBombletDamage: 0.45
+  evoBombletRadius: 1.9
+  levels:
+  - text: "Grenade lanc\xE9e au c\u0153ur de la foule."
+    grenades: 1
+    damage: 26
+    radius: 2.3
+    cooldown: 2.3
+  - text: "D\xE9g\xE2ts +40%, explosion plus large"
+    grenades: 1
+    damage: 36
+    radius: 2.6
+    cooldown: 2.1
+  - text: +1 grenade
+    grenades: 2
+    damage: 38
+    radius: 2.7
+    cooldown: 1.95
+  - text: "D\xE9g\xE2ts +35%, recharge rapide"
+    grenades: 2
+    damage: 52
+    radius: 2.9
+    cooldown: 1.8
+  - text: "+1 grenade, d\xE9g\xE2ts +25%, zone +15%"
+    grenades: 3
+    damage: 65
+    radius: 3.3
+    cooldown: 1.6
+--- !u!114 &682253631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd086632422d03947956035dcdd29c9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.TeslaWeapon
+  displayName: Batterie Tesla
+  color: {r: 0.45, g: 0.75, b: 1, a: 1}
+  unlockCost: 0
+  range: 9
+  chainRange: 4.5
+  knockback: 1.5
+  evoDamage: 38
+  evoChains: 14
+  evoBolts: 3
+  evoCooldown: 0.75
+  evoSkyStrikes: 3
+  evoStrikeRadius: 2.2
+  levels:
+  - text: "Un \xE9clair qui saute d'ennemi en ennemi (3 cibles)."
+    damage: 14
+    chains: 3
+    cooldown: 1.35
+  - text: +1 cible
+    damage: 14
+    chains: 4
+    cooldown: 1.25
+  - text: "D\xE9g\xE2ts +55%, +1 cible"
+    damage: 22
+    chains: 5
+    cooldown: 1.1
+  - text: +2 cibles, recharge rapide
+    damage: 25
+    chains: 7
+    cooldown: 0.95
+  - text: "+3 cibles, d\xE9g\xE2ts +35%"
+    damage: 34
+    chains: 10
+    cooldown: 0.8
+--- !u!114 &682253632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29cb56d06b25cea4d8f15c6b485ad50d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.FlamethrowerWeapon
+  displayName: Lance-flammes
+  color: {r: 1, g: 0.4, b: 0.15, a: 1}
+  unlockCost: 0
+  puffPrefab: {fileID: 870002531851718567, guid: 00fedf79a6f700045b25a46489f2bf2d, type: 3}
+  tick: 0.2
+  knockback: 0.8
+  burnFactor: 1.2
+  evoDamage: 14
+  evoRange: 6.5
+  evoAngle: 60
+  evoJets: 3
+  evoSpin: 150
+  levels:
+  - text: Un jet de flammes qui embrase tout devant toi.
+    damage: 4.5
+    range: 4
+    angle: 50
+    jets: 1
+  - text: "Jet plus long, d\xE9g\xE2ts +20%"
+    damage: 5.5
+    range: 4.6
+    angle: 50
+    jets: 1
+  - text: +1 jet (vise un autre ennemi)
+    damage: 5.5
+    range: 4.6
+    angle: 50
+    jets: 2
+  - text: "D\xE9g\xE2ts +45%, c\xF4ne plus large"
+    damage: 8
+    range: 5
+    angle: 60
+    jets: 2
+  - text: "D\xE9g\xE2ts +40%, jet plus long"
+    damage: 11
+    range: 5.6
+    angle: 60
+    jets: 2
+--- !u!114 &682253633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dc11b276b28dcb4e87d928eae94c5b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.DartWeapon
+  displayName: "Fl\xE9chettes"
+  color: {r: 0.55, g: 1, b: 0.6, a: 1}
+  unlockCost: 0
+  bulletPrefab: {fileID: 6853629409002717990, guid: da711f26feca13d4483cc6362a4b69a2, type: 3}
+  range: 11
+  speed: 22
+  knockback: 1
+  evoDarts: 10
+  evoDamage: 16
+  evoPoison: 18
+  evoCooldown: 0.9
+  evoPierce: 2
+  evoBurstRadius: 1.3
+  levels:
+  - text: "Une fl\xE9chette empoisonn\xE9e vers un ennemi au hasard."
+    damage: 6
+    poison: 4
+    darts: 1
+    cooldown: 0.8
+    pierce: 0
+  - text: "+1 fl\xE9chette"
+    damage: 6
+    poison: 4
+    darts: 2
+    cooldown: 0.75
+    pierce: 0
+  - text: Poison +75%
+    damage: 7
+    poison: 7
+    darts: 2
+    cooldown: 0.7
+    pierce: 0
+  - text: "+1 fl\xE9chette, elles traversent 1 ennemi"
+    damage: 7
+    poison: 7
+    darts: 3
+    cooldown: 0.65
+    pierce: 1
+  - text: "+1 fl\xE9chette, d\xE9g\xE2ts +40%, traverse 2 ennemis"
+    damage: 10
+    poison: 9
+    darts: 4
+    cooldown: 0.55
+    pierce: 2
+--- !u!114 &682253634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ed18b4a8c2b79c4492e27f3c3375541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.GasWeapon
+  displayName: Gaz toxique
+  color: {r: 0.5, g: 0.95, b: 0.3, a: 1}
+  unlockCost: 0
+  visual: {fileID: 339696197}
+  slowFactor: 0.75
+  evoDamage: 24
+  evoRadius: 5
+  evoTick: 0.3
+  evoSlow: 0.45
+  evoHealPerEnemy: 0.12
+  evoHealCap: 1
+  levels:
+  - text: Un nuage toxique empoisonne et ralentit les ennemis proches.
+    damage: 6
+    radius: 2.2
+    tick: 0.5
+  - text: Zone plus large
+    damage: 6
+    radius: 2.7
+    tick: 0.5
+  - text: "D\xE9g\xE2ts +65%"
+    damage: 10
+    radius: 2.7
+    tick: 0.45
+  - text: "Zone et cadence augment\xE9es"
+    damage: 10
+    radius: 3.2
+    tick: 0.4
+  - text: "Nuage mortel : d\xE9g\xE2ts +50%, zone +15%"
+    damage: 15
+    radius: 3.7
+    tick: 0.35
+--- !u!114 &682253635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6823e7920f02bd43977682a8076db5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.MolotovWeapon
+  displayName: Cocktail Molotov
+  color: {r: 1, g: 0.45, b: 0.1, a: 1}
+  unlockCost: 0
+  bottlePrefab: {fileID: 5982970638461115036, guid: 551aff08aa5acaa4a83a9aa41d2612fe, type: 3}
+  firePrefab: {fileID: 7237852324989357053, guid: 816d1d6794a9a4e44b7471d0ad9c82f6, type: 3}
+  range: 9
+  flightTime: 0.55
+  fireTick: 0.35
+  impactDamage: 1.5
+  evoBottles: 8
+  evoDamage: 22
+  evoRadius: 3
+  evoDuration: 6
+  evoCooldown: 2.4
+  levels:
+  - text: Lance un cocktail qui embrase le sol et les ennemis.
+    bottles: 1
+    damage: 8
+    radius: 1.8
+    duration: 3
+    cooldown: 2.5
+  - text: +1 bouteille
+    bottles: 2
+    damage: 8
+    radius: 1.8
+    duration: 3
+    cooldown: 2.4
+  - text: "Feu plus large, plus long, d\xE9g\xE2ts +40%"
+    bottles: 2
+    damage: 11
+    radius: 2.1
+    duration: 3.5
+    cooldown: 2.2
+  - text: +1 bouteille, recharge rapide
+    bottles: 3
+    damage: 11
+    radius: 2.2
+    duration: 3.5
+    cooldown: 2
+  - text: "+1 bouteille, d\xE9g\xE2ts +25%, feu g\xE9ant"
+    bottles: 4
+    damage: 14
+    radius: 2.5
+    duration: 4
+    cooldown: 1.9
+--- !u!114 &682253636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9630331829f85954a8779f607b26f00a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.MacheteWeapon
+  displayName: Machettes
+  color: {r: 0.8, g: 0.85, b: 0.95, a: 1}
+  unlockCost: 0
+  bladePrefab: {fileID: 8568141812938123448, guid: 6782734e032d8a146bd2141585199513, type: 3}
+  hitCooldown: 0.45
+  knockback: 7
+  bladeHitRadius: 0.7
+  evoDamage: 34
+  evoBlades: 8
+  evoMinRadius: 2.2
+  evoMaxRadius: 5
+  evoSpin: 380
+  levels:
+  - text: Deux machettes tournent autour de toi.
+    damage: 10
+    blades: 2
+    radius: 2.2
+    spinSpeed: 230
+  - text: +1 machette
+    damage: 11
+    blades: 3
+    radius: 2.3
+    spinSpeed: 240
+  - text: "D\xE9g\xE2ts +45%, zone plus large"
+    damage: 16
+    blades: 3
+    radius: 2.5
+    spinSpeed: 260
+  - text: +1 machette, rotation rapide
+    damage: 17
+    blades: 4
+    radius: 2.7
+    spinSpeed: 290
+  - text: "+1 machette, d\xE9g\xE2ts +40%"
+    damage: 24
+    blades: 5
+    radius: 3
+    spinSpeed: 310
+--- !u!114 &682253637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 706d05f4bbee2374eb8dfc609ee28d01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.ShotgunWeapon
+  displayName: "Fusil \xE0 pompe"
+  color: {r: 1, g: 0.55, b: 0.3, a: 1}
+  unlockCost: 0
+  pelletPrefab: {fileID: 8526346385847345403, guid: 0f96d2f00d5c47d439df587537eb7100, type: 3}
+  range: 7.5
+  pelletSpeed: 22
+  spreadDegrees: 55
+  evoDamage: 24
+  evoPellets: 14
+  evoCooldown: 0.7
+  evoExplodeRadius: 1.4
+  levels:
+  - text: "Rafale de plombs en c\xF4ne, gros recul."
+    damage: 8
+    pellets: 6
+    cooldown: 1.25
+    knockback: 7
+    pierce: 0
+  - text: +2 plombs
+    damage: 8
+    pellets: 8
+    cooldown: 1.15
+    knockback: 7
+    pierce: 0
+  - text: "D\xE9g\xE2ts +50%, les plombs traversent 1 ennemi"
+    damage: 12
+    pellets: 8
+    cooldown: 1
+    knockback: 8
+    pierce: 1
+  - text: +2 plombs, recharge rapide
+    damage: 13
+    pellets: 10
+    cooldown: 0.9
+    knockback: 8
+    pierce: 1
+  - text: "+2 plombs, d\xE9g\xE2ts +40%, traverse 2 ennemis"
+    damage: 18
+    pellets: 12
+    cooldown: 0.75
+    knockback: 10
+    pierce: 2
+--- !u!114 &682253638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3278657194d4dd4fa3e3c560835bbb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.RevolverWeapon
+  displayName: Revolver
+  color: {r: 1, g: 0.8, b: 0.4, a: 1}
+  unlockCost: 0
+  bulletPrefab: {fileID: 6853629409002717990, guid: da711f26feca13d4483cc6362a4b69a2, type: 3}
+  range: 14
+  bulletSpeed: 26
+  knockback: 3
+  evoDamage: 34
+  evoCooldown: 0.1
+  evoPierce: 2
+  evoRicochet: 2
+  levels:
+  - text: Tire sur l'ennemi le plus proche.
+    damage: 13
+    cooldown: 0.7
+    bullets: 1
+    pierce: 0
+  - text: +1 balle (vise un autre ennemi)
+    damage: 13
+    cooldown: 0.65
+    bullets: 2
+    pierce: 0
+  - text: "D\xE9g\xE2ts +40%, les balles traversent 1 ennemi"
+    damage: 18
+    cooldown: 0.6
+    bullets: 2
+    pierce: 1
+  - text: +1 balle, cadence +15%
+    damage: 18
+    cooldown: 0.52
+    bullets: 3
+    pierce: 1
+  - text: "+1 balle, d\xE9g\xE2ts +40%, traverse 2 ennemis"
+    damage: 25
+    cooldown: 0.42
+    bullets: 4
+    pierce: 2
+--- !u!114 &682253639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b9c8218ccf5a8c419264a04c5b6d694, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.UpgradeManager
+  startingWeapon: {fileID: 682253638}
+  maxWeapons: 5
+  maxPassives: 6
+--- !u!114 &682253640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64b6e42c47e5bcf4e928565cb998ae87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.PlayerXP
+  xpBase: 2
+  xpLinear: 1.1
+  xpCubic: 0.07
+  xpPower: 3
+--- !u!114 &682253641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c851050fbbe037b4a93aae41d1a53ceb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.PlayerHealth
+  bodyRenderer: {fileID: 536211632}
+  hurtMaterial: {fileID: 2100000, guid: b269fdcd2b08acb418820f356808a98f, type: 2}
+  invulnerability: 0.35
+  regenDelayAfterHit: 2
+--- !u!114 &682253642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b40ec4e3dc29a848ba5efc7c3b7effe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.PlayerController
+  joystickRadius: 130
+  radius: 0.4
+  mapHalfSize: 190
+  visual: {fileID: 1185530577}
+--- !u!114 &682253643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 750d6ee6a0066f64589a19e83b9b87a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.PlayerStats
+  moveSpeed: 5.2
+  maxHealth: 100
+  regen: 0
+  calmRegen: 0
+  armor: 0
+  pickupRadius: 2.8
+  xpMult: 1
+  goldMult: 1
+  damageMult: 1.15
+  cooldownMult: 1
+  areaMult: 1
+  durationMult: 1
+  extraProjectiles: 0
+  critChance: 0.05
+  critMult: 2
+  ricochets: 0
+  burnChance: 0
+  corpseExplodeChance: 0
+  lifeStealChance: 0
+  burnPower: 1
+  bleedPower: 0
+  shockChance: 0
+  poisonChance: 0
+  bulletExplodeChance: 0
+  shockPoison: 0
+  bladeIgnite: 0
+  lowHpDamage: 0
+  rerolls: 1
+  banishes: 3
+  luck: 0
+--- !u!136 &682253644
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!54 &682253645
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 682253627}
+  serializedVersion: 5
+  m_Mass: 4
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 116
+  m_CollisionDetection: 0
+--- !u!1 &1145095233
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1145095236}
+  - component: {fileID: 1145095235}
+  - component: {fileID: 1145095234}
+  m_Layer: 0
+  m_Name: Ground
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &1145095234
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145095233}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 20aec6174494f75468ce6822568d5c74, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1145095235
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145095233}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1145095236
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145095233}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 40, y: 1, z: 40}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1185530576
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1185530577}
+  m_Layer: 0
+  m_Name: Visual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1185530577
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185530576}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 536211631}
+  - {fileID: 1628545766}
+  m_Father: {fileID: 682253628}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1234672007
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234672018}
+  - component: {fileID: 1234672017}
+  - component: {fileID: 1234672016}
+  - component: {fileID: 1234672015}
+  - component: {fileID: 1234672014}
+  - component: {fileID: 1234672013}
+  - component: {fileID: 1234672012}
+  - component: {fileID: 1234672011}
+  - component: {fileID: 1234672010}
+  - component: {fileID: 1234672009}
+  - component: {fileID: 1234672008}
+  m_Layer: 0
+  m_Name: Game
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1234672008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0174840da1ac4084794973fddfff4083, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.MenuScreen
+--- !u!114 &1234672009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a16db6890292e094a91885e35fe59bec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.GameHUD
+--- !u!114 &1234672010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e50d0f0ff11d86e4fa9c2c286ce3f21e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.DamageNumbers
+  show: 1
+  poolSize: 80
+  lifetime: 0.6
+--- !u!114 &1234672011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60370f05d4392ca48bc229abf9d1ca42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.Loot
+  gemPrefab: {fileID: 4300646424330301143, guid: f30b5ff9064212041857d1d871e7f234, type: 3}
+  healthPrefab: {fileID: 7574021890087133950, guid: bbfbdf47bbe505b4b88e6744205a5412, type: 3}
+  magnetPrefab: {fileID: 180126176066331961, guid: 7b6992a818af8ac4f8df67948fb99fd1, type: 3}
+  chestPrefab: {fileID: 3367808246791004511, guid: d251845ceb892d042b218bec6bcd3071, type: 3}
+  coinPrefab: {fileID: 8582561259173466438, guid: 20ef8a74c7fd94f4198c4323cb860a1a, type: 3}
+  rewardChestPrefab: {fileID: 2177223389665117190, guid: af808dfe7d6a9ea49886778c00ab43cf, type: 3}
+  healthChance: 0.01
+  healthMinInterval: 12
+  eliteHealthChance: 0.3
+  crateHealthChance: 0.3
+  magnetChance: 0.004
+  coinChance: 0.03
+  maxGems: 250
+--- !u!114 &1234672012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c44dd3cb36e224c8e9f5245e07a7ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.ArenaEvents
+  barrel: {fileID: 11400000, guid: 4a652fe3b2892a949ab96aa93116e064, type: 2}
+  barrelInterval: 7
+  maxBarrels: 7
+  startBarrels: 3
+  crate: {fileID: 11400000, guid: ab9c1ce2af5170448895102c9bf0667b, type: 2}
+  firstSupplyTime: 30
+  supplyEvery: 70
+  dropHeight: 14
+  frenzyFirstCombo: 400
+  frenzyComboGrowth: 600
+  frenzyComboScale: 1
+  frenzyDuration: 8
+  frenzyCooldownMult: 0.5
+  frenzySpeedMult: 1.2
+  firstChallengeTime: 85
+  challengeInterval: 110
+  challengeDuration: 20
+  challengeStreamFactor: 1.1
+  challengeMinKills: 30
+--- !u!114 &1234672013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baff1b1b591d46a4eadac0b1065f46ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.RunDirector
+  entries:
+  - enemy: {fileID: 11400000, guid: 69f3a05d11d47864b85942080e757859, type: 2}
+    startTime: 0
+    endTime: 99999
+    weight: 1
+    weightPerMinute: -0.05
+    minWeight: 0.45
+    maxWeight: 0
+    groupSize: 1
+  - enemy: {fileID: 11400000, guid: 17ed8bd979c87d84f85de3b090961a70, type: 2}
+    startTime: 20
+    endTime: 99999
+    weight: 0.25
+    weightPerMinute: 0
+    minWeight: 0.05
+    maxWeight: 0
+    groupSize: 4
+  - enemy: {fileID: 11400000, guid: 9924dba8f8f326a47bd81cb628dc8969, type: 2}
+    startTime: 45
+    endTime: 99999
+    weight: 0.5
+    weightPerMinute: 0.05
+    minWeight: 0.05
+    maxWeight: 0.9
+    groupSize: 1
+  - enemy: {fileID: 11400000, guid: b7994eec6890c7345b0eb22a9ff12e04, type: 2}
+    startTime: 90
+    endTime: 99999
+    weight: 0.1
+    weightPerMinute: 0.01
+    minWeight: 0.05
+    maxWeight: 0.2
+    groupSize: 1
+  - enemy: {fileID: 11400000, guid: 2e279da8d6afd964ba33209c8ef927b1, type: 2}
+    startTime: 100
+    endTime: 99999
+    weight: 0.2
+    weightPerMinute: 0
+    minWeight: 0.05
+    maxWeight: 0
+    groupSize: 1
+  - enemy: {fileID: 11400000, guid: fb019997d7ff90a488828167d8189e00, type: 2}
+    startTime: 130
+    endTime: 99999
+    weight: 0.15
+    weightPerMinute: 0.03
+    minWeight: 0.05
+    maxWeight: 0.45
+    groupSize: 1
+  - enemy: {fileID: 11400000, guid: 29219d12c90c3ab478c11fbbd1ddeb16, type: 2}
+    startTime: 150
+    endTime: 99999
+    weight: 0.25
+    weightPerMinute: 0.02
+    minWeight: 0.05
+    maxWeight: 0.45
+    groupSize: 1
+  spawnMargin: 2
+  aheadChance: 0.15
+  baseRate: 1
+  ratePerMinute: 1.7
+  earlyRamp: 0.5
+  maxRate: 45
+  maxAlive: 320
+  hardCap: 380
+  waveLength: 50
+  buildTime: 30
+  peakTime: 12
+  buildStartMult: 0.7
+  buildEndMult: 1.3
+  peakMult: 1.35
+  lullSilence: 5
+  lullMult: 0.3
+  rhythmRampMinutes: 1.5
+  bossStreamMult: 0.6
+  healthPerMinute: 0.15
+  healthPerMinuteSquared: 0.03
+  endlessHealthPerMinuteSquared: 0.04
+  endlessDamagePerMinute: 0.03
+  damagePerMinute: 0.07
+  xpPerMinute: 0.03
+  firstEliteTime: 55
+  eliteInterval: 40
+  hordeEnemy: {fileID: 11400000, guid: 69f3a05d11d47864b85942080e757859, type: 2}
+  hordeFastEnemy: {fileID: 11400000, guid: 9924dba8f8f326a47bd81cb628dc8969, type: 2}
+  hordeKamikaze: {fileID: 11400000, guid: b7994eec6890c7345b0eb22a9ff12e04, type: 2}
+  hordeHeavyEnemy: {fileID: 11400000, guid: fb019997d7ff90a488828167d8189e00, type: 2}
+  hordeHeavyFromMinute: 5
+  hordeBaseCount: 12
+  hordeCountPerMinute: 6
+  hordeMaxCount: 100
+  assaultRangedEnemy: {fileID: 11400000, guid: 29219d12c90c3ab478c11fbbd1ddeb16, type: 2}
+  assaultMixFromMinute: 2.5
+  assaultBaseCount: 8
+  assaultCountPerMinute: 3.5
+  assaultMaxCount: 60
+  ratEnemy: {fileID: 11400000, guid: 17ed8bd979c87d84f85de3b090961a70, type: 2}
+  firstRatTime: 62
+  ratInterval: 80
+  ratBaseCount: 28
+  ratCountPerMinute: 4
+  goldenEnemy: {fileID: 11400000, guid: 9ed5eb2809fed384f9561ce6b5d59751, type: 2}
+  firstGoldenTime: 105
+  goldenInterval: 120
+  goldenCount: 12
+  thiefEnemy: {fileID: 11400000, guid: 3c701b7b3c6b2f642b3336e3d67107ca, type: 2}
+  firstThiefTime: 72
+  thiefInterval: 95
+  boss: {fileID: 11400000, guid: afd43eff4fe572249b4357258100b0a3, type: 2}
+  firstBossTime: 200
+  bossInterval: 200
+  bossHealthGrowth: 0.6
+--- !u!114 &1234672014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc484916ac174ab4ba8866caacb23d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.GameFX
+  bloodParticleMaterial: {fileID: 2100000, guid: a158ead7a2997d44a9a87ae58cbf9c76, type: 2}
+  bloodSplatPrefab: {fileID: 490447717399127265, guid: 83298dd54b9bbca46b6245ae8c458f7f, type: 3}
+  maxSplats: 150
+  gibMaterial: {fileID: 2100000, guid: 3e148e3383391e64799ba6f01adb0f33, type: 2}
+  glowParticleMaterial: {fileID: 2100000, guid: 2b1c729dcdeedd047b608e24874b60fa, type: 2}
+  ringMaterial: {fileID: 2100000, guid: 4450df7617221c344851fb5ccc8797a7, type: 2}
+  glowMaterial: {fileID: 2100000, guid: 8fb2b558ca8992b49b4ce26444750e01, type: 2}
+  lineMaterial: {fileID: 2100000, guid: 1baa5e4fcf5d5d841a6f33039a7e3064, type: 2}
+--- !u!114 &1234672015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d602c3d9d484634386e412f9b14c215, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.Combat
+--- !u!114 &1234672016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77cbbc2dd4792834ea11ec5f1eec5c54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.Pool
+--- !u!114 &1234672017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1a9eccb32766e240963e178e90e890c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.GameManager
+  levelUpNovaRadius: 4.5
+  levelUpNovaDamage: 10
+--- !u!4 &1234672018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234672007}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1628545765
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1628545766}
+  - component: {fileID: 1628545768}
+  - component: {fileID: 1628545767}
+  m_Layer: 0
+  m_Name: Gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1628545766
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628545765}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.38, y: 1.1, z: 0.45}
+  m_LocalScale: {x: 0.14, y: 0.16, z: 0.6}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1185530577}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1628545767
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628545765}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 44eeb8aca502901409928afe96dae5a8, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1628545768
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628545765}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1946172647
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1946172649}
+  - component: {fileID: 1946172648}
+  m_Layer: 0
+  m_Name: Directional Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!108 &1946172648
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946172647}
+  m_Enabled: 1
+  serializedVersion: 13
+  m_Type: 1
+  m_Color: {r: 1, g: 0.9, b: 0.78, a: 1}
+  m_Intensity: 1.5
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 2
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShapeRadius: 0.025
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!4 &1946172649
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1946172647}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.44037747, y: -0.26672933, z: 0.13885048, w: 0.8459573}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2107933732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2107933737}
+  - component: {fileID: 2107933736}
+  - component: {fileID: 2107933735}
+  - component: {fileID: 2107933734}
+  - component: {fileID: 2107933733}
+  m_Layer: 0
+  m_Name: Main Camera
+  m_TagString: MainCamera
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2107933733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107933732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dba4c6302cbae204a8e8548a4300af81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.CameraFollow
+  target: {fileID: 682253628}
+  offset: {x: 0, y: 15, z: -8.5}
+  minVisibleWidth: 11
+  smoothing: 10
+  maxShake: 0.6
+  fogStartPadding: 6
+  fogEndPadding: 30
+--- !u!114 &2107933734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107933732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
+--- !u!81 &2107933735
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107933732}
+  m_Enabled: 1
+--- !u!20 &2107933736
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107933732}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.07, g: 0.07, b: 0.08, a: 1}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 80
+  field of view: 50
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &2107933737
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2107933732}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5034816, y: -0, z: -0, w: 0.864006}
+  m_LocalPosition: {x: 0, y: 15, z: -8.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 1946172649}
+  - {fileID: 1145095236}
+  - {fileID: 682253628}
+  - {fileID: 2107933737}
+  - {fileID: 662383663}
+  - {fileID: 1234672018}
+  - {fileID: 623479658}
