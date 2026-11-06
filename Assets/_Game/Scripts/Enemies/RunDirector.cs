@@ -90,8 +90,9 @@ namespace Survivor
         [Header("Scaling (per minute)")]
         public float healthPerMinute = 0.15f;
         public float healthPerMinuteSquared = 0.03f;
-        [Tooltip("Endless only: extra toughness so a strong build still falls around 15-20 min.")]
-        public float endlessHealthPerMinuteSquared = 0.04f;
+        [Tooltip("Endless only: extra toughness so a strong build still falls around 15-20 min. 0.04 -> 0.01 with the 20-level " +
+                 "stuff: builds stop growing around 5 min, the base curve does the rest.")]
+        public float endlessHealthPerMinuteSquared = 0.01f;
         public float endlessDamagePerMinute = 0.03f;
         public float damagePerMinute = 0.07f;
         [Tooltip("XP per enemy grows this much per minute. Kept low: the stream already grows, the XP curve (PlayerXP) does the pacing.")]
@@ -148,6 +149,81 @@ namespace Survivor
         [Tooltip("Each new boss gets this much more health (0.6 = +60%).")]
         public float bossHealthGrowth = 0.6f;
 
+        [Header("Danger tiers (endless): every dangerStep seconds the arena adds a rule, announced (Docs/Pacing.md)")]
+        [Tooltip("Seconds per danger tier. 150 = a new tier at 2:30, 5:00, 7:30...")]
+        public float dangerStep = 150f;
+        [Tooltip("From tier 8 (Apocalypse): extra enemy health and damage per tier.")]
+        public float apocalypsePerTier = 0.12f;
+
+        /// <summary>Danger tier of the run (1 at the start; endless only, always 1 in the campaign).</summary>
+        public int Danger { get; private set; } = 1;
+        /// <summary>Fired when the danger tier goes up (new tier).</summary>
+        public event Action<int> DangerChanged;
+
+        /// <summary>Name and rule of each tier (index = tier - 1); tier 8 and up are all "Apocalypse".</summary>
+        public static readonly string[,] DangerTiers =
+        {
+            { "Crépuscule", "Le début de la nuit" },
+            { "Les coureurs", "Plus de coureurs" },
+            { "Pluie d'acide", "Les cracheurs se multiplient" },
+            { "Élites enragées", "Élites plus fréquentes, +1 affixe" },
+            { "La marée", "Hordes et assauts 30% plus gros" },
+            { "Les colosses", "Les brutes déferlent" },
+            { "Nuit rouge", "Ennemis 10% plus rapides" },
+            { "Apocalypse", "+12% PV et dégâts à chaque palier" },
+        };
+
+        public static string DangerName(int tier)
+        {
+            int i = Mathf.Clamp(tier, 1, DangerTiers.GetLength(0)) - 1;
+            int extra = tier - DangerTiers.GetLength(0);
+            return extra > 0 ? $"{DangerTiers[i, 0]} {extra + 1}" : DangerTiers[i, 0];
+        }
+
+        public static string DangerRule(int tier) => DangerTiers[Mathf.Clamp(tier, 1, DangerTiers.GetLength(0)) - 1, 1];
+
+        /// <summary>Yellow at tier 1, deep red from tier 7.</summary>
+        public static Color DangerColor(int tier) => Color.Lerp(new Color(1f, 0.85f, 0.3f), new Color(1f, 0.15f, 0.1f), Mathf.Clamp01((tier - 1) / 6f));
+
+        bool DangerOn => !RunConfig.IsCampaign;
+        float DangerHealthMult => 1f + apocalypsePerTier * Mathf.Max(0, Danger - DangerTiers.GetLength(0) + 1);
+
+        /// <summary>Stream weight multiplier of an enemy type at the current tier.</summary>
+        float DangerWeight(EnemyData e)
+        {
+            if (!DangerOn || !e) return 1f;
+            // Tiers 2-3 stay gentle: they land around the 3:00 horde and the first boss (a 1.6x first try killed
+            // focused builds at 4:44); the late tiers can hit harder.
+            if (e == hordeFastEnemy && Danger >= 2) return 1.35f;
+            if (e == assaultRangedEnemy && Danger >= 3) return 1.45f;
+            if (e == hordeHeavyEnemy && Danger >= 6) return 1.7f;
+            return 1f;
+        }
+
+        float DangerEliteInterval => DangerOn && Danger >= 4 ? 0.7f : 1f;
+        float DangerHordeMult => DangerOn && Danger >= 5 ? 1.3f : 1f;
+
+        void UpdateDanger(float time)
+        {
+            if (!DangerOn || dangerStep <= 0f) return;
+            int tier = 1 + Mathf.FloorToInt(time / dangerStep);
+            if (tier <= Danger) return;
+            Danger = tier;
+            // One-shot rules (statics reset with each run by RunModifiers.ResetStatics).
+            if (tier == 4) RunModifiers.ExtraEliteAffixes += 1;
+            if (tier == 7) RunModifiers.EnemySpeedMult *= 1.1f;
+            DangerChanged?.Invoke(tier);
+
+            Color c = DangerColor(tier);
+            if (GameHUD.Instance)
+            {
+                GameHUD.Instance.QueueBanner($"<size=96>DANGER {tier}</size>\n<size=52>{DangerName(tier)}</size>\n<size=36>{DangerRule(tier)}</size>", c, 2.8f);
+                GameHUD.Instance.ScreenFlash(new Color(c.r * 0.6f, c.g * 0.15f, 0.05f), 0.35f);
+            }
+            SFX.Play(SfxId.Alert, 0.9f, 0.75f);
+            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.2f);
+        }
+
         public Enemy CurrentBoss { get; private set; }
         public float Minutes => GameManager.Instance ? GameManager.Instance.RunTime / 60f : 0f;
 
@@ -181,6 +257,7 @@ namespace Survivor
         void Start()
         {
             Threats.ApplyToDirector(this); // ranked threats: scales this run's boss / elite timers (defaults untouched)
+            Enemy.ResetAffixRolls();
             nextBoss = firstBossTime;
             nextElite = firstEliteTime;
             nextRats = firstRatTime;
@@ -189,9 +266,9 @@ namespace Survivor
             lastPeakWave = 0; // wave 0's peak is stream only (no horde in the first minute)
         }
 
-        public float HealthMult(float minutes) => 1f + healthPerMinute * minutes
-            + (healthPerMinuteSquared + (RunConfig.IsCampaign ? 0f : endlessHealthPerMinuteSquared)) * minutes * minutes;
-        public float DamageMult(float minutes) => 1f + (damagePerMinute + (RunConfig.IsCampaign ? 0f : endlessDamagePerMinute)) * minutes;
+        public float HealthMult(float minutes) => (1f + healthPerMinute * minutes
+            + (healthPerMinuteSquared + (RunConfig.IsCampaign ? 0f : endlessHealthPerMinuteSquared)) * minutes * minutes) * DangerHealthMult;
+        public float DamageMult(float minutes) => (1f + (damagePerMinute + (RunConfig.IsCampaign ? 0f : endlessDamagePerMinute)) * minutes) * DangerHealthMult;
         public float XPMult(float minutes) => 1f + xpPerMinute * minutes;
 
         /// <summary>Base stream (picks per second) before the wave multiplier.</summary>
@@ -209,6 +286,7 @@ namespace Survivor
 
             float time = gm.RunTime;
             float minutes = time / 60f;
+            UpdateDanger(time);
 
             float waveMult = UpdateWave(time, minutes);
             bool bossAlive = CurrentBoss;
@@ -249,14 +327,16 @@ namespace Survivor
             // ---- Elites: any phase but the peak (never stacked on a horde), pushed to the lull if needed. ----
             if (time >= nextElite && Phase != WavePhase.Peak)
             {
-                nextElite = Mathf.Max(nextElite + eliteInterval, time + eliteInterval * 0.5f);
+                float interval = eliteInterval * DangerEliteInterval;
+                nextElite = Mathf.Max(nextElite + interval, time + interval * 0.5f);
                 SpawnElite(time, minutes);
             }
 
             // ---- Boss: on its timer (Campaign reads firstBossTime / bossInterval for the boss star). ----
-            if (time >= nextBoss)
+            // Never two bosses at once: a boss still alive at its successor's time delays it until it dies.
+            if (time >= nextBoss && !bossAlive)
             {
-                nextBoss += bossInterval;
+                nextBoss = Mathf.Max(nextBoss + bossInterval, time + bossInterval * 0.5f);
                 lastEvent = time;
                 SpawnBoss(minutes);
                 return;
@@ -347,7 +427,7 @@ namespace Survivor
             if (!hordeEnemy) return;
 
             // Evenly spread all around the screen edges: the player is surrounded whatever the orientation.
-            int count = Mathf.RoundToInt((hordeBaseCount + hordeCountPerMinute * minutes) * RunConfig.SpawnRateMult);
+            int count = Mathf.RoundToInt((hordeBaseCount + hordeCountPerMinute * minutes) * RunConfig.SpawnRateMult * DangerHordeMult);
             count = Mathf.Min(count, hordeMaxCount, hardCap - Enemy.Active.Count);
             if (count <= 0) return;
 
@@ -376,7 +456,7 @@ namespace Survivor
         {
             if (!hordeEnemy) return;
 
-            int count = Mathf.RoundToInt((assaultBaseCount + assaultCountPerMinute * minutes) * RunConfig.SpawnRateMult);
+            int count = Mathf.RoundToInt((assaultBaseCount + assaultCountPerMinute * minutes) * RunConfig.SpawnRateMult * DangerHordeMult);
             count = Mathf.Min(count, assaultMaxCount, hardCap - Enemy.Active.Count);
             if (count <= 0) return;
 
@@ -581,14 +661,14 @@ namespace Survivor
             float minutes = time / 60f;
             float total = 0f;
             foreach (var e in entries)
-                if (e.enemy && time >= e.startTime && time < e.endTime) total += e.WeightAt(minutes);
+                if (e.enemy && time >= e.startTime && time < e.endTime) total += e.WeightAt(minutes) * DangerWeight(e.enemy);
             if (total <= 0f) return null;
 
             float roll = Random.value * total;
             foreach (var e in entries)
             {
                 if (!e.enemy || time < e.startTime || time >= e.endTime) continue;
-                roll -= e.WeightAt(minutes);
+                roll -= e.WeightAt(minutes) * DangerWeight(e.enemy);
                 if (roll <= 0f) return e;
             }
             return null;

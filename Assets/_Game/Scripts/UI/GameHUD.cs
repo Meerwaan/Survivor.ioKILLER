@@ -34,7 +34,7 @@ namespace Survivor
         CanvasGroup cardsGroup;
         float cardsReadyAt;
 
-        int shownSeconds = -1, shownKills = -1, shownLevel = -1, shownScore = -1, shownGold = -1, shownCombo = -1;
+        int shownSeconds = -1, shownKills = -1, shownLevel = -1, shownScore = -1, shownGold = -1, shownCombo = -1, shownBuild = -1;
 
         static readonly Color EvoCard = new(0.2f, 0.08f, 0.26f, 0.97f);
 
@@ -85,7 +85,10 @@ namespace Survivor
             if (state == GameState.Paused)
             {
                 pauseBuild.text = DescribeBuild();
-                pausePerks.text = RunModifiers.Instance ? RunModifiers.Instance.Describe() : "";
+                // Set bonuses first (they come from the stuff), then relics and pacts.
+                string sets = Synergies.DescribeActive();
+                string perks = RunModifiers.Instance ? RunModifiers.Instance.Describe() : "";
+                pausePerks.text = sets.Length > 0 ? sets + "\n" + perks : perks;
                 FillBuildRow(pauseBuildRow);
                 RefreshMuteLabel();
             }
@@ -142,18 +145,34 @@ namespace Survivor
 
             // Next goal: the record first (if close), else the next medal.
             string line;
-            if (!recordDone) line = $"Record : {goalBest}";
+            if (!recordDone) line = $"Record : {Medals.FormatScore(goalBest)}";
             else if (Medals.Next(board, score, out var next, out int at)) line = $"<color=#{ColorUtility.ToHtmlStringRGB(Medals.ColorOf(next))}>{Medals.Name(next)}</color> à {at}";
             else line = $"<color=#{ColorUtility.ToHtmlStringRGB(Medals.ColorOf(Medal.Legende))}>Légende !</color>";
             if (goalMedal != Medal.None) line = $"<color=#{ColorUtility.ToHtmlStringRGB(Medals.ColorOf(goalMedal))}>● {Medals.Name(goalMedal)}</color>   " + line;
-            goalText.text = line;
+            goalText.text = line + PaceLine(board, score);
+        }
+
+        /// <summary>
+        /// Live comparison with the personal-best run at the same moment (a "ghost"): "+3 200 vs record" in green,
+        /// "-1 100 vs record" in red; once past the record run's length, how far from its final score.
+        /// </summary>
+        static string PaceLine(string board, int score)
+        {
+            var prog = RunProgress.Find(board);
+            if (prog == null || prog.pace.Count == 0) return "";
+            int rec = RunProgress.RecordAt(board, GameManager.Instance.RunTime);
+            int d = rec >= 0 ? score - rec : score - prog.paceFinal;
+            string amount = Medals.FormatScore(Mathf.Abs(d));
+            if (rec < 0)
+                return d >= 0 ? $"\n<color=#FFD94D>RECORD BATTU  +{amount}</color>" : $"\n<color=#FF9A70>Encore {amount} pour le record</color>";
+            return d >= 0 ? $"\n<color=#8CFF7A>+{amount} vs record</color>" : $"\n<color=#FF7070>-{amount} vs record</color>";
         }
 
         /// <summary>One goal banner at a time, and never on top of an event banner.</summary>
         void UpdateGoalAnnounces()
         {
             if (goalAnnounces.Count == 0 || Time.unscaledTime < goalAnnounceAt) return;
-            if (bannerText.gameObject.activeSelf) return;
+            if (GameManager.Instance.State != GameState.Playing || bannerText.gameObject.activeSelf) return;
             var (text, color) = goalAnnounces.Dequeue();
             ShowBanner($"<size=90>{text}</size>", color, 1.6f);
             ScreenFlash(color, 0.25f);
@@ -170,6 +189,7 @@ namespace Survivor
             UIAnim.SlideIn(levelUpTitle.rectTransform, new Vector2(0, 60), 0f, 0.3f, 1.6f);
             ShowCards(options);
             FillBuildRow(levelUpBuild);
+            RefreshStuff();
             levelUpPanel.SetActive(true);
         }
 
@@ -183,10 +203,132 @@ namespace Survivor
             cardsReadyAt = Time.unscaledTime + 0.35f;
             cardsGroup.interactable = false;
 
-            int rerolls = UpgradeManager.Instance.RerollsLeft;
-            rerollButton.gameObject.SetActive(rerolls > 0);
+            // Full stuff (only evolutions left): rerolling or banishing can't change anything.
+            var um = UpgradeManager.Instance;
+            int rerolls = um.RerollsLeft;
+            rerollButton.gameObject.SetActive(rerolls > 0 && !um.BuildComplete);
             rerollLabel.text = $"RELANCER ({rerolls})";
             SetBanishMode(false);
+        }
+
+        /// <summary>Stuff gauge and its title on the level-up screen.</summary>
+        void RefreshStuff()
+        {
+            var um = UpgradeManager.Instance;
+            int used = um.BuildLevels, cap = um.BuildCap;
+            stuffTitle.text = um.BuildComplete
+                ? $"STUFF COMPLET  {Mathf.Min(used, cap)}/{cap}"
+                : $"TON STUFF  {used}/{cap}  <color=#{ColorUtility.ToHtmlStringRGB(UIKit.Muted)}><size=26>· {cap - used} niveau{(cap - used > 1 ? "x" : "")} libre{(cap - used > 1 ? "s" : "")}</size></color>";
+            FillStuffGauge(stuffGauge);
+        }
+
+        /// <summary>
+        /// One segment per stuff level (20 by default), colored by the item that uses it (weapons first), empty ones dark.
+        /// Shows at a glance how much room is left and where it went.
+        /// </summary>
+        public static void FillStuffGauge(RectTransform row)
+        {
+            foreach (Transform child in row) Destroy(child.gameObject);
+            var um = UpgradeManager.Instance;
+            if (!um) return;
+            var colors = new List<Color>();
+            foreach (var w in um.Weapons)
+                for (int i = 0; i < w.Level; i++) colors.Add(w.Evolved ? UpgradeManager.EvolutionColor : w.color);
+            foreach (var p in um.Passives)
+                for (int i = 0; i < p.level; i++) colors.Add(p.color);
+
+            int cap = um.BuildCap;
+            float width = row.rect.width > 1f ? row.rect.width : 900f, height = row.rect.height > 1f ? row.rect.height : 18f;
+            const float gap = 6f;
+            float seg = (width - gap * (cap - 1)) / cap;
+            for (int i = 0; i < cap; i++)
+            {
+                var r = UIKit.Rect("Seg", row);
+                r.anchorMin = r.anchorMax = new Vector2(0f, 0.5f);
+                r.pivot = new Vector2(0f, 0.5f);
+                r.anchoredPosition = new Vector2(i * (seg + gap), 0f);
+                r.sizeDelta = new Vector2(seg, height);
+                var img = UIKit.Image(r, i < colors.Count ? colors[i] : new Color(1f, 1f, 1f, 0.12f));
+                img.raycastTarget = false;
+            }
+        }
+
+        /// <summary>
+        /// Family labels stuck on the top edge of a card ("FEU", "EXPLOSIF"...): what set bonuses the item counts for.
+        /// Bonuses without a family say "UTILITAIRE" (they never count for a set).
+        /// </summary>
+        static void AddTagLabels(RectTransform card, UpgradeOption option)
+        {
+            if (option.kind == UpgradeKind.Bonus) return;
+            var list = new List<(string name, Color color)>();
+            foreach (var syn in Synergies.All)
+                if ((option.tags & syn.tag) != 0) list.Add((Synergies.TagName(syn.tag).ToUpperInvariant(), syn.color));
+            if (list.Count == 0)
+            {
+                if (option.kind != UpgradeKind.Passive) return;
+                list.Add(("UTILITAIRE", new Color(0.62f, 0.64f, 0.68f)));
+            }
+
+            float x = -26f;
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                var (name, color) = list[i];
+                var chip = UIKit.Rect("Tag " + name, card);
+                chip.anchorMin = chip.anchorMax = new Vector2(1f, 1f);
+                chip.pivot = new Vector2(1f, 0.5f);
+                UIKit.Image(chip, color).raycastTarget = false;
+                var label = UIKit.Label(chip, name, 24, new Color(0.06f, 0.06f, 0.07f), TextAnchor.MiddleCenter, FontStyle.Bold);
+                UIKit.Stretch(label.rectTransform);
+                var shadow = label.GetComponent<Shadow>();
+                if (shadow) shadow.enabled = false;
+                float w = Mathf.Max(80f, label.preferredWidth + 26f);
+                chip.sizeDelta = new Vector2(w, 34f);
+                chip.anchoredPosition = new Vector2(x, 0f);
+                x -= w + 8f;
+            }
+        }
+
+        // ---------- Queued banners (wait for a quiet moment instead of replacing an event banner) ----------
+
+        readonly Queue<(string text, Color color, float duration)> bannerQueue = new();
+        float nextQueuedBanner;
+
+        /// <summary>Shows this banner as soon as no other banner is up and the run is playing.</summary>
+        public void QueueBanner(string text, Color color, float duration) => bannerQueue.Enqueue((text, color, duration));
+
+        void UpdateBannerQueue()
+        {
+            if (bannerQueue.Count == 0 || Time.unscaledTime < nextQueuedBanner) return;
+            if (GameManager.Instance.State != GameState.Playing || bannerText.gameObject.activeSelf) return;
+            var (text, color, duration) = bannerQueue.Dequeue();
+            ShowBanner(text, color, duration);
+            nextQueuedBanner = Time.unscaledTime + duration + 0.6f;
+        }
+
+        /// <summary>A level-up once the stuff is full (GameManager.LevelBurst): a callout instead of the card screen.</summary>
+        public void ShowLevelBurst(int level, int scoreBonus)
+        {
+            // Own label under the timer: the multi-kill callouts the burst itself causes would overwrite a callout.
+            burstText.text = $"NIVEAU {level}  ·  <color=#FFFFFF>+{scoreBonus} pts</color>";
+            burstAge = 0f;
+            burstText.gameObject.SetActive(true);
+            UIAnim.SlideIn(burstText.rectTransform, new Vector2(0, 30), 0f, 0.25f, 1.5f);
+            ScreenFlash(UIKit.Gold, 0.25f);
+            xpPunch = 1f;
+        }
+
+        Text burstText;
+        float burstAge = 99f;
+        const float BurstShow = 1.8f;
+
+        void UpdateBurst(float dt)
+        {
+            if (!burstText.gameObject.activeSelf) return;
+            burstAge += dt;
+            var c = burstText.color;
+            c.a = Mathf.Clamp01((BurstShow - burstAge) / 0.5f);
+            burstText.color = c;
+            if (burstAge >= BurstShow) burstText.gameObject.SetActive(false);
         }
 
         void Reroll()
@@ -204,11 +346,16 @@ namespace Survivor
 
         void SetBanishMode(bool on)
         {
-            int left = UpgradeManager.Instance.BanishesLeft;
-            banishMode = on && left > 0;
-            banishButton.gameObject.SetActive(left > 0);
+            var um = UpgradeManager.Instance;
+            int left = um.BanishesLeft;
+            banishMode = on && left > 0 && !um.BuildComplete;
+            banishButton.gameObject.SetActive(left > 0 && !um.BuildComplete);
             banishLabel.text = banishMode ? "ANNULER" : $"BANNIR ({left})";
-            levelUpSub.text = banishMode ? "Touche la carte à bannir pour toute la partie" : "Choisis une amélioration";
+            int room = um.BuildRoom;
+            levelUpSub.text = banishMode ? "Touche la carte à bannir pour toute la partie"
+                : room <= 0 ? "Stuff complet : l'évolution est gratuite !"
+                : room == 1 ? "<color=#FFD94D>Dernier niveau de stuff : choisis bien !</color>"
+                : "Choisis une amélioration";
             levelUpSub.color = banishMode ? UIKit.Blood : UIKit.Muted;
         }
 
@@ -307,11 +454,19 @@ namespace Survivor
 
             xpFill.fillAmount = xp.Current / xp.Required;
 
-            if (xp.Level != shownLevel)
+            var um = UpgradeManager.Instance;
+            int build = um ? um.BuildLevels : 0;
+            if (xp.Level != shownLevel || build != shownBuild)
             {
-                if (shownLevel > 0) xpPunch = 1f;
+                if (shownLevel > 0 && xp.Level != shownLevel) xpPunch = 1f;
                 shownLevel = xp.Level;
-                levelText.text = $"Nv {shownLevel}";
+                shownBuild = build;
+                bool full = um && um.BuildComplete;
+                levelText.text = !um ? $"Nv {shownLevel}"
+                    : full ? $"Nv {shownLevel}   ·   <color=#FFD94D>STUFF COMPLET</color>"
+                    : $"Nv {shownLevel}   ·   Stuff {build}/{um.BuildCap}";
+                // Gold XP bar once the stuff is full: from now on every level is a burst.
+                xpFill.color = full ? UIKit.Gold : new Color(0.2f, 0.75f, 1f);
             }
             xpPunch = Mathf.MoveTowards(xpPunch, 0f, dt * 3f);
             xpBar.localScale = new Vector3(1f, 1f + xpPunch * 0.5f, 1f);
@@ -348,6 +503,8 @@ namespace Survivor
             }
 
             UpdateGoalAnnounces();
+            UpdateBannerQueue();
+            UpdateBurst(dt);
             UpdateCombo(dt);
             UpdateCallout(dt);
             UpdateVignette(dt);
@@ -532,19 +689,25 @@ namespace Survivor
         {
             var um = UpgradeManager.Instance;
             var sb = new System.Text.StringBuilder();
+            int used = um.BuildLevels, cap = um.BuildCap;
+            sb.Append(um.BuildComplete
+                ? $"<color=#FFD94D><b>STUFF COMPLET {Mathf.Min(used, cap)}/{cap}</b></color>\n"
+                : $"<color=#FFD94D><b>STUFF {used}/{cap}</b></color>  <size=30>({cap - used} libre{(cap - used > 1 ? "s" : "")})</size>\n");
             foreach (var w in um.Weapons)
             {
                 if (w.Level == 0) continue;
-                sb.Append(w.Evolved ? $"<color=#D9A6FF>{w.CurrentName}  ÉVO</color>\n" : $"{w.displayName}  Nv {w.Level}\n");
+                sb.Append(w.Evolved ? $"<size=38><color=#D9A6FF>{w.CurrentName}  ÉVO</color></size>\n" : $"<size=38>{w.displayName}  Nv {w.Level}/{w.MaxLevel}</size>\n");
             }
-            sb.Append('\n');
             int shown = 0;
             foreach (var p in um.Passives)
             {
                 if (p.level == 0) continue;
-                sb.Append($"<size=34>{p.name} {p.level}</size>");
+                sb.Append($"<size=32>{p.name} {p.level}/{p.maxLevel}</size>");
                 sb.Append(++shown % 2 == 0 ? "\n" : "     ");
             }
+            if (shown % 2 == 1) sb.Append('\n');
+            string absent = um.AbsentNames();
+            if (absent.Length > 0) sb.Append($"<size=28><color=#999999>Absentes cette partie : {absent}</color></size>");
             return sb.ToString();
         }
 
@@ -556,7 +719,7 @@ namespace Survivor
             var um = UpgradeManager.Instance;
             var items = new List<(string name, Color color, bool round, string badge)>();
             foreach (var w in um.Weapons)
-                if (w.Level > 0) items.Add((w.CurrentName, w.Evolved ? UpgradeManager.EvolutionColor : w.color, false, w.Evolved ? "EVO" : w.Level.ToString()));
+                if (w.Level > 0) items.Add((w.CurrentName, w.Evolved ? UpgradeManager.EvolutionColor : w.color, false, w.Evolved ? "ÉVO" : w.Level.ToString()));
             foreach (var p in um.Passives)
                 if (p.level > 0) items.Add((p.name, p.color, true, p.level.ToString()));
 
@@ -681,6 +844,11 @@ namespace Survivor
             UIKit.Place(challengeText.rectTransform, UIKit.Top, new Vector2(0, -228), new Vector2(800, 60));
             challengeText.gameObject.SetActive(false);
 
+            burstText = UIKit.Label(hudRoot, "", 44, UIKit.Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            // Below the timer, mode label, boss bar, challenge and frenzy lines; above the event banners.
+            UIKit.Place(burstText.rectTransform, UIKit.Top, new Vector2(0, -362), new Vector2(800, 56));
+            burstText.gameObject.SetActive(false);
+
             frenzyText = UIKit.Label(hudRoot, "", 48, ArenaEvents.FrenzyColor, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Place(frenzyText.rectTransform, UIKit.Top, new Vector2(0, -290), new Vector2(800, 64));
             frenzyText.gameObject.SetActive(false);
@@ -688,7 +856,8 @@ namespace Survivor
 
         // Level-up cards (BUILDS): 3 or 4 cards per hand, banish mode.
         Button banishButton;
-        Text banishLabel, levelUpSub;
+        Text banishLabel, levelUpSub, stuffTitle;
+        RectTransform stuffGauge;
         bool banishMode;
         int cardCount = 3;
 
@@ -711,10 +880,13 @@ namespace Survivor
             banishButton = UIKit.Button(panel, "BANNIR", UIKit.Dark, UIKit.Center, new Vector2(235, -510), new Vector2(450, 110), ToggleBanish, 44);
             banishLabel = banishButton.GetComponentInChildren<Text>();
 
-            var buildTitle = UIKit.Label(panel, "TON BUILD", 30, UIKit.Muted, TextAnchor.MiddleCenter, FontStyle.Bold);
-            UIKit.Place(buildTitle.rectTransform, UIKit.Center, new Vector2(0, -630), new Vector2(600, 50));
+            // Stuff: "TON STUFF 12/20" + one segment per level, then the item icons.
+            stuffTitle = UIKit.Label(panel, "TON STUFF", 32, UIKit.Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            UIKit.Place(stuffTitle.rectTransform, UIKit.Center, new Vector2(0, -608), new Vector2(1000, 46));
+            stuffGauge = UIKit.Rect("Stuff Gauge", panel);
+            UIKit.Place(stuffGauge, UIKit.Center, new Vector2(0, -648), new Vector2(940, 18));
             levelUpBuild = UIKit.Rect("Build", panel);
-            UIKit.Place(levelUpBuild, UIKit.Center, new Vector2(0, -710), new Vector2(1000, 90));
+            UIKit.Place(levelUpBuild, UIKit.Center, new Vector2(0, -716), new Vector2(1000, 90));
 
             levelUpPanel.SetActive(false);
         }
@@ -743,8 +915,9 @@ namespace Survivor
             RefreshMuteLabel();
 
             // Relics and pacts of this run (see RunModifiers).
+            // Below the SON button (it ends at -585): synergies first, then relics and pacts.
             pausePerks = UIKit.Label(panel, "", 30, Color.white, TextAnchor.UpperCenter);
-            UIKit.Place(pausePerks.rectTransform, UIKit.Center, new Vector2(0, -610), new Vector2(1040, 340));
+            UIKit.Place(pausePerks.rectTransform, UIKit.Center, new Vector2(0, -775), new Vector2(1040, 330));
             pausePerks.lineSpacing = 1.05f;
 
             pausePanel.SetActive(false);
@@ -865,6 +1038,8 @@ namespace Survivor
 
             // Part of the active Codex preset: just a reminder under the icon (the draw itself is untouched).
             if (option.inPreset) PresetBadge.Create(card, Vector2.zero, new Vector2(22, 16), 40f);
+
+            AddTagLabels(card, option);
 
             UIAnim.SlideIn(card, new Vector2(0, -260), 0.06f + index * 0.08f, 0.35f, 0.75f);
             if (evo) UIAnim.Pulse(card, 4f, 0.015f);

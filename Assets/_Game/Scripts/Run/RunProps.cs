@@ -194,6 +194,8 @@ namespace Survivor
     {
         public Perk Pact { get; private set; }
         public float TouchRadius => 1.3f;
+        /// <summary>Can't be sealed during its first 1.5 s: a player running forward must not take a curse before reading it.</summary>
+        public bool Armed => age >= 1.5f;
 
         Renderer pillar, core;
         GroundRing ring, inner;

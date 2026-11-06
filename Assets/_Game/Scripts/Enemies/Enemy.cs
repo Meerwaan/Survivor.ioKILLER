@@ -41,6 +41,9 @@ namespace Survivor
 
         /// <summary>Enemies this many meters off-screen are moved back in front of the player.</summary>
         const float RelocateMargin = 12f;
+        /// <summary>Boss leash: seconds spent this far off-screen before it is moved back in front of the player.</summary>
+        const float BossLeashMargin = 8f, BossLeashDelay = 6f;
+        float bossAway;
         const float EliteScale = 1.4f;
 
         static readonly Color ThiefSparkle = new(2.5f, 2f, 0.6f);
@@ -170,6 +173,7 @@ namespace Survivor
         {
             Data = data;
             SpawnId = ++spawnCounter;
+            bossAway = 0f;
             IsElite = elite && data.canBeElite && data.behaviour != EnemyBehaviour.Boss &&
                       data.behaviour != EnemyBehaviour.Prop && data.behaviour != EnemyBehaviour.Thief;
             spawnHealthMult = healthMultiplier;
@@ -216,15 +220,24 @@ namespace Survivor
         // ---------- Elite affixes / bounty ----------
 
         /// <summary>None in the first 90 s (the start is fragile), then 1, sometimes 2 from 7 min.</summary>
+        /// <summary>Elites rolled this run (seeded runs: the Nth elite gets the same affixes for everyone).</summary>
+        static int eliteRolls;
+
+        /// <summary>Called by RunDirector.Start: each run counts its elites from 0.</summary>
+        public static void ResetAffixRolls() => eliteRolls = 0;
+
         static EliteAffix RollAffixes()
         {
             float minutes = RunDirector.Instance ? RunDirector.Instance.Minutes : 0f;
-            int count = minutes < 1.5f ? 0 : minutes < 7f ? 1 : Random.value < 0.45f ? 2 : 1;
+            // Daily / weekly: affixes come from the seed and the elite's index, like the cards (fair for everyone).
+            System.Random seeded = RunConfig.Seed != 0 ? new System.Random(GameModes.Hash(RunConfig.Seed, 13 * 1000003 + ++eliteRolls, 0)) : null;
+            float roll = seeded != null ? (float)seeded.NextDouble() : Random.value;
+            int count = minutes < 1.5f ? 0 : minutes < 7f ? 1 : roll < 0.45f ? 2 : 1;
             count = Mathf.Min(3, count + RunModifiers.ExtraEliteAffixes);
             EliteAffix result = EliteAffix.None;
             for (int tries = 0; count > 0 && tries < 20; tries++)
             {
-                var a = AllAffixes[Random.Range(0, AllAffixes.Length)];
+                var a = AllAffixes[seeded != null ? seeded.Next(0, AllAffixes.Length) : Random.Range(0, AllAffixes.Length)];
                 if ((result & a) != 0) continue;
                 result |= a;
                 count--;
@@ -499,6 +512,20 @@ namespace Survivor
             {
                 Relocate(player);
                 return;
+            }
+
+            // A boss left far behind catches up after a few seconds: while it lives there are no hordes,
+            // so outrunning it must never be a safe way to farm the time score.
+            if (IsBoss && view)
+            {
+                if (view.IsInView(rb.position, BossLeashMargin)) bossAway = 0f;
+                else if ((bossAway += Time.deltaTime) >= BossLeashDelay)
+                {
+                    bossAway = 0f;
+                    Relocate(player);
+                    if (GameHUD.Instance) GameHUD.Instance.ShowBanner("LE BOSS TE RATTRAPE !", UIKit.Blood, 1.4f);
+                    return;
+                }
             }
 
             Vector3 move = dir;

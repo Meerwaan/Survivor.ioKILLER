@@ -37,7 +37,7 @@ namespace Survivor
             codexQuiet = false;
 
             MetaUI.Text(page, "CODEX", 70, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 785), new Vector2(640, 90), FontStyle.Bold);
-            MetaUI.Text(page, "Tout le monde à armes égales : c'est le hasard qui fait ton set.", 28, UIKit.Muted,
+            MetaUI.Text(page, "Tout le monde à armes égales : c'est le hasard qui fait ton stuff.", 28, UIKit.Muted,
                 TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 712), new Vector2(1040, 50));
             for (int i = 0; i < CodexTabs.Length; i++) CodexTabButton(i);
 
@@ -84,6 +84,7 @@ namespace Survivor
 
         float CodexWeapons(RectTransform content, UpgradeManager um, float y, bool animate)
         {
+            y = CodexIntro(content, CodexStuffRules(um), y);
             y = CodexIntro(content, "Touche une arme pour en faire ton <color=#" + MetaUI.GoldHex + ">arme de départ</color>. Toutes sont disponibles, pour tout le monde.", y);
             var selected = CodexStartingWeapon(um);
             var weapons = um.Weapons;
@@ -212,7 +213,7 @@ namespace Survivor
             }
 
             y += 10f;
-            SectionTitle(content, $"RÉACTIONS  <size=28><color=#{MutedHex}>toujours actives, sans rien équiper</color></size>", y);
+            SectionTitle(content, $"RÉACTIONS  <size=28><color=#{MutedHex}>toujours actives, dès que les effets se croisent</color></size>", y);
             y += 74f;
             foreach (var r in Synergies.Reactions)
             {
@@ -264,8 +265,9 @@ namespace Survivor
         {
             Presets.RemoveUnknown(id => CodexFindWeapon(um, id) != null, id => um.FindPassive(id) != null);
 
-            y = CodexIntro(content, "Prépare tes builds pour théorycrafter. Un preset ne choisit rien à ta place et ne change pas les tirages : " +
-                                    "en partie, les cartes de ton preset <b>actif</b> portent juste ce badge.", y);
+            y = CodexIntro(content, "Prépare tes stuffs à l'avance. Un preset ne choisit rien à ta place et ne change pas les tirages : " +
+                                    "en partie, les cartes de ton preset <b>actif</b> portent juste ce badge. " +
+                                    $"Rappel : {um.buildCap} niveaux de stuff (3 armes au Nv 5 + leurs 3 partenaires = 18).", y);
             PresetBadge.Create(content, UIKit.TopLeft, new Vector2(20, -y), 44f);
             y += 64f;
 
@@ -380,7 +382,7 @@ namespace Survivor
             // What this build would reach: that's the theorycraft part.
             var block = MetaUI.Card(content, "Build Summary", UIKit.Top, new Vector2(0, -y), new Vector2(CodexWidth, 100), UIKit.Card);
             float cy = 16f;
-            CodexFlow(block, "SYNERGIES DU BUILD", 30, UIKit.Gold, 28f, ref cy, CodexWidth - 56f, FontStyle.Bold, 6f);
+            CodexFlow(block, "SYNERGIES DU STUFF", 30, UIKit.Gold, 28f, ref cy, CodexWidth - 56f, FontStyle.Bold, 6f);
             CodexFlow(block, CodexSynergyDetails(p, um), 27, CodexLine, 28f, ref cy, CodexWidth - 56f, FontStyle.Normal, 14f);
             CodexFlow(block, "ÉVOLUTIONS", 30, UpgradeManager.EvolutionColor, 28f, ref cy, CodexWidth - 56f, FontStyle.Bold, 6f);
             CodexFlow(block, CodexEvolutionDetails(p, um), 27, CodexLine, 28f, ref cy, CodexWidth - 56f, FontStyle.Normal, 0f);
@@ -612,6 +614,13 @@ namespace Survivor
         }
 
         static string CodexTags(ItemTag tags) =>
-            tags == ItemTag.None ? $"<color=#{DimHex}>Sans famille</color>" : Synergies.TagNames(tags);
+            tags == ItemTag.None ? $"<color=#{DimHex}>Utilitaire (ne compte pour aucune famille)</color>" : Synergies.TagNames(tags);
+
+        /// <summary>The run rules that shape a build, shown at the top of the weapons tab.</summary>
+        static string CodexStuffRules(UpgradeManager um) =>
+            $"<color=#{MetaUI.GoldHex}><b>Ton stuff : {um.buildCap} niveaux max</b></color> par partie (chaque niveau d'arme ou de bonus compte, " +
+            $"{um.maxWeapons} armes et {um.maxPassives} bonus au plus). Les <b>évolutions</b> sont gratuites. Chaque tirage propose une carte " +
+            "pour monter une de tes armes, et une arme au Nv 5 voit toujours son bonus partenaire. Une fois le stuff complet, " +
+            $"chaque niveau donne une onde de choc, un soin et des points. Chaque partie, <b>{um.absentWeapons} armes</b> tirées au hasard sont absentes.";
     }
 }

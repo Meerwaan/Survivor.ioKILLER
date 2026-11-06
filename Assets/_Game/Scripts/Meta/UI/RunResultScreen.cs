@@ -168,7 +168,7 @@ namespace Survivor
 
             var panel = UIKit.Overlay("Result", content, 0.97f);
 
-            var title = MetaUI.Text(panel, "TU ES MORT", 120, UIKit.Blood, TextAnchor.MiddleCenter,
+            var title = MetaUI.Text(panel, gm.Abandoned ? "ABANDON" : "TU ES MORT", 120, UIKit.Blood, TextAnchor.MiddleCenter,
                 UIKit.Center, new Vector2(0, 800), new Vector2(1060, 160), FontStyle.Bold);
             UIAnim.SlideIn(title.rectTransform, new Vector2(0, 120), 0f, 0.5f, 2f);
 
@@ -177,11 +177,12 @@ namespace Survivor
                 UIKit.Center, new Vector2(0, 690), new Vector2(1040, 60), FontStyle.Bold);
             if (!res.submitted)
                 MetaUI.Text(panel, res.mode == GameMode.Daily ? "Entraînement : score non classé (1 essai classé par jour)" : "Score non classé",
-                    30, PracticeColor, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 640), new Vector2(1040, 44));
+                    30, PracticeColor, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 648), new Vector2(1040, 40));
 
+            // Run stats, then the "beat yourself" line: danger tier vs best, longest run, last scores on this board.
             int level = PlayerXP.Instance ? PlayerXP.Instance.Level : 1;
-            MetaUI.Text(panel, $"Temps {UIKit.FormatTime(Mathf.FloorToInt(gm.RunTime))}   ·   Tués {gm.Kills}   ·   Niveau {level}   ·   Boss {gm.BossKills}",
-                32, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 585), new Vector2(1040, 46));
+            MetaUI.Text(panel, $"Temps {UIKit.FormatTime(Mathf.FloorToInt(gm.RunTime))}   ·   Tués {gm.Kills}   ·   Niveau {level}   ·   Boss {gm.BossKills}\n" + ProgressLine(res),
+                30, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 584), new Vector2(1040, 76));
 
             // Score: base x multiplier = final
             if (res.mult > 1.001f)
@@ -192,8 +193,8 @@ namespace Survivor
             UIAnim.SlideIn(final.rectTransform, new Vector2(0, -40), 0.2f, 0.4f, 1.3f);
 
             string record = res.newBest
-                ? "NOUVEAU RECORD !"
-                : res.previousBest > 0 ? $"Record : {Medals.FormatScore(res.previousBest)}" : "";
+                ? res.previousBest > 0 ? $"NOUVEAU RECORD !  +{Medals.FormatScore(res.finalScore - res.previousBest)}" : "NOUVEAU RECORD !"
+                : res.previousBest > 0 ? $"Record : {Medals.FormatScore(res.previousBest)}  <size=30>·  il t'a manqué {Medals.FormatScore(res.previousBest - res.finalScore)}</size>" : "";
             var recordText = MetaUI.Text(panel, record, res.newBest ? 50 : 36, res.newBest ? UIKit.Gold : UIKit.Muted, TextAnchor.MiddleCenter,
                 UIKit.Center, new Vector2(0, 298), new Vector2(1040, 60), FontStyle.Bold);
             if (res.newBest) UIAnim.Pulse(recordText.rectTransform, 2.5f, 0.05f);
@@ -231,10 +232,16 @@ namespace Survivor
             // The build of the run (weapons, evolutions, bonuses): what made this score.
             if (UpgradeManager.Instance)
             {
-                MetaUI.Text(panel, "TON BUILD", 28, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, -752), new Vector2(600, 40), FontStyle.Bold);
+                var um = UpgradeManager.Instance;
+                string stuff = $"TON STUFF {Mathf.Min(um.BuildLevels, um.BuildCap)}/{um.BuildCap}";
+                if (gm.LevelBursts > 0) stuff += $"   ·   {gm.LevelBursts} prime{(gm.LevelBursts > 1 ? "s" : "")} de niveau (+{Medals.FormatScore(gm.LevelBurstScore)})";
+                MetaUI.Text(panel, stuff, 28, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, -752), new Vector2(1040, 40), FontStyle.Bold);
                 var build = UIKit.Rect("Build", panel);
                 UIKit.Place(build, UIKit.Center, new Vector2(0, -815), new Vector2(1000, 90));
                 GameHUD.FillBuildRow(build);
+                string absent = um.AbsentNames();
+                if (absent.Length > 0)
+                    MetaUI.Text(panel, $"Armes absentes : {absent}", 24, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, -878), new Vector2(1040, 34));
             }
         }
 
@@ -257,6 +264,22 @@ namespace Survivor
                 line.Append($"<color=#{MetaUI.GoldHex}>{r.claimable} à récupérer</color>");
             }
             if (line.Length == 0) line.Append("Le camp et les missions t'attendent au menu");
+            return line.ToString();
+        }
+
+        /// <summary>"Danger 5 (record !)  ·  Plus longue : 16:56  ·  Dernières : 45 k · 61 k · 217 k".</summary>
+        static string ProgressLine(RankedResult res)
+        {
+            string hex = ColorUtility.ToHtmlStringRGB(RunDirector.DangerColor(res.danger));
+            var line = new StringBuilder($"<color=#{hex}>Danger {res.danger}</color>");
+            if (res.submitted && res.danger > res.previousBestDanger && res.previousBestDanger > 0)
+                line.Append($" <color=#{MetaUI.GreenHex}>(record !)</color>");
+            else if (res.previousBestDanger > 0) line.Append($" (record {res.previousBestDanger})");
+            if (res.submitted && res.seconds > res.previousBestSeconds && res.previousBestSeconds > 0)
+                line.Append($"   ·   <color=#{MetaUI.GreenHex}>Partie la plus longue !</color>");
+            else if (res.previousBestSeconds > 0)
+                line.Append($"   ·   Plus longue : {UIKit.FormatTime(Mathf.FloorToInt(res.previousBestSeconds))}");
+            // The last scores are on the mode's rules page (menu): two lines max here.
             return line.ToString();
         }
 

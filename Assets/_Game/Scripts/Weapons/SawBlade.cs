@@ -11,6 +11,8 @@ namespace Survivor
         float damage, range, speed, size, knockback, traveled, returnSpeed;
         bool returning, alwaysCrit;
         readonly List<Enemy> hit = new(32);
+        /// <summary>Hit candidates scratch. Shared: only used inside Update, which never runs nested.</summary>
+        static readonly List<Enemy> Candidates = new(32);
         TrailRenderer trail;
 
         void Awake() => trail = GetComponentInChildren<TrailRenderer>();
@@ -78,11 +80,13 @@ namespace Survivor
             transform.position = p;
 
             float hitR = size * 0.85f;
-            var list = Enemy.Active;
-            for (int i = list.Count - 1; i >= 0; i--)
+            // Only the enemies around the blade (snapshot of this frame, same order as walking Enemy.Active backwards).
+            var list = Candidates;
+            EnemyGrid.Query(p, hitR, list);
+            for (int i = 0; i < list.Count; i++)
             {
-                if (i >= list.Count) continue;
                 var e = list[i];
+                if (!EnemyGrid.IsLive(e)) continue; // died or got recycled earlier this frame
                 Vector3 d = e.transform.position - p;
                 d.y = 0f;
                 float r = hitR + e.Radius;

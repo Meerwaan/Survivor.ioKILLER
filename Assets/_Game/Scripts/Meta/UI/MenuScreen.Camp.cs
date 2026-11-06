@@ -56,8 +56,8 @@ namespace Survivor
 
             // Long-term goal. The New Game+ itself doesn't exist yet: just a teaser for now.
             string goal = Camp.IsMaxed
-                ? $"<color=#{MetaUI.GoldHex}>Camp au max : New Game+ bientôt !</color>"
-                : $"Camp : {Camp.TotalLevels}/{Camp.MaxTotalLevels} niveaux  ·  <size=26>un camp au max réserve une surprise…</size>";
+                ? $"<color=#{MetaUI.GoldHex}>Camp au max : mode MENACES (NG+) débloqué !</color>"
+                : $"Camp : {Camp.TotalLevels}/{Camp.MaxTotalLevels} niveaux  ·  <size=26>un camp au max débloque les Menaces (NG+)</size>";
             MetaUI.Text(content, goal, 32, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -y - 10f), new Vector2(960, 70));
             y += 100f;
             MetaUI.SetHeight(content, y);

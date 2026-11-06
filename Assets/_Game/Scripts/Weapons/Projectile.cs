@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Survivor
 {
     /// <summary>
-    /// Straight-flying bullet. Checks distance to enemies instead of using physics (cheaper with many enemies).
+    /// Straight-flying bullet. Checks distance to the enemies around it (EnemyGrid) instead of using physics (cheaper with many enemies).
     /// Can pierce, bounce to the next enemy (ricochet) and explode on impact.
     /// Synergies: once it has bounced it always ignites (if the player has incendiary bullets),
     /// Poudre noire can make it explode, and Pistolero II "special" bullets are exploding crits.
@@ -24,6 +24,8 @@ namespace Survivor
         ItemTag tags;
         bool special, bounced;
         readonly List<Enemy> alreadyHit = new(8);
+        /// <summary>Hit candidates scratch. Shared: only used inside Update, which never runs nested.</summary>
+        static readonly List<Enemy> Candidates = new(32);
         TrailRenderer trail;
 
         void Awake() => trail = GetComponentInChildren<TrailRenderer>();
@@ -61,11 +63,13 @@ namespace Survivor
 
             Vector3 p = transform.position;
             var stats = PlayerController.Instance ? PlayerController.Instance.Stats : null;
-            var list = Enemy.Active;
-            for (int i = list.Count - 1; i >= 0; i--)
+            // Only the enemies around us (snapshot of this frame, same order as walking Enemy.Active backwards).
+            var list = Candidates;
+            EnemyGrid.Query(p, radius, list);
+            for (int i = 0; i < list.Count; i++)
             {
-                if (i >= list.Count) continue;
                 var enemy = list[i];
+                if (!EnemyGrid.IsLive(enemy)) continue; // died or got recycled earlier this frame
                 Vector3 d = enemy.transform.position - p;
                 d.y = 0f;
                 float r = enemy.Radius + radius;

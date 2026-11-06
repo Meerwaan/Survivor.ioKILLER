@@ -48,7 +48,7 @@ namespace Survivor
         public override string Summary => "Aura toxique : tout ce qui t'entoure fond.";
         public override string EvolutionName => "Peste noire";
         public override string EvolutionPassive => "regen";
-        public override string EvolutionText => "Nuage géant qui englue les ennemis et te soigne pour chaque victime.";
+        public override string EvolutionText => "Nuage géant qui englue les ennemis et te soigne un peu pour chaque ennemi dedans.";
         public override ItemTag Tags => ItemTag.Poison;
 
         float timer, pulse;

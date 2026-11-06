@@ -6,7 +6,7 @@ namespace Survivor
 
     /// <summary>
     /// Honest goals instead of fake players: score tiers per board (Bronze / Argent / Or / Diamant / Légende).
-    /// Score = kill points + 2 per second (GameManager), times the threat multiplier. Rough model (Docs/Pacing.md:
+    /// Score = kill points + 2 per second + level bursts once the stuff is full (GameManager), times the threat multiplier. Rough model (Docs/Pacing.md:
     /// kills per 50 s wave ~350 at 2 min, ~700 at 5 min, ~1400 at 10 min, ~11 points per kill):
     /// 3 min ~10 k, 5 min ~27 k, 8 min ~65 k, 10 min ~95 k, 13 min ~160 k, 16 min ~250 k.
     /// A decent player (dies around 8-12 min) lands Argent / Or in Classique. Tune here only.

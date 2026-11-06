@@ -57,7 +57,7 @@ namespace Survivor
                 case MissionType.GoldPicked: return new[] { 80, 150, 250, 400 }[tier];
                 case MissionType.Survive: return new[] { 180, 300, 420, 600 }[tier];
                 case MissionType.Combo: return new[] { 50, 100, 200, 300 }[tier];
-                case MissionType.Level: return new[] { 10, 15, 20, 25 }[tier];
+                case MissionType.Level: return new[] { 10, 14, 18, 22 }[tier];
                 case MissionType.StageWin: return new[] { 1, 1, 2, 2 }[tier];
                 case MissionType.DailyChallenge: return 1;
                 case MissionType.Ranked: return new[] { 2, 2, 3, 3 }[tier];
@@ -75,7 +75,7 @@ namespace Survivor
                 case MissionType.Bosses: return n > 1 ? $"Bats {n} boss" : "Bats un boss";
                 case MissionType.Evolve: return n > 1 ? $"Fais évoluer {n} armes" : "Fais évoluer une arme";
                 case MissionType.Runs: return $"Joue {n} parties";
-                case MissionType.GoldPicked: return $"Ramasse {n} pièces d'or";
+                case MissionType.GoldPicked: return $"Gagne {n} or en une journée";
                 case MissionType.Survive: return $"Survis {n / 60} min en une partie";
                 case MissionType.Combo: return $"Atteins un combo x{n}";
                 case MissionType.Level: return $"Atteins le niveau {n} en une partie";

@@ -9,7 +9,7 @@ namespace Survivor
         public string boardId = "";
         /// <summary>"DÉFI DU JOUR  ·  x1.45" (see GameModes.RunLabel).</summary>
         public string label = "";
-        /// <summary>Kill points + 2 per second.</summary>
+        /// <summary>Kill points + 2 per second + level bursts.</summary>
         public int baseScore;
         public float mult = 1f;
         /// <summary>round(baseScore x mult): what goes to the board.</summary>
@@ -24,6 +24,10 @@ namespace Survivor
         public Medal medal;
         /// <summary>Medal of the personal best before this run (to celebrate a new tier).</summary>
         public Medal previousMedal;
+        /// <summary>Danger tier reached (RunDirector.Danger) and the best one before this run.</summary>
+        public int danger, previousBestDanger;
+        /// <summary>Survival time and the longest one before this run.</summary>
+        public float seconds, previousBestSeconds;
 
         public int Best => Math.Max(previousBest, submitted ? finalScore : 0);
         public bool NewMedal => submitted && medal > previousMedal;

@@ -126,7 +126,20 @@ namespace Survivor
             var gems = XPGem.Active;
             if (gems.Count >= maxGems)
             {
-                gems[Random.Range(0, gems.Count)].AddValue(value);
+                // Merge into the closest gem: XP must stay where the kill happened, not vanish across the map.
+                XPGem best = gems[0];
+                float bestSqr = float.MaxValue;
+                for (int i = 0; i < gems.Count; i++)
+                {
+                    Vector3 d = gems[i].transform.position - position;
+                    float sqr = d.x * d.x + d.z * d.z;
+                    if (sqr < bestSqr)
+                    {
+                        bestSqr = sqr;
+                        best = gems[i];
+                    }
+                }
+                best.AddValue(value);
                 return;
             }
             Pool.Instance.Spawn<XPGem>(gemPrefab, position, Quaternion.identity).Init(value);

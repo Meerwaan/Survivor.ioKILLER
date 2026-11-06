@@ -5,6 +5,39 @@ defaults (rebuild the scene with *Survivor > Build Prototype Scene* to apply the
 Code: `Scripts/Upgrades/Synergies.cs` (set bonuses, reactions, statuses), `UpgradeManager.cs` (bonuses, cards, rarity, banish).
 Pacing targets and the XP / enemy curves live in `Docs/Pacing.md`.
 
+## Stuff: the 20-level build (owner's rule, 2026-11-06)
+
+Owner: "on ne doit pas pouvoir améliorer à l'infini... un stuff c'est ~20 niveaux et tu dois créer ton stuff avec ces 20
+améliorations, sinon ça devient trop cheaté". And: random picks must never give the big upgrades, a coherent stuff must
+help you score. Code: `UpgradeManager` (`buildCap`, `BuildLevels`, `BuildRoom`, `BuildComplete`, `HasChoices`),
+`GameManager.LevelBurst`, `GameHUD` (gauge, labels).
+
+- **Budget**: `buildCap` = 20 levels. Every weapon level and every bonus level counts (the starting weapon's Nv 1 too, so a
+  run starts at 1/20). **Evolutions are free** (they don't use a level): depth is rewarded. Rare / epic cards still give
+  +2 / +3 levels but cost the same in budget (= tempo, not more final power), clamped to the room left.
+  Slots are unchanged (5 weapons, 6 bonuses), so the real choice is **wide** (many items at low level = set bonuses I/II)
+  vs **deep** (3 weapons at Nv 5 + their partners = 18 levels = 3 evolutions) or a mix.
+- **Draw rules for focus**: every hand has at least one card that levels up a weapon you own (while one can still level).
+  Without it the bot's weapons stayed at Nv 1-3 (owned weapons were only ~18% of the draw weight). And a weapon at Nv 5
+  always gets its partner bonus in the hand (else, with ~25 bonuses in the pool, the focused bot filled its stuff at 4:47
+  without ever seeing the Grenades' partner: 2 evolutions instead of 3).
+- **Full stuff**: no more cards. Each level-up is a **level burst** instead (no pause): a nova of 6.5 m x area, damage
+  14 x enemy health scaling x damage bonus (clears normal enemies around you), heals 10% max HP (30% max per batch) and gives
+  `40 x level` score points. A pending evolution still opens the card screen (evolution + heal + gold, no reroll/banish).
+  XP (Cerveau frais, Boussole, Pacte de l'avare) therefore turns into score once the stuff is full.
+- **Arsenal of the run**: `absentWeapons` = 3 weapons (of 10) are left out of the pool each run (never the starting weapon,
+  never a weapon of the weekly element; daily / weekly: from the seed, stream 5). Announced at the start and listed in pause.
+  Partners of absent weapons stay in the pool (they still count for sets).
+- **Threat "Bagage léger"** (+20% score): stuff limited to 16.
+- Labels: family chips stuck on the top edge of every card (FEU, EXPLOSIF... or UTILITAIRE for bonuses without family),
+  evolution recipes with the met conditions in green ("Évolution : Nv 5 + Adrénaline"), partner hints with the weapon level
+  ("Fait évoluer : Revolver (Nv 3/5)"), "Partenaire d'évolution : X" for weapons not owned yet, stuff gauge (one segment per
+  level, colored by item) + "TON STUFF 12/20" on the level-up screen, "Stuff 12/20" in the XP bar (gold bar once full).
+
+Other coherence fixes in the same pass: Rage +0.12 -> +0.14 (= +12% of the 1.15 base per level, as the card says);
+corpse explosions (Cadavres explosifs, Mèche courte) now go through `Synergies.Explosion` (Artificier zone + réplique,
+Fusion, Dispersion), like grenades; Gatling du Diable fires 35% faster per extra projectile (Chargeur étendu did nothing on it).
+
 ## What the enemies ask for
 
 Endless HP mult is now `1 + 0.15m + 0.07m²` (see Pacing.md): 5 min 3.5x, 10 min 9.5x, 15 min 19x. The stream is
@@ -47,7 +80,7 @@ If one is clearly dominant, lower its evo damage first, not its early levels.
 
 | Bonus | Tags | Per level (before → after) | Max | Notes |
 |---|---|---|---|---|
-| Rage | Lame | +15% → **+12%** damage | 5 | Shotgun evo. 5/5 = +60% |
+| Rage | Lame | +15% → **+12%** damage (+0.14 on the 1.15 base) | 5 | Shotgun evo. 5/5 = +61% |
 | Adrénaline | Balle | x0.91 → **x0.92** cooldown | 5 | Revolver evo. 5/5 = +52% fire rate |
 | Gros calibre | Explosif | +12% area | 5 | Machete evo |
 | Sang froid | Survie, Poison | +0.7 HP/s → **+0.4 HP/s, +0.5 more after 4 s without a hit** | 5 | Gas evo. Base regen also pauses 2 s after a hit (PlayerHealth). 5/5: 0 in a brawl, 2 HP/s after 2 s, 4.5 HP/s after 4 s |
@@ -135,7 +168,7 @@ All constants are at the top of `Synergies.cs` (`FerRougeMult`, `ElectrocutionMu
   can't be banished. `UpgradeManager.Banished` lists the ids.
 - Rerolls: 1 per run (`PlayerStats.rerolls`), +1 per Patte de lapin level.
 
-Expected build timeline with the new XP curve (Pacing: ~25 picks at 5:00, ~36 at 8:00, ~44 at 10:00, incl. chests):
+(Outdated since the 20-level stuff: see the Stuff section above and Pacing.md "Stuff pass".) Expected build timeline with the new XP curve (Pacing: ~25 picks at 5:00, ~36 at 8:00, ~44 at 10:00, incl. chests):
 2 weapons by ~1:00-1:30, 3 weapons + first tier I by ~3:00, first rare cards from ~2:30, 4-5 weapons and the first
 evolution ~6-8 min (5 targeted picks among ~20, plus rare jumps), full slots ~9-11 min, 2-3 evolutions by ~12 min.
 If evolutions come before 6 min in tests: lower `OwnedWeaponWeight` (3 → 2.5) or `RareMax` first.
@@ -163,7 +196,7 @@ If evolutions come before 6 min in tests: lower `OwnedWeaponWeight` (3 → 2.5) 
 
 Code: `Scripts/Modes/` (`GameModes.cs` setup per mode, `Threats.cs`, `Medals.cs`, `ModeHUD.cs`, `UI/MenuScreen.Ranked.cs`).
 Everyone plays with the same rules inside a mode; nothing is permanent. Score sent to a board = round(base score x multiplier),
-base score = kill points + 2 per second.
+base score = kill points + 2 per second + level bursts (40 x level for each level gained once the stuff is full, `GameManager.LevelBurst`).
 
 | Mode | Board | Rules |
 |---|---|---|
@@ -175,7 +208,7 @@ base score = kill points + 2 per second.
 Seeded draws (`UpgradeManager.SeedDraw`): one `System.Random` per draw from (seed, stream, counter): level-up hand N,
 reroll N of that hand, banish N, fixed-size draw N. Same picks = same cards. Enemies / loot stay `UnityEngine.Random`.
 
-Threats (multiplier = 1 + sum, max x2.80):
+Threats (multiplier = 1 + sum, max x3.00 with the 11 threats):
 
 | Threat | Effect | Bonus | Hook |
 |---|---|---|---|
@@ -185,10 +218,11 @@ Threats (multiplier = 1 + sum, max x2.80):
 | Sprinteurs | enemy speed x1.15 | +20% | `RunModifiers.EnemySpeedMult` base |
 | Élites enragées | elite timers x0.7 (first x0.8), elite HP x1.3, +1 affix | +15% | `RunModifiers.EliteHealthMult / ExtraEliteAffixes`, `RunDirector.eliteInterval` |
 | Boss pressé | boss at 150 s then every 150 s (was 200) | +20% | `RunDirector.firstBossTime / bossInterval` x0.75 |
-| Famine | no meat (normal kills, elites, crates); chests still heal | +15% | `Loot` chances = 0 for the run |
+| Famine | no meat (normal kills, elites, crates); chests, heal cards and level bursts still heal | +15% | `Loot` chances = 0 for the run |
 | Sans filet | no reroll, no banish | +10% | `UpgradeManager` |
 | Fragile | max HP x0.7 | +20% | `PlayerStats.maxHealth` |
 | Verre canon (mutator) | damage x1.3, max HP x0.5 | +10% | `PlayerStats` |
+| Bagage léger | stuff limited to 16 levels instead of 20 (appended last: indexes never move) | +20% | `Threats.BuildCapCut` -> `UpgradeManager.BuildCap` |
 
 Daily / weekly never pick the mutator. All hooks act on this run's instances only (tuned defaults untouched).
 
@@ -197,8 +231,10 @@ so ~10 k at 3 min, ~27 k at 5 min, ~65 k at 8 min, ~95 k at 10 min, ~250 k at 16
 
 | Board | Bronze | Argent | Or | Diamant | Légende |
 |---|---|---|---|---|---|
-| Classique | 8 000 | 30 000 | 75 000 | 150 000 | 250 000 |
-| Jour / Semaine | 10 000 | 35 000 | 90 000 | 180 000 | 300 000 |
-| Menaces | 12 000 | 45 000 | 110 000 | 220 000 | 380 000 |
+| Classique | 10 000 | 40 000 | 100 000 | 200 000 | 400 000 |
+| Jour / Semaine | 12 000 | 45 000 | 120 000 | 240 000 | 480 000 |
+| Menaces | 15 000 | 60 000 | 150 000 | 300 000 | 600 000 |
+
+(Values from `Medals.cs`, the source of truth.)
 
 Target: a decent player (dies 8-12 min) gets Argent / Or in Classique. Retune in `Medals.cs` after real playtests.

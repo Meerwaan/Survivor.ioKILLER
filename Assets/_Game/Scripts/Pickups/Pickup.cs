@@ -15,8 +15,12 @@ namespace Survivor
         public float healFraction = 0.2f;
         [Tooltip("Chest: share of max HP healed. Boss chest 0.5 -> 0.3; the small reward chest is set to 0.15 by the builder.")]
         public float chestHealFraction = 0.3f;
-        [Tooltip("Chest only: free level-ups granted.")]
-        public int chestUpgrades = 3;
+        /// <summary>Non-chest pickups farther than this from the player are recycled (about 3 screens away).</summary>
+        const float FarDespawnDistance = 60f;
+
+        [Tooltip("Chest only: free level-ups granted (boss 3 -> 2 with the 20-level stuff; the reward chest is set to 1 by the builder). " +
+                 "Once the stuff is full they become level bursts.")]
+        public int chestUpgrades = 2;
         [Tooltip("Coin: gold given.")]
         public int value = 2;
         [Tooltip("Chest: gold given.")]
@@ -72,6 +76,14 @@ namespace Survivor
             Vector3 target = player.Position + Vector3.up * 0.6f;
             Vector3 toPlayer = target - transform.position;
             float distance = toPlayer.magnitude;
+
+            // Coins, meat and magnets left far behind are recycled (mobile: hundreds of forgotten pickups add up).
+            // Chests always wait for the player.
+            if (type != PickupType.Chest && distance > FarDespawnDistance)
+            {
+                Pool.Instance.Despawn(gameObject);
+                return;
+            }
 
             float radius = player.Stats.pickupRadius * (type == PickupType.Coin ? 1.3f : 1f);
             if (!attracted && distance <= radius) attracted = true;

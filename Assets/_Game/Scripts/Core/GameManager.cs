@@ -34,6 +34,16 @@ namespace Survivor
         [Tooltip("Damage (times the damage bonus). Was 15: one-shot every zombie for the first 3 minutes.")]
         public float levelUpNovaDamage = 10f;
 
+        [Header("Level burst (level-ups once the stuff is full: no cards, instant reward)")]
+        [Tooltip("Radius in meters (times the area bonus).")]
+        public float levelBurstRadius = 6.5f;
+        [Tooltip("Damage x the enemy health scaling of the moment x the damage bonus: it always clears normal enemies around you.")]
+        public float levelBurstDamage = 14f;
+        [Tooltip("Share of max HP healed per level (at most 30% for a batch).")]
+        public float levelBurstHeal = 0.1f;
+        [Tooltip("Score bonus per level = this x the player's level.")]
+        public int levelBurstScorePerLevel = 40;
+
         public GameState State { get; private set; } = GameState.Menu;
         public float RunTime { get; private set; }
         public int Kills { get; private set; }
@@ -42,7 +52,12 @@ namespace Survivor
         public int Gold { get; private set; }
         /// <summary>Gold banked at the end of the run, survival bonus included.</summary>
         public int GoldEarned { get; private set; }
-        public int Score => killScore + Mathf.FloorToInt(RunTime) * 2;
+        /// <summary>Kill points + 2 per second + level bursts (levels gained once the stuff is full).</summary>
+        public int Score => killScore + Mathf.FloorToInt(RunTime) * 2 + LevelBurstScore;
+        /// <summary>Score from level bursts this run.</summary>
+        public int LevelBurstScore { get; private set; }
+        /// <summary>Level-ups turned into bursts this run (stuff full).</summary>
+        public int LevelBursts { get; private set; }
         /// <summary>True when a campaign stage was survived to the end.</summary>
         public bool Won { get; private set; }
         /// <summary>Lowest health fraction reached this run (campaign "health" star).</summary>
@@ -61,6 +76,9 @@ namespace Survivor
 
         int killScore;
         int pendingLevelUps;
+        /// <summary>Displayed score every RunProgress.Step seconds (the record "ghost" of this run if it becomes the best).</summary>
+        readonly System.Collections.Generic.List<int> paceSamples = new(64);
+        float nextPaceSample;
         Coroutine hitStop;
 
         void Awake()
@@ -133,6 +151,11 @@ namespace Survivor
 
             RunTime += Time.deltaTime;
             if (PlayerHealth.Instance) LowestHealth = Mathf.Min(LowestHealth, PlayerHealth.Instance.Fraction);
+            while (RunTime >= nextPaceSample)
+            {
+                paceSamples.Add(FinalScore);
+                nextPaceSample += RunProgress.Step;
+            }
 
             // Campaign stage: surviving the whole duration wins.
             if (RunConfig.Duration > 0f && RunTime >= RunConfig.Duration)
@@ -142,10 +165,49 @@ namespace Survivor
                 return;
             }
 
-            if (pendingLevelUps > 0) OpenLevelUp();
+            if (pendingLevelUps > 0)
+            {
+                // Full stuff and nothing to evolve: no card screen, the level pays out right away.
+                if (UpgradeManager.Instance.HasChoices) OpenLevelUp();
+                else LevelBurst();
+            }
+        }
+
+        /// <summary>
+        /// Every queued level-up at once, once the stuff is full: a shockwave that clears normal enemies around the player,
+        /// a small heal and a score bonus. Keeps level-ups exciting without making the build stronger.
+        /// </summary>
+        void LevelBurst()
+        {
+            int count = pendingLevelUps;
+            pendingLevelUps = 0;
+            int level = PlayerXP.Instance ? PlayerXP.Instance.Level : 1;
+            int bonus = levelBurstScorePerLevel * level * count;
+            LevelBurstScore += bonus;
+            LevelBursts += count;
+
+            var pc = PlayerController.Instance;
+            if (pc)
+            {
+                var s = pc.Stats;
+                Vector3 p = pc.Position;
+                float radius = levelBurstRadius * s.areaMult;
+                Combat.Nova(p, radius, levelBurstDamage * RunModifiers.WorldScale * s.damageMult);
+                if (GameFX.Instance)
+                {
+                    GameFX.Instance.Ring(p, radius * 1.15f, UpgradeManager.EvolutionColor * 2.5f, 0.55f);
+                    GameFX.Instance.Flash(p + Vector3.up * 0.5f, radius * 0.45f, UIKit.Gold * 2f, 0.15f);
+                }
+            }
+            if (PlayerHealth.Instance) PlayerHealth.Instance.Heal(PlayerHealth.Instance.Max * Mathf.Min(0.3f, levelBurstHeal * count));
+            SFX.Play(SfxId.LevelUp);
+            if (GameHUD.Instance) GameHUD.Instance.ShowLevelBurst(level, bonus);
         }
 
         public int EliteKills { get; private set; }
+
+        /// <summary>A save from 0 HP (Plume de phénix): counts as having dropped to 0 for the campaign health star.</summary>
+        public void RecordNearDeath() => LowestHealth = 0f;
 
         public void RegisterKill(int score, bool boss, bool elite = false)
         {
@@ -188,9 +250,14 @@ namespace Survivor
             if (State == GameState.Paused) SetState(GameState.Playing);
         }
 
+        /// <summary>The run was ended from the pause menu (result screen title).</summary>
+        public bool Abandoned { get; private set; }
+
         public void Abandon()
         {
-            if (State == GameState.Paused) EndRun();
+            if (State != GameState.Paused) return;
+            Abandoned = true;
+            EndRun();
         }
 
         /// <summary>
@@ -199,6 +266,8 @@ namespace Survivor
         /// </summary>
         public void PlayerDied()
         {
+            LowestHealth = 0f; // the lethal hit lands outside Update: a revive must not keep the "health" star
+
             if (State == GameState.Playing && ReviveOffer.TryOffer(ResumeAfterRevive, EndRun))
             {
                 SetState(GameState.Revive);
@@ -225,6 +294,9 @@ namespace Survivor
             int score = FinalScore;
             int previousBest = string.IsNullOrEmpty(board) ? 0 : BestScoreFor(board);
             bool newBest = submit && Leaderboard.TrySetPersonalBest(board, score);
+            int danger = RunDirector.Instance ? RunDirector.Instance.Danger : 1;
+            // Personal progress (record ghost, best danger, best time, last scores): submitted ranked runs only.
+            var progressBefore = submit ? RunProgress.Finish(board, paceSamples, score, danger, RunTime, newBest) : RunProgress.Find(board);
             LastResult = campaign ? null : new RankedResult
             {
                 mode = RunConfig.Mode,
@@ -239,6 +311,10 @@ namespace Survivor
                 rank = submit ? 0 : -1,
                 medal = Medals.For(board, score),
                 previousMedal = Medals.For(board, previousBest),
+                danger = danger,
+                previousBestDanger = progressBefore != null ? progressBefore.bestDanger : 0,
+                seconds = RunTime,
+                previousBestSeconds = progressBefore != null ? progressBefore.bestSeconds : 0f,
             };
 
             // Bank the gold: what was picked up plus a survival bonus.

@@ -123,7 +123,7 @@ namespace Survivor
         {
             Relic("frost", "Talisman de givre", "10% de chance de geler un ennemi touché", new Color(0.5f, 0.85f, 1f),
                 (m, s) => FreezeChance += 0.1f),
-            Relic("lead", "Bottes de plomb", "+15% d'armure, -8% de vitesse", new Color(0.6f, 0.62f, 0.7f),
+            Relic("lead", "Bottes de plomb", "-15% de dégâts reçus, -8% de vitesse", new Color(0.6f, 0.62f, 0.7f),
                 (m, s) => { s.armor += 0.15f; s.moveSpeed *= 0.92f; }),
             Relic("fang", "Croc de vampire", "Tous les 30 ennemis tués : +5 PV", new Color(0.9f, 0.2f, 0.3f),
                 (m, s) => { m.vampireEvery = 30; m.vampireHeal = 5f; }),
@@ -164,7 +164,7 @@ namespace Survivor
                 (m, s) => { s.extraProjectiles += 1; EnemyHealthMult *= 1.3f; }),
             Pact("greed", "Pacte de l'avare", "+60% d'or, +20% d'XP", "Ennemis +20% de dégâts",
                 (m, s) => { s.goldMult += 0.6f; s.xpMult += 0.2f; EnemyDamageMult *= 1.2f; }),
-            Pact("iron", "Pacte de fer", "+20% d'armure", "Armes 12% plus lentes",
+            Pact("iron", "Pacte de fer", "-20% de dégâts reçus", "Armes 12% plus lentes",
                 (m, s) => { s.armor += 0.2f; s.cooldownMult *= 1.12f; }),
             Pact("sacrifice", "Pacte du sacrifice", "Soin complet + un coffre", "-20% de PV max",
                 (m, s) =>
@@ -189,6 +189,14 @@ namespace Survivor
             if (PlayerHealth.Instance) PlayerHealth.Instance.Heal(0f); // clamps current health to the new max
         }
 
+        // ---------- Seeded picks (daily / weekly: the Nth relic and the Nth altar are the same for everyone) ----------
+
+        const int StreamRelics = 11, StreamPacts = 12;
+        int relicGrants, pactRolls;
+
+        static System.Random Seeded(int stream, int index) =>
+            RunConfig.Seed != 0 ? new System.Random(GameModes.Hash(RunConfig.Seed, stream * 1000003 + index, 0)) : null;
+
         // ---------- Queries ----------
 
         public bool Has(string id)
@@ -212,9 +220,10 @@ namespace Survivor
             var pool = new List<Perk>(Pacts.Length);
             foreach (var p in Pacts) if (!Has(p.id)) pool.Add(p);
             var result = new List<Perk>(count);
+            var seeded = Seeded(StreamPacts, ++pactRolls);
             while (result.Count < count && pool.Count > 0)
             {
-                int i = Random.Range(0, pool.Count);
+                int i = seeded != null ? seeded.Next(0, pool.Count) : Random.Range(0, pool.Count);
                 result.Add(pool[i]);
                 pool.RemoveAt(i);
             }
@@ -229,7 +238,8 @@ namespace Survivor
             int left = 0;
             foreach (var r in Relics) if (!Has(r.id)) left++;
             if (left == 0) return null;
-            int pick = Random.Range(0, left);
+            var seeded = Seeded(StreamRelics, ++relicGrants);
+            int pick = seeded != null ? seeded.Next(0, left) : Random.Range(0, left);
             foreach (var r in Relics)
             {
                 if (Has(r.id)) continue;
@@ -376,6 +386,7 @@ namespace Survivor
             {
                 // Called before PlayerHealth checks for death: healing here saves the run.
                 phoenix = false;
+                if (GameManager.Instance) GameManager.Instance.RecordNearDeath();
                 health.Heal(health.Max * 0.5f);
                 Version++;
                 var s = Stats;

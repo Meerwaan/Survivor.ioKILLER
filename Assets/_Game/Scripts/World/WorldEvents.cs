@@ -267,7 +267,8 @@ namespace Survivor
 
             if (active != Kind.None || highTimer < comfortHold || time < nextPressure || time < pressureUnlock) return;
             var director = RunDirector.Instance;
-            if (director.Phase == WavePhase.Lull) return;
+            if (director.Phase == WavePhase.Lull || director.Phase == WavePhase.Peak) return;
+            if (director.CurrentBoss) return; // the boss is already the pressure
             if (ArenaEvents.Instance && ArenaEvents.Instance.ChallengeActive) return;
 
             int level = Mathf.Min(3, PressureLevel + 1);
@@ -423,11 +424,11 @@ namespace Survivor
             float ahead = Mathf.Min(2.6f, r.height * 0.15f);
             Vector3 c = player.Position + new Vector3(0f, 0f, ahead);
             altars.Clear();
-            if (pacts.Count == 1) altars.Add(PactAltar.Create(pacts[0], c + new Vector3(0f, 0f, 1.5f), AltarColor));
+            if (pacts.Count == 1) altars.Add(PactAltar.Create(pacts[0], ClampToMap(c + new Vector3(0f, 0f, 1.5f), 1f), AltarColor));
             else
             {
-                altars.Add(PactAltar.Create(pacts[0], c + new Vector3(-side, 0f, 0f), AltarColor));
-                altars.Add(PactAltar.Create(pacts[1], c + new Vector3(side, 0f, 0f), new Color(0.75f, 0.2f, 1f)));
+                altars.Add(PactAltar.Create(pacts[0], ClampToMap(c + new Vector3(-side, 0f, 0f), 1f), AltarColor));
+                altars.Add(PactAltar.Create(pacts[1], ClampToMap(c + new Vector3(side, 0f, 0f), 1f), new Color(0.75f, 0.2f, 1f)));
             }
             eventEnd = Now + altarLifetime;
 
@@ -449,7 +450,7 @@ namespace Survivor
             for (int i = 0; i < altars.Count; i++)
             {
                 var a = altars[i];
-                if (!a || !PlayerWithin(a.transform.position, a.TouchRadius)) continue;
+                if (!a || !a.Armed || !PlayerWithin(a.transform.position, a.TouchRadius)) continue;
                 if (RunModifiers.Instance) RunModifiers.Instance.SealPact(a.Pact, a.transform.position);
                 ClearAltars(a);
                 EndEvent();
@@ -985,7 +986,7 @@ namespace Survivor
             // Never centered on the player: you have to walk to it.
             Vector3 dir = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f) * Vector3.forward;
             safe.center = player.Position + dir * (safeStartRadius * 0.95f); // just outside: step in during the grace time
-            safe.center.y = 0f;
+            safe.center = ClampToMap(safe.center, safeStartRadius);
             safe.active = true;
             safeStart = time;
             safeEnd = time + safeDuration;
@@ -1022,7 +1023,7 @@ namespace Survivor
 
             float k = Mathf.Clamp01((time - safeStart - safeGrace) / Mathf.Max(1f, safeDuration - safeGrace));
             safeRadius = Mathf.Lerp(safeStartRadius, safeEndRadius, k);
-            if (time - safeStart > safeGrace) safe.center += safeVelocity * dt;
+            if (time - safeStart > safeGrace) safe.center = ClampToMap(safe.center + safeVelocity * dt, safeRadius);
             safe.inside = PlayerWithin(safe.center, safeRadius - PlayerController.Instance.Radius * 2f);
 
             bool grace = time - safeStart < safeGrace;
@@ -1112,6 +1113,14 @@ namespace Survivor
             ambushCount = 0;
             SFX.Play(SfxId.Horde, 0.6f, 1.15f);
             if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.15f);
+        }
+
+        /// <summary>Keeps a zone center inside the walkable map (PlayerController.mapHalfSize), radius included.</summary>
+        static Vector3 ClampToMap(Vector3 p, float radius)
+        {
+            float half = PlayerController.Instance ? PlayerController.Instance.mapHalfSize : 190f;
+            float m = Mathf.Max(0f, half - radius - 0.5f);
+            return new Vector3(Mathf.Clamp(p.x, -m, m), 0f, Mathf.Clamp(p.z, -m, m));
         }
 
         // ================= RUNNER (pressure: a reward to chase) =================

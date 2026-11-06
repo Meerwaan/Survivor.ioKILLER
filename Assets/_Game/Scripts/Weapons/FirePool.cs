@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Survivor
@@ -6,6 +7,8 @@ namespace Survivor
     public class FirePool : MonoBehaviour
     {
         float damage, radius, life, tick, timer, age;
+        /// <summary>Hit candidates scratch. Shared: only used inside Update, which never runs nested.</summary>
+        static readonly List<Enemy> Candidates = new(32);
 
         static readonly Color EmberColor = new(2.5f, 0.9f, 0.15f);
 
@@ -45,11 +48,13 @@ namespace Survivor
             Vector3 center = transform.position;
             if (GameFX.Instance) GameFX.Instance.Embers(center, radius * 0.8f, 2 + Mathf.RoundToInt(radius), EmberColor);
 
-            var list = Enemy.Active;
-            for (int i = list.Count - 1; i >= 0; i--)
+            // Only the enemies around the pool (snapshot of this frame, same order as walking Enemy.Active backwards).
+            var list = Candidates;
+            EnemyGrid.Query(center, radius, list);
+            for (int i = 0; i < list.Count; i++)
             {
-                if (i >= list.Count) continue;
                 var enemy = list[i];
+                if (!EnemyGrid.IsLive(enemy)) continue; // died or got recycled earlier this frame
                 Vector3 d = enemy.transform.position - center;
                 d.y = 0f;
                 float r = radius + enemy.Radius;

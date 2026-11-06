@@ -97,7 +97,8 @@ namespace Survivor
 
         void FireGatling(Vector3 origin)
         {
-            timer = evoCooldown * Stats.cooldownMult;
+            // One bullet at a time: extra projectiles (Chargeur étendu, Pacte du chaos) make the stream faster instead.
+            timer = evoCooldown * Stats.cooldownMult / (1f + 0.35f * Stats.extraProjectiles);
 
             // Rotate between the closest enemies so the stream sprays the whole crowd.
             targets.Clear();

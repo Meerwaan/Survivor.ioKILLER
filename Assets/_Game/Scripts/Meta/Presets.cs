@@ -68,7 +68,7 @@ namespace Survivor
 
         public static int IndexOf(Preset p) => p == null ? -1 : Data.presets.IndexOf(p);
 
-        /// <summary>New empty preset named "Build N" (null when the list is full).</summary>
+        /// <summary>New empty preset named "Stuff N" (null when the list is full).</summary>
         public static Preset Create()
         {
             if (Data.presets.Count >= MaxPresets) return null;
@@ -141,7 +141,7 @@ namespace Survivor
         {
             for (int n = 1; ; n++)
             {
-                string name = "Build " + n;
+                string name = "Stuff " + n;
                 if (!Data.presets.Exists(p => p.name == name)) return name;
             }
         }

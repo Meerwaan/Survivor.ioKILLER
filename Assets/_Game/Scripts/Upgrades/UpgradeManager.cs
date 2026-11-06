@@ -72,6 +72,11 @@ namespace Survivor
         public int maxWeapons = 5;
         [Tooltip("How many different bonuses the player can carry.")]
         public int maxPassives = 6;
+        [Tooltip("STUFF: total levels a build can hold (weapon levels + bonus levels, the starting weapon's level 1 included). " +
+                 "Evolutions are free. Once it's full, level-ups give a level burst instead of cards (GameManager).")]
+        public int buildCap = 20;
+        [Tooltip("Weapons left out of the card pool each run (never the starting weapon, never the weekly element's).")]
+        public int absentWeapons = 3;
 
         public static readonly Color EvolutionColor = new(0.85f, 0.45f, 1f);
         public static readonly Color RareColor = new(0.3f, 0.7f, 1f);
@@ -103,9 +108,11 @@ namespace Survivor
         bool runStarted;
 
         readonly HashSet<string> banished = new();
+        readonly List<Weapon> absent = new();
         List<UpgradeOption> hand;
         int handSize = 3;
         int lastMilestone;
+        bool announcedComplete;
 
         public IReadOnlyList<Weapon> Weapons => weapons;
         public IReadOnlyList<Passive> Passives => passives;
@@ -114,6 +121,57 @@ namespace Survivor
         /// <summary>Items removed from the pool for this run (weapon Ids / passive ids).</summary>
         public IReadOnlyCollection<string> Banished => banished;
         public bool IsBanished(string id) => banished.Contains(id);
+        /// <summary>The hand on screen (after rerolls / banishes). Null before the first level-up.</summary>
+        public IReadOnlyList<UpgradeOption> CurrentHand => hand;
+
+        // ---------- Stuff (build budget) ----------
+
+        /// <summary>Levels the build can hold this run (threat "Bagage léger" lowers it).</summary>
+        public int BuildCap => Mathf.Max(5, buildCap - Threats.BuildCapCut);
+
+        /// <summary>Levels in the build now: every weapon level plus every bonus level (evolutions are free).</summary>
+        public int BuildLevels
+        {
+            get
+            {
+                int n = 0;
+                if (weapons != null) foreach (var w in weapons) n += w.Level;
+                if (passives != null) foreach (var p in passives) n += p.level;
+                return n;
+            }
+        }
+
+        /// <summary>Levels still free in the build.</summary>
+        public int BuildRoom => Mathf.Max(0, BuildCap - BuildLevels);
+        /// <summary>The stuff is full: no more weapon or bonus levels this run.</summary>
+        public bool BuildComplete => BuildRoom <= 0;
+
+        /// <summary>A maxed weapon whose partner bonus is owned can evolve (evolutions don't cost stuff levels).</summary>
+        public bool EvolutionReady
+        {
+            get
+            {
+                if (weapons != null) foreach (var w in weapons) if (CanEvolve(w)) return true;
+                return false;
+            }
+        }
+
+        /// <summary>A level-up should open the card screen (otherwise GameManager plays a level burst).</summary>
+        public bool HasChoices => !BuildComplete || EvolutionReady;
+
+        /// <summary>Weapons left out of this run's card pool (chosen at the start, same rule for everyone).</summary>
+        public IReadOnlyList<Weapon> AbsentWeapons => absent;
+        public bool IsAbsent(Weapon w) => absent.Contains(w);
+
+        /// <summary>"Batterie Tesla, Scie circulaire et Gaz toxique" (empty if none).</summary>
+        public string AbsentNames()
+        {
+            if (absent.Count == 0) return "";
+            var names = new List<string>();
+            foreach (var w in absent) names.Add(w.displayName);
+            if (names.Count == 1) return names[0];
+            return string.Join(", ", names.GetRange(0, names.Count - 1)) + " et " + names[names.Count - 1];
+        }
 
         void Awake()
         {
@@ -141,10 +199,11 @@ namespace Survivor
             return new List<Passive>
             {
                 // Evolution partners
-                P("damage", "Rage", "+12% dégâts", red, lame, s => s.damageMult += 0.12f),
+                // +0.14 on the 1.15 base = +12% of the base damage per level (5/5: +61%).
+                P("damage", "Rage", "+12% dégâts", red, lame, s => s.damageMult += 0.14f),
                 P("cooldown", "Adrénaline", "Armes 8% plus rapides", yellow, balle, s => s.cooldownMult *= 0.92f),
                 P("area", "Gros calibre", "+12% zone d'effet", orange, explosif, s => s.areaMult += 0.12f),
-                P("regen", "Sang froid", "+0.4 PV/s (pause 2 s après un coup), +0.5 de plus après 4 s sans être touché", green, survie | poison, s =>
+                P("regen", "Sang froid", "+0,4 PV/s (pause 2 s après un coup), +0,5 de plus après 4 s sans être touché", green, survie | poison, s =>
                 {
                     s.regen += 0.4f;
                     s.calmRegen += 0.5f;
@@ -152,17 +211,17 @@ namespace Survivor
                 P("duration", "Bidon d'essence", "+15% durée des effets et portée des scies", orange, feu | poison, s => s.durationMult += 0.15f),
                 P("projectiles", "Chargeur étendu", "+1 projectile pour toutes les armes (sauf le gaz)", yellow, balle, s => s.extraProjectiles += 1, 2),
                 P("corpse", "Cadavres explosifs", "+10% de chance qu'un ennemi tué explose", red, explosif, s => s.corpseExplodeChance += 0.1f),
-                P("crit", "Œil de lynx", "+8% critique, +15% dégâts critiques", yellow, lame | balle, s => { s.critChance += 0.08f; s.critMult += 0.15f; }),
+                P("crit", "Œil de lynx", "+8% de critique, +15% dégâts critiques", yellow, lame | balle, s => { s.critChance += 0.08f; s.critMult += 0.15f; }),
                 P("huile", "Huile de vidange", "+25% dégâts de brûlure", orange, feu, s => s.burnPower += 0.25f),
                 // Archero-style tricks
                 P("ricochet", "Ricochet", "Les balles rebondissent sur +1 ennemi (et +1 cible pour l'éclair)", blue, balle | elec, s => s.ricochets += 1, 3),
-                P("burn", "Balles incendiaires", "+12% de chance d'enflammer. Les ricochets enflamment toujours", orange, feu, s => s.burnChance += 0.12f, 4),
+                P("burn", "Balles incendiaires", "Tous tes coups : +12% de chance d'enflammer. Les ricochets enflamment toujours", orange, feu, s => s.burnChance += 0.12f, 4),
                 P("vampire", "Sangsue", "+5% de chance de rendre 3 PV par ennemi tué (2 PV/s max)", red, survie, s => s.lifeStealChance += 0.05f),
                 P("powder", "Poudre noire", "+8% de chance qu'une balle explose à l'impact", yellow, explosif | balle, s => s.bulletExplodeChance += 0.08f),
-                P("copper", "Fil de cuivre", "+8% de chance qu'un coup électrocute 2 ennemis proches", blue, elec, s => s.shockChance += 0.08f),
+                P("copper", "Fil de cuivre", "+8% de chance qu'un coup lance un arc sur 2 ennemis proches", blue, elec, s => s.shockChance += 0.08f),
                 P("battery", "Acide de batterie", "Tes éclairs empoisonnent (+15% du coup par seconde). Éclair + poison = Surcharge", teal, elec | poison,
                     s => s.shockPoison += 0.15f),
-                P("serrated", "Lame dentelée", "Les lames font saigner (+40%). Tes critiques aussi", red, lame, s => s.bleedPower += 0.4f),
+                P("serrated", "Lame dentelée", "Les lames font saigner (+40% du coup en 3 s). Tes critiques aussi (moitié)", red, lame, s => s.bleedPower += 0.4f),
                 P("hotblade", "Lame chauffée", "+12% de chance que tes lames enflamment. Lame sur ennemi en feu : Fer rouge", orange, lame | feu,
                     s => s.bladeIgnite += 0.12f, 4),
                 P("acid", "Fiole d'acide", "+10% de chance d'empoisonner. Feu + poison = explosion toxique", green, poison, s => s.poisonChance += 0.1f),
@@ -172,8 +231,9 @@ namespace Survivor
                 P("laststand", "Dos au mur", "Plus tu es blessé, plus tu frappes fort : jusqu'à +12% dégâts", red, survie, s => s.lowHpDamage += 0.12f),
                 P("speed", "Bottes de course", "+8% vitesse de déplacement", grey, ItemTag.None, s => s.moveSpeed *= 1.08f),
                 P("magnet", "Aimant rouillé", "+35% rayon de ramassage", blue, elec, s => s.pickupRadius *= 1.35f),
-                P("xp", "Cerveau frais", "+10% d'XP gagnée", blue, ItemTag.None, s => s.xpMult += 0.1f),
-                P("luck", "Patte de lapin", "Plus de cartes rares et épiques, et de 4e choix. +1 relance", clover, ItemTag.None, s =>
+                P("xp", "Cerveau frais", "+10% d'XP : stuff rempli plus vite, puis plus de primes de niveau", blue, ItemTag.None, s => s.xpMult += 0.1f),
+                P("luck", "Patte de lapin", Threats.NoSafetyNet ? "Plus de cartes rares et épiques, et de 4e choix"
+                    : "Plus de cartes rares et épiques, et de 4e choix. +1 relance", clover, ItemTag.None, s =>
                 {
                     s.luck += 1f;
                     if (Instance && !Threats.NoSafetyNet) Instance.RerollsLeft++; // threat "Sans filet": no reroll at all
@@ -208,7 +268,61 @@ namespace Survivor
                 if (w.Id == id && Progression.IsUnlocked(w)) start = w;
             if (!start) start = startingWeapon ? startingWeapon : weapons.Length > 0 ? weapons[0] : null;
             if (start) start.LevelUp();
+            PickAbsentWeapons(start);
+            announcedComplete = false;
             Synergies.Refresh(false);
+
+            if (absent.Count > 0 && GameHUD.Instance)
+                GameHUD.Instance.QueueBanner($"<size=72>ARSENAL DE LA PARTIE</size>\n<size=38>Absentes : {AbsentNames()}</size>",
+                    new Color(0.85f, 0.85f, 0.9f), 2.6f);
+        }
+
+        /// <summary>
+        /// Arsenal of the run: a few weapons are left out of the card pool so two runs don't play the same.
+        /// Never the starting weapon, never a weapon of the weekly element. Daily / weekly: from the seed (same for everyone).
+        /// </summary>
+        void PickAbsentWeapons(Weapon start)
+        {
+            absent.Clear();
+            absent.AddRange(AbsentFor(start, RunConfig.Seed, RunConfig.BoostedTag));
+        }
+
+        /// <summary>
+        /// The weapons a run leaves out: seeded (daily / weekly, same for everyone) when <paramref name="seed"/> isn't 0.
+        /// Also used by the ranked rules page to show them before the run.
+        /// </summary>
+        public List<Weapon> AbsentFor(Weapon start, int seed, ItemTag boosted)
+        {
+            var result = new List<Weapon>();
+            var candidates = new List<Weapon>();
+            foreach (var w in weapons)
+            {
+                if (w == start || !Progression.IsUnlocked(w)) continue;
+                if (boosted != ItemTag.None && (w.Tags & boosted) != 0) continue;
+                candidates.Add(w);
+            }
+            // Keep at least 5 weapons in play (start included) whatever the setting.
+            int count = Mathf.Clamp(absentWeapons, 0, Mathf.Max(0, weapons.Length - 5));
+            System.Random seededPick = seed != 0 ? new System.Random(GameModes.Hash(seed, StreamArsenal * 1000003, 0)) : null;
+            while (result.Count < count && candidates.Count > 0)
+            {
+                int i = seededPick != null ? seededPick.Next(0, candidates.Count) : Random.Range(0, candidates.Count);
+                result.Add(candidates[i]);
+                candidates.RemoveAt(i);
+            }
+            return result;
+        }
+
+        /// <summary>"Gaz toxique, Scie et Tesla" for a seeded run that starts with <paramref name="startId"/> (rules page).</summary>
+        public string AbsentNamesFor(string startId, int seed, ItemTag boosted)
+        {
+            Weapon start = null;
+            foreach (var w in weapons) if (w.Id == startId) start = w;
+            var list = AbsentFor(start, seed, boosted);
+            var names = new List<string>();
+            foreach (var w in list) names.Add(w.displayName);
+            if (names.Count <= 1) return names.Count == 1 ? names[0] : "";
+            return string.Join(", ", names.GetRange(0, names.Count - 1)) + " et " + names[names.Count - 1];
         }
 
         // ---------- Seeded draws (daily / weekly) ----------
@@ -221,7 +335,7 @@ namespace Survivor
         System.Random seeded;
         int handCount, exactCount, rerollCount, banishCount;
 
-        const int StreamHand = 1, StreamExact = 2, StreamReroll = 3, StreamBanish = 4;
+        const int StreamHand = 1, StreamExact = 2, StreamReroll = 3, StreamBanish = 4, StreamArsenal = 5;
 
         void SeedDraw(int stream, int index, int sub = 0)
         {
@@ -252,16 +366,24 @@ namespace Survivor
 
         bool CanEvolve(Weapon w)
         {
-            if (w.Level == 0 || !w.IsMaxed || w.Evolved) return false;
+            // A banished weapon keeps its levels but never evolves (see TryBanish).
+            if (w.Level == 0 || !w.IsMaxed || w.Evolved || banished.Contains(w.Id)) return false;
             var p = FindPassive(w.EvolutionPassive);
             return p != null && p.level > 0;
         }
 
+        /// <summary>Green = condition already met (on the evolution hints).</summary>
+        public const string DoneHex = "8CFF7A";
+
+        /// <summary>"Évolution : Nv 5 + Adrénaline", each condition already met in green.</summary>
         string EvolutionHint(Weapon w)
         {
             if (w.Evolved) return "";
             var p = FindPassive(w.EvolutionPassive);
-            return p == null ? "" : $"Évolution : max + {p.name}";
+            if (p == null) return "";
+            string lv = w.IsMaxed ? $"<color=#{DoneHex}>Nv {w.MaxLevel}</color>" : $"Nv {w.MaxLevel}";
+            string partner = p.level > 0 ? $"<color=#{DoneHex}>{p.name}</color>" : p.name;
+            return $"Évolution : {lv} + {partner}";
         }
 
         /// <summary>Joins two card hints with " · " when both fit on one line, else keeps the first non-empty one.</summary>
@@ -310,13 +432,13 @@ namespace Survivor
             _ => "",
         };
 
-        /// <summary>1, 2 or 3 levels, never more than the item has left.</summary>
+        /// <summary>1, 2 or 3 levels, never more than the item has left nor than the stuff has room for.</summary>
         int RollJump(int room)
         {
             float epic = EpicChance, rare = RareChance;
             float r = Rand01();
             int jump = r < epic ? 3 : r < epic + rare ? 2 : 1;
-            return Mathf.Clamp(jump, 1, Mathf.Max(1, room));
+            return Mathf.Clamp(jump, 1, Mathf.Max(1, Mathf.Min(room, BuildRoom)));
         }
 
         bool RollExtraCard()
@@ -349,13 +471,15 @@ namespace Survivor
         List<Candidate> BuildPool(HashSet<string> exclude)
         {
             var pool = new List<Candidate>();
+            // Full stuff: nothing can level up any more (evolutions are added by Roll, they're free).
+            if (BuildComplete) return pool;
 
             int ownedWeapons = OwnedWeapons();
             foreach (var w in weapons)
             {
                 if (w.IsMaxed || banished.Contains(w.Id) || (exclude != null && exclude.Contains(w.Id))) continue;
                 bool isNew = w.Level == 0;
-                if (isNew && (ownedWeapons >= maxWeapons || !Progression.IsUnlocked(w))) continue;
+                if (isNew && (ownedWeapons >= maxWeapons || !Progression.IsUnlocked(w) || absent.Contains(w))) continue;
                 // Weapons are the fun part: they come up about half the time. New ones that fit the build a bit more.
                 float weight = isNew ? NewWeaponWeight * Synergies.CardWeight(w.Tags) : OwnedWeaponWeight;
                 if (isNew && ownedWeapons >= DampNewWeaponsFrom) weight *= LateNewItemMult;
@@ -447,8 +571,8 @@ namespace Survivor
                 apply = () =>
                 {
                     bool wasNew = weapon.Level == 0;
-                    for (int i = 0; i < jump; i++) weapon.LevelUp();
-                    if (wasNew) Synergies.Refresh(true);
+                    for (int i = 0; i < jump && BuildRoom > 0; i++) weapon.LevelUp();
+                    AfterPick(wasNew);
                 },
             };
         }
@@ -458,13 +582,24 @@ namespace Survivor
             var passive = p;
             var rarity = (UpgradeRarity)(jump - 1);
 
-            // Tell the player when a bonus is the key to one of their weapons' evolution.
+            // Tell the player when a bonus is the key to one of their weapons' evolution (and how far that weapon is).
             string hint = "";
+            Weapon partnerOf = null;
             foreach (var w in weapons)
-                if (w.Level > 0 && !w.Evolved && w.EvolutionPassive == p.id) hint = $"Fait évoluer : {w.displayName}";
+            {
+                if (w.Evolved || w.EvolutionPassive != p.id) continue;
+                if (w.Level > 0)
+                {
+                    hint = p.level > 0 ? "" // already the partner: more levels don't change the evolution
+                        : w.IsMaxed ? $"Fait évoluer : {w.displayName} <color=#{DoneHex}>tout de suite !</color>"
+                        : $"Fait évoluer : {w.displayName} (Nv {w.Level}/{w.MaxLevel})";
+                }
+                else if (!absent.Contains(w)) partnerOf = w;
+            }
             // ...and which set bonus a new one pushes.
             if (p.level == 0) hint = JoinHint(hint, Synergies.CardHint(p.tags));
-            if (hint.Length == 0 && p.tags != ItemTag.None) hint = Synergies.TagNames(p.tags);
+            // Nothing better to say: the weapon it evolves (teaches the pairs).
+            if (hint.Length == 0 && partnerOf) hint = $"Partenaire d'évolution : {partnerOf.displayName}";
 
             return new UpgradeOption
             {
@@ -482,14 +617,25 @@ namespace Survivor
                 apply = () =>
                 {
                     bool wasNew = passive.level == 0;
-                    for (int i = 0; i < jump && passive.level < passive.maxLevel; i++)
+                    for (int i = 0; i < jump && passive.level < passive.maxLevel && BuildRoom > 0; i++)
                     {
                         passive.level++;
                         passive.apply(stats);
                     }
-                    if (wasNew) Synergies.Refresh(true);
+                    AfterPick(wasNew);
                 },
             };
+        }
+
+        /// <summary>Set bonus banners for a new item, then the "stuff complet" announce the first time the build is full.</summary>
+        void AfterPick(bool wasNew)
+        {
+            if (wasNew) Synergies.Refresh(true);
+            if (!BuildComplete || announcedComplete) return;
+            announcedComplete = true;
+            if (GameHUD.Instance)
+                GameHUD.Instance.QueueBanner($"STUFF COMPLET !\n<size=42>{BuildCap} niveaux. Chaque niveau suivant :\nonde de choc + soin + prime de score</size>",
+                    UIKit.Gold, 3.2f);
         }
 
         /// <summary>
@@ -566,6 +712,9 @@ namespace Survivor
                 if (CanEvolve(w)) result.Add(EvolutionOption(w));
             if (result.Count > count) result.RemoveRange(count, result.Count - count);
             int evolutions = result.Count;
+            // Full stuff: the hand is the evolution(s) only. Offering a heal next to it would let the player keep the
+            // evolution pending and farm a 50% heal on every later level.
+            if (BuildComplete && evolutions > 0) return result;
 
             var pool = BuildPool(null);
 
@@ -576,6 +725,31 @@ namespace Survivor
                 if (fresh.Count > 0)
                 {
                     var pick = fresh[RandRange(0, fresh.Count)];
+                    pool.Remove(pick);
+                    result.Add(MakeOption(pick));
+                }
+            }
+
+            // A weapon at Nv 5 always gets its partner bonus offered: a focused stuff must be able to reach its evolution
+            // (with ~25 bonuses in the pool, the partner could otherwise never show up before the stuff is full).
+            foreach (var w in weapons)
+            {
+                if (result.Count >= count) break;
+                if (w.Level == 0 || !w.IsMaxed || w.Evolved || banished.Contains(w.Id)) continue;
+                var partner = pool.Find(c => c.passive != null && c.passive.id == w.EvolutionPassive && c.passive.level == 0);
+                if (partner == null) continue;
+                pool.Remove(partner);
+                result.Add(MakeOption(partner));
+            }
+
+            // With a 20-level stuff, focusing must always be possible: every hand has a card that levels up a weapon
+            // the player owns (as long as one can still level up).
+            if (result.Count < count)
+            {
+                var owned = pool.FindAll(c => c.weapon && c.weapon.Level > 0);
+                if (owned.Count > 0)
+                {
+                    var pick = TakeWeighted(owned);
                     pool.Remove(pick);
                     result.Add(MakeOption(pick));
                 }
@@ -606,8 +780,9 @@ namespace Survivor
                 title = w.EvolutionName,
                 levelLabel = "ÉVOLUTION !",
                 description = w.EvolutionText,
-                hint = $"{w.displayName} évolue",
+                hint = $"{w.displayName} évolue · gratuit, hors stuff",
                 color = EvolutionColor,
+                tags = w.Tags,
                 inPreset = Presets.InActive(w.Id),
                 apply = () => weapon.Evolve(),
             };

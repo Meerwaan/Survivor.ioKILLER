@@ -52,16 +52,27 @@ namespace Survivor
             canvasRect.gameObject.SetActive(inRun && Shown);
             if (!inRun || !Shown) return;
 
-            label.text = GameModes.RunLabel;
-            label.color = RunConfig.SubmitScore ? UIKit.Gold : PracticeColor;
-            float width = Mathf.Clamp(label.preferredWidth + 48f, 260f, 900f);
-            pill.sizeDelta = new Vector2(width, 38f);
+            RefreshLabel();
 
             if (state == GameState.Playing && !introShown)
             {
                 introShown = true;
                 if (GameHUD.Instance) GameHUD.Instance.ShowBanner(IntroText(), RunConfig.SubmitScore ? Color.white : PracticeColor, 2.8f);
             }
+        }
+
+        int shownDanger = -1;
+
+        /// <summary>"CLASSIQUE  ·  DANGER 3", the tier colored from yellow to red.</summary>
+        void RefreshLabel()
+        {
+            int danger = RunDirector.Instance ? RunDirector.Instance.Danger : 1;
+            shownDanger = danger;
+            string hex = ColorUtility.ToHtmlStringRGB(RunDirector.DangerColor(danger));
+            label.text = $"{GameModes.RunLabel}   ·   <color=#{hex}>DANGER {danger}</color>";
+            label.color = RunConfig.SubmitScore ? UIKit.Gold : PracticeColor;
+            float width = Mathf.Clamp(label.preferredWidth + 48f, 260f, 900f);
+            pill.sizeDelta = new Vector2(width, 38f);
         }
 
         static string IntroText()
@@ -92,6 +103,7 @@ namespace Survivor
             if (Screen.safeArea != appliedSafeArea) ApplySafeArea();
             bool boss = RunDirector.Instance && RunDirector.Instance.CurrentBoss;
             if (pill.gameObject.activeSelf == boss) pill.gameObject.SetActive(!boss);
+            if (RunDirector.Instance && RunDirector.Instance.Danger != shownDanger) RefreshLabel();
         }
 
         void ApplySafeArea()

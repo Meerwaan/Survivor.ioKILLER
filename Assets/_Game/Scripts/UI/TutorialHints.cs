@@ -27,19 +27,23 @@ namespace Survivor
             Boss = 6,
             Reroll = 7,
             Pause = 8,
+            Stuff = 9,
+            Danger = 10,
         }
 
         static readonly Dictionary<Hint, string> Texts = new()
         {
             [Hint.Move] = "Glisse ton doigt n'importe où pour bouger.\n<color=#FFD94D>Tes armes tirent toutes seules !</color>",
             [Hint.Gems] = "Ramasse les <color=#66B3FF>gemmes</color> pour monter de niveau.",
-            [Hint.Choices] = "Chaque niveau = un choix. Tout le monde a les mêmes chances :\n<color=#FFD94D>c'est ton build qui fait la différence.</color>",
+            [Hint.Choices] = "Chaque niveau = un choix (jusqu'au stuff complet). Mêmes chances pour tous :\n<color=#FFD94D>c'est ton stuff qui fait la différence.</color>",
             [Hint.Evolution] = "Arme au <color=#FFD94D>Nv 5</color> + son bonus partenaire (indiqué sur la carte)\n= <color=#D973FF>ÉVOLUTION</color> surpuissante !",
-            [Hint.SetBonus] = "<color=#FFD94D>Bonus d'ensemble !</color> 2 objets du même type (Feu, Lame, Poison…)\n= bonus I. Va jusqu'à 4 pour le bonus II.",
+            [Hint.SetBonus] = "<color=#FFD94D>Synergie !</color> 2 objets de la même famille (Feu, Lame, Poison…)\n= palier I. Va jusqu'à 4 pour le palier II.",
             [Hint.LowHealth] = "<color=#FF5544>Vie basse !</color> Bouge, ne reste pas encerclé.\nLa <color=#FF8866>viande</color> et les coffres soignent.",
-            [Hint.Boss] = "<color=#FF5544>BOSS !</color> Suis la flèche rouge.\nTue-le : son coffre donne plusieurs améliorations.",
-            [Hint.Reroll] = "Pas de bonne carte ? <color=#FFD94D>RELANCER</color> tire 3 nouvelles cartes,\n<color=#FFD94D>BANNIR</color> retire un objet pour toute la partie.",
-            [Hint.Pause] = "Le bouton pause montre ton build complet\net tes bonus actifs.",
+            [Hint.Boss] = "<color=#FF5544>BOSS !</color> Suis la flèche rouge.\nTue-le : son coffre rapporte gros.",
+            [Hint.Reroll] = "Pas de bonne carte ? <color=#FFD94D>RELANCER</color> tire une nouvelle main,\n<color=#FFD94D>BANNIR</color> retire un objet pour toute la partie.",
+            [Hint.Pause] = "Le bouton pause montre ton stuff complet\net tes synergies actives.",
+            [Hint.Stuff] = "Ton <color=#FFD94D>STUFF</color> a 20 niveaux max (jauge sous les cartes).\nSpécialise-toi : <color=#FFD94D>armes Nv 5 + partenaires</color> !",
+            [Hint.Danger] = "Le <color=#FF7A50>DANGER</color> monte toutes les 2:30 (sous le chrono).\nEn haut à droite : ton score <color=#8CFF7A>contre ton record</color>.",
         };
 
         int seen;
@@ -140,6 +144,8 @@ namespace Survivor
 
             if (!Seen(Hint.Gems) && level <= 1 && t > 4f && XPGem.Active.Count > 0) return Hint.Gems;
             if (!Seen(Hint.Choices) && level >= 2 && leveled) return Hint.Choices;
+            if (!Seen(Hint.Stuff) && Seen(Hint.Choices) && level >= 4 && leveled) return Hint.Stuff;
+            if (!Seen(Hint.Danger) && RunDirector.Instance && RunDirector.Instance.Danger >= 2) return Hint.Danger;
             if (!Seen(Hint.SetBonus) && Synergies.Active().Count > 0) return Hint.SetBonus;
             if (!Seen(Hint.Evolution) && level >= 5 && t > 60f) return Hint.Evolution;
             if (!Seen(Hint.Reroll) && level >= 8 && UpgradeManager.Instance && UpgradeManager.Instance.RerollsLeft > 0) return Hint.Reroll;

@@ -14,11 +14,53 @@ namespace Survivor
         public StringBuilder log = new StringBuilder();
         public int levelUps, exceptions;
         public bool ended;
-        public float firstEvo = -1f, fullBuild = -1f;
+        public float firstEvo = -1f, fullBuild = -1f, stuffFull = -1f;
         public float minHpWindow = 1f;
         float angle, nextLog;
         int minFps = 999;
         float fpsAcc; int fpsFrames;
+
+        // ---------- Batch of runs (editor tests): Queue "focus" / "smart" / "random" runs, read AllLogs ----------
+
+        /// <summary>Runs still to play after the current one ("focus", "smart" or "random"). Each ends with Replay().</summary>
+        public static readonly System.Collections.Generic.Queue<string> Batch = new();
+        /// <summary>END lines of every finished batch run.</summary>
+        public static readonly StringBuilder AllLogs = new();
+        static bool hooked;
+
+        /// <summary>Starts a batch from Play mode on a fresh Classic run: e.g. StartBatch("focus","random","focus").</summary>
+        public static void StartBatch(params string[] kinds)
+        {
+            Batch.Clear();
+            foreach (var k in kinds) Batch.Enqueue(k);
+            if (!hooked)
+            {
+                hooked = true;
+                UnityEngine.SceneManagement.SceneManager.sceneLoaded += (_, _) => AttachNext(false); // Replay starts the run itself
+            }
+            AttachNext(true);
+        }
+
+        static void AttachNext(bool start)
+        {
+            if (Batch.Count == 0) return;
+            var pc = FindAnyObjectByType<PlayerController>();
+            if (!pc) return;
+            string kind = Batch.Dequeue();
+            var bot = pc.gameObject.AddComponent<ZzTestBot>();
+            bot.kind = kind;
+            bot.smart = kind != "random";
+            bot.focus = kind == "focus";
+            var gm = GameManager.Instance;
+            if (start && gm && gm.State == GameState.Menu)
+            {
+                GameModes.Configure(GameMode.Classic);
+                gm.StartRun();
+            }
+        }
+
+        public string kind = "";
+        float replayAt = -1f;
 
         void Awake() { Instance = this; Application.logMessageReceived += OnLog; }
         void OnDestroy() { Application.logMessageReceived -= OnLog; PlayerController.DebugInput = Vector2.zero; }
@@ -160,7 +202,12 @@ namespace Survivor
             return kiteDir;
         }
 
-        /// <summary>A decent player's priorities: evolve, level owned weapons, a 3rd/4th weapon, then passives.</summary>
+        /// <summary>
+        /// Card choice. smart: a decent player (evolve, level owned weapons, partners). focus (with smart): plans for the
+        /// 20-level stuff = 3 weapons to Nv 5 + their partners, no 4th weapon. Neither: a random card (the "random build" test).
+        /// </summary>
+        public bool focus = true;
+
         UpgradeOption Pick(System.Collections.Generic.List<UpgradeOption> opts)
         {
             Build(out int weapons, out int passives, out _);
@@ -169,12 +216,17 @@ namespace Survivor
             foreach (var o in opts)
             {
                 float s = 0f;
+                bool partner = o.hint.Contains("Fait évoluer");
+                bool set = o.hint.Contains("Débloque");
                 switch (o.kind)
                 {
                     case UpgradeKind.Evolution: s = 100f; break;
                     case UpgradeKind.Weapon: s = 50f; break;
-                    case UpgradeKind.NewWeapon: s = weapons < 3 ? 60f : weapons < 5 ? 25f : 5f; break;
-                    case UpgradeKind.Passive: s = o.hint.Contains("évoluer") ? 45f : o.levelLabel != null && !o.levelLabel.ToUpperInvariant().Contains("NOUVEAU") ? 30f : (passives < 6 ? 20f : 5f); break;
+                    case UpgradeKind.NewWeapon: s = weapons < 3 ? 60f : focus ? 3f : weapons < 5 ? 25f : 5f; break;
+                    case UpgradeKind.Passive:
+                        bool owned = o.levelLabel != null && !o.levelLabel.ToUpperInvariant().Contains("NOUVEAU");
+                        s = partner ? 55f : owned ? 30f : set ? 26f : passives < 6 ? 20f : 5f;
+                        break;
                     default: s = 1f; break;
                 }
                 s += (int)o.rarity * 8f;
@@ -189,15 +241,28 @@ namespace Survivor
             if (gm == null) return;
             if (gm.State == GameState.LevelUp)
             {
-                var opts = UpgradeManager.Instance.RollOptions(3);
-                if (opts.Count > 0) { levelUps++; gm.ChooseUpgrade(smart ? Pick(opts) : opts[0]); }
+                // The hand on screen (never re-roll: a seeded run must see the same hands as a human).
+                var hand = UpgradeManager.Instance.CurrentHand;
+                var opts = hand != null ? new System.Collections.Generic.List<UpgradeOption>(hand) : UpgradeManager.Instance.RollOptions(3);
+                if (opts.Count > 0) { levelUps++; gm.ChooseUpgrade(smart ? Pick(opts) : opts[Random.Range(0, opts.Count)]); }
                 return;
             }
+            var umLog = UpgradeManager.Instance;
+            if (umLog && umLog.BuildComplete && stuffFull < 0f) stuffFull = gm.RunTime;
             if (gm.State == GameState.GameOver && !ended)
             {
                 ended = true;
-                Build(out int w, out int p, out int e);
-                log.AppendLine($"END t={gm.RunTime:0} won={gm.Won} lvl={PlayerXP.Instance.Level} kills={gm.Kills} bosses={gm.BossKills} gold={gm.Gold} picks={levelUps} firstEvo={firstEvo:0} fullBuild={fullBuild:0} errors={exceptions}");
+                string b = Build(out int w, out int p, out int e);
+                string end = $"END [{kind}] t={gm.RunTime:0} won={gm.Won} lvl={PlayerXP.Instance.Level} score={gm.Score} burstScore={gm.LevelBurstScore} bursts={gm.LevelBursts} kills={gm.Kills} bosses={gm.BossKills} gold={gm.Gold} picks={levelUps} firstEvo={firstEvo:0} stuffFull={stuffFull:0} evos={e} errors={exceptions} absent={UpgradeManager.Instance.AbsentNames()} :: {b}";
+                log.AppendLine(end);
+                AllLogs.AppendLine(end);
+                if (Batch.Count > 0) replayAt = Time.unscaledTime + 1f;
+            }
+            if (replayAt > 0f && Time.unscaledTime >= replayAt)
+            {
+                replayAt = -1f;
+                gm.Replay();
+                return;
             }
             if (gm.State != GameState.Playing) { PlayerController.DebugInput = Vector2.zero; return; }
             if (Time.timeScale > 0.9f && Time.timeScale < speed) Time.timeScale = speed;
@@ -232,7 +297,7 @@ namespace Survivor
                 if (w >= 5 && p >= 6 && fullBuild < 0) fullBuild = gm.RunTime;
                 var we = WorldEvents.Instance;
                 var rd = FindAnyObjectByType<RunDirector>();
-                log.AppendLine($"[{gm.RunTime:0}s] L{PlayerXP.Instance.Level} {(rd ? rd.Phase.ToString() : "-")} hp {(hp ? hp.Fraction : 0):0.00} min {minHpWindow:0.00} alive {Enemy.Active.Count} comfort {ComfortMeter.Value:0.00} pres {(we ? we.PressureLevel : -1)} combo? fps {(fpsFrames > 0 ? fpsAcc / fpsFrames : 0):0}/{minFps} :: {b}");
+                log.AppendLine($"[{gm.RunTime:0}s] L{PlayerXP.Instance.Level} S{UpgradeManager.Instance.BuildLevels} {(rd ? rd.Phase.ToString() : "-")} hp {(hp ? hp.Fraction : 0):0.00} min {minHpWindow:0.00} alive {Enemy.Active.Count} comfort {ComfortMeter.Value:0.00} pres {(we ? we.PressureLevel : -1)} combo? fps {(fpsFrames > 0 ? fpsAcc / fpsFrames : 0):0}/{minFps} :: {b}");
                 fpsAcc = 0; fpsFrames = 0; minFps = 999; minHpWindow = 1f;
             }
         }

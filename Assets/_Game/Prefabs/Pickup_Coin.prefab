@@ -138,6 +138,6 @@ MonoBehaviour:
   type: 3
   healFraction: 0.2
   chestHealFraction: 0.3
-  chestUpgrades: 3
+  chestUpgrades: 2
   value: 2
   chestGold: 50

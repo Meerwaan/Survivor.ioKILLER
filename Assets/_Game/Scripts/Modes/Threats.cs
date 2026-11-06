@@ -10,7 +10,7 @@ namespace Survivor
         public string id;
         public string name;
         public string description;
-        /// <summary>Added to the score multiplier (0.25 = +25 %).</summary>
+        /// <summary>Added to the score multiplier (0.25 = +25%).</summary>
         public float bonus;
         /// <summary>Mutator: trades a boost for a restriction (smaller bonus, never picked for the daily / weekly).</summary>
         public bool mutator;
@@ -32,24 +32,33 @@ namespace Survivor
     public static class Threats
     {
         public const string Horde = "horde", Flesh = "chair", Fangs = "crocs", Sprint = "sprint", Elites = "elites",
-            BossRush = "boss", Famine = "famine", NoNet = "filet", Fragile = "fragile", GlassCannon = "verre";
+            BossRush = "boss", Famine = "famine", NoNet = "filet", Fragile = "fragile", GlassCannon = "verre", Light = "leger";
 
         static ThreatDef T(string id, string name, string desc, float bonus, bool mutator = false) =>
             new() { id = id, name = name, description = desc, bonus = bonus, mutator = mutator };
 
         public static readonly ThreatDef[] All =
         {
-            T(Horde, "Horde dense", "+30 % d'ennemis (flot, hordes, rats)", 0.25f),
-            T(Flesh, "Chair épaisse", "Ennemis +35 % de PV", 0.25f),
-            T(Fangs, "Crocs", "Ennemis +30 % de dégâts", 0.20f),
-            T(Sprint, "Sprinteurs", "Ennemis +15 % de vitesse", 0.20f),
-            T(Elites, "Élites enragées", "Élites plus fréquentes, +30 % PV, +1 affixe", 0.15f),
+            T(Horde, "Horde dense", "+30% d'ennemis (flot, hordes, rats)", 0.25f),
+            T(Flesh, "Chair épaisse", "Ennemis +35% de PV", 0.25f),
+            T(Fangs, "Crocs", "Ennemis +30% de dégâts", 0.20f),
+            T(Sprint, "Sprinteurs", "Ennemis +15% de vitesse", 0.20f),
+            T(Elites, "Élites enragées", "Élites plus fréquentes, +30% PV, +1 affixe", 0.15f),
             T(BossRush, "Boss pressé", "Un boss toutes les 2:30 au lieu de 3:20", 0.20f),
-            T(Famine, "Famine", "Aucune viande ne tombe (coffres seulement)", 0.15f),
+            T(Famine, "Famine", "Aucune viande ne tombe", 0.15f),
             T(NoNet, "Sans filet", "Ni relance, ni bannissement", 0.10f),
-            T(Fragile, "Fragile", "-30 % de PV max", 0.20f),
-            T(GlassCannon, "Verre canon", "+30 % de dégâts, mais -50 % de PV max", 0.10f, true),
+            T(Fragile, "Fragile", "-30% de PV max", 0.20f),
+            T(GlassCannon, "Verre canon", "+30% de dégâts, mais -50% de PV max", 0.10f, true),
+            // Appended last: indexes above must never move (daily / weekly picks use them).
+            T(Light, "Bagage léger", $"Stuff limité à {20 - LightCapCut} niveaux au lieu de 20", 0.20f),
         };
+
+        /// <summary>Threats the daily / weekly seeds pick from (the first N of All).</summary>
+        const int SeededPool = 10;
+
+        /// <summary>"Bagage léger": levels removed from the build cap (UpgradeManager.BuildCap).</summary>
+        const int LightCapCut = 4;
+        public static int BuildCapCut => Has(Light) ? LightCapCut : 0;
 
         // ---------- Tuning (what each threat does) ----------
 
@@ -137,7 +146,8 @@ namespace Survivor
         public static int PickFromSeed(int seed, int count)
         {
             var pool = new List<int>();
-            for (int i = 0; i < All.Length; i++) if (!All[i].mutator) pool.Add(i);
+            // Only the first 10 threats: the ones added later never change the daily / weekly picks of a seed.
+            for (int i = 0; i < Mathf.Min(All.Length, SeededPool); i++) if (!All[i].mutator) pool.Add(i);
             var rng = new System.Random(seed);
             int mask = 0;
             for (int n = 0; n < count && pool.Count > 0; n++)

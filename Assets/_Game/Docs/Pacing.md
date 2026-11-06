@@ -142,3 +142,80 @@ escalate to level 3 around 4:30 while the bot is comfortable. 60 fps (editor), 0
 A human should last longer than the bot (~12-15 min). Next levers if real playtests say it's too hard late:
 `endlessHealthPerMinuteSquared` (0.04) and `WorldEvents.comfortHigh`; too easy early: `PlayerStats.damageMult`.
 The first evolution (~4:30) comes a bit before the 6-8 min target; acceptable for now (it is the first "wow").
+
+## Stuff pass: 20-level build cap (2026-11-06, afternoon)
+
+The owner capped the build at ~20 upgrades ("sinon ça devient trop cheaté"). Design and labels: `Docs/Balance.md`, section
+"Stuff". What changed for the pacing:
+
+| Knob | Before | After | Why |
+|---|---|---|---|
+| XP curve | `2 + 1.1n + 0.07n^3` | same + `40 * max(0, n - 16)^2` (`PlayerXP.xpKnee / xpLate / xpLatePower`) | identical up to L17 (the first 3:30 were tuned and liked), then slower: once the stuff is full a level is a burst, about one a minute instead of every ~25 s |
+| Boss chest | 3 level-ups | 2 (`Pickup.chestUpgrades`) | otherwise the first boss alone fills 15% of the stuff |
+| Endless HP growth | `endlessHealthPerMinuteSquared` 0.04 | 0.01 | it was there to stop builds that kept growing; capped builds stop around 4-5 min, the base curve (0.03 m²) does the rest. HP mult: 10 min 6.5x (was 9.5x), 15 min 12.3x (was 19x), 20 min 20x (was 32x) |
+| XP curve (final) | knee 16 / late 40 | **knee 14 / late 45** | with the draw guarantees, knee 16 let a focused bot fill its stuff at 3:28 and burst every ~28 s |
+| Level-up | always the card screen | card screen until the stuff is full (or an evolution is ready), then an instant **level burst** | keeps the action flowing late |
+
+A first try (`0.1n^3.3`, no knee) slowed L10-16 too: the focused bot reached L10 at 2:16 and L12 stalled for 100 s before
+the 3:00 horde, dying at 2:51 and 3:35. Don't slow the levels before the first boss.
+
+Measured (kite bot skill 0.75, Classique, start weapon Gaz, 3 random absent weapons per run):
+
+| Run | Rules | Death | Level | Score | Stuff full | Evolutions | Bursts |
+|---|---|---|---|---|---|---|---|
+| focus | knee 16, owned-weapon card | 13:48 | 28 | 216 665 | 4:30 | 2 (partner never offered) | 12 (5% of score) |
+| random | same | 3:56 | 16 | 16 403 | - | 0 | 0 |
+| random | same | 3:40 | 17 | 15 926 | - | 0 | 0 |
+| focus | + partner guarantee | 12:58 | 28 | 219 472 | 3:28 | 3 (by ~3:30) | 20 (9%) |
+| **focus** | **final: knee 14 / late 45** | **16:56** | 28 | **332 453** | **5:12** | 3 (1st 2:39) | 18 (5%, one per ~39 s) |
+| **smart (wide: 4 weapons)** | final | **13:42** | 26 | **217 240** | 4:28 | 3 | 11 |
+| **random** | final | **7:05** | 22 | **61 907** | 4:55 | 0 (5 weapons Nv 2-3) | 2 |
+
+Final rules: focused > wide > random (Diamant/near-Légende > Diamant > Argent), a coherent stuff lasts 2-4x longer and
+scores 5-20x more than random picks: the owner's rule. 0 errors in every run. Gold ~1100-1600 per 13-17 min.
+HP oscillates 30-100% from minute 5 (dips in peaks, recovers in lulls), pressure events reach level 2-3 while comfortable.
+Next levers: too easy late -> `endlessHealthPerMinuteSquared` 0.01 -> 0.015; stuff full too early for humans (they pick
+up gems better than the bot) -> `xpLate` 45 -> 60; bursts too generous -> `GameManager.levelBurstHeal` 0.1 -> 0.07.
+
+## Danger tiers and "beat yourself" (2026-11-06, evening)
+
+Owner: "une vraie difficulté qui avance, qui fait que les gens reviennent pour se dépasser à chaque fois".
+
+**Danger tiers** (`RunDirector.Danger`, endless modes only, the campaign keeps its tuned stages): every `dangerStep` = 150 s
+the arena adds one rule, announced with a banner ("DANGER 3 · Pluie d'acide") and shown next to the mode label under
+the timer, colored yellow -> red. The hidden per-minute scaling is unchanged; the tiers make the climb legible and give
+each part of the run its own flavor. Tiers are cumulative:
+
+| Tier | From | Name | Rule |
+|---|---|---|---|
+| 1 | 0:00 | Crépuscule | base |
+| 2 | 2:30 | Les coureurs | runners x1.35 in the stream (x1.6 killed a focused bot at 4:44) |
+| 3 | 5:00 | Pluie d'acide | spitters x1.45 in the stream |
+| 4 | 7:30 | Élites enragées | elite interval x0.7, +1 affix |
+| 5 | 10:00 | La marée | hordes and assaults x1.3 |
+| 6 | 12:30 | Les colosses | brutes x1.7 in the stream |
+| 7 | 15:00 | Nuit rouge | enemies +10% speed |
+| 8+ | 17:30 | Apocalypse (2, 3...) | +12% enemy HP and damage per tier (`apocalypsePerTier`) |
+
+**Beat yourself** (`Modes/RunProgress.cs`, PlayerPrefs `progress_v1`, submitted ranked runs only): per board, the score
+of the personal-best run every 15 s (a "ghost"), the best danger tier, the longest run and the last 10 scores.
+- HUD, under "Record : X": "+3 200 vs record" (green) or "-1 100 vs record" (red) at the same moment of the record run;
+  past its length, "Encore X pour le record" or "RECORD BATTU +X".
+- Result screen: "NOUVEAU RECORD ! +X" or "Record : X · il t'a manqué Y", then "Danger 5 (record !) · Partie la plus
+  longue ! · Dernières : 45 k · 61 k · 217 k".
+- Ranked rules page: your records (danger, longest run, runs played) and last 5 scores before you start.
+
+Measured with the tiers (+ EnemyGrid perf change), kite bot, Classique:
+
+| Run | Death | Danger reached | Score | Stuff full | Evolutions |
+|---|---|---|---|---|---|
+| focus (Rev, Fusil, Gaz) | 20:25 | 9 (Apocalypse 2) | 393 015 | 5:00 | 3 |
+| focus (Mac, Gaz, Tesla) | 10:26 | 5 | 123 127 | 5:17 | 3 |
+| focus (Gaz, Fléchettes, Tesla), tiers 2-3 at x1.6 | 16:48 | 7 | 308 170 | 6:45 | 3 |
+| focus (Mac, Gaz, Tesla), tiers 2-3 at x1.6 | 4:44 | 2 | 22 977 | - | 1 |
+| smart / wide | 9:55 - 13:32 | 4 - 6 | 119 - 199 k | 4:30 - 7:23 | 3 |
+| random | 2:53 - 3:09 | 2 | 9 - 12 k | - | 0 - 1 |
+
+Machettes-based stuffs go less far than gun / gas stuffs (the evolution is defensive): the stuff decides the score.
+Légende (400 k) needs ~20 min: rare, as intended. Editor fps (x4 time scale) never below 26, 35 after 8 min. 0 errors.
+Levers: `dangerStep` (150 s), the tier multipliers in `RunDirector.DangerWeight`, `apocalypsePerTier` (0.12).

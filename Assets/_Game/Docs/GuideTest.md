@@ -1,4 +1,76 @@
-# Guide de test — nuit du 6 novembre 2026
+# Guide de test — soir du 6 novembre 2026 : difficulté qui monte + se dépasser
+
+## Nouveau
+
+1. **Paliers de DANGER** (modes classés, pas la campagne) : toutes les 2:30 le danger monte d'un cran, avec une bannière
+   et une nouvelle règle. Le palier est affiché sous le chrono (« CLASSIQUE · DANGER 3 »), du jaune au rouge.
+   | Palier | À | Nom | Règle |
+   |---|---|---|---|
+   | 2 | 2:30 | Les coureurs | plus de coureurs |
+   | 3 | 5:00 | Pluie d'acide | plus de cracheurs |
+   | 4 | 7:30 | Élites enragées | élites plus fréquentes, +1 affixe |
+   | 5 | 10:00 | La marée | hordes et assauts +30% |
+   | 6 | 12:30 | Les colosses | les brutes déferlent |
+   | 7 | 15:00 | Nuit rouge | ennemis +10% de vitesse |
+   | 8+ | 17:30 | Apocalypse | +12% PV et dégâts par palier |
+2. **Contre ton record, en direct** : en haut à droite, sous « Record », une ligne te dit si tu es devant
+   (« +3 200 vs record », vert) ou derrière (rouge) ton meilleur run au même moment. Comme un fantôme en course.
+3. **Écran de fin** : « NOUVEAU RECORD ! +12 300 » ou « il t'a manqué 4 300 », ton palier de danger contre ton meilleur,
+   ta partie la plus longue et tes derniers scores. Les mêmes records sont affichés dans les règles de chaque mode classé.
+4. **Défi du jour plus juste** : les affixes des élites sont maintenant les mêmes pour tout le monde (comme les cartes,
+   reliques et pactes).
+5. **Perf mobile** : les balles, scies et flaques de feu ne testent plus que les ennemis proches (~4 000 tests par image
+   au lieu de ~55 000 avec 350 ennemis).
+
+# (Avant) Guide de test — après-midi du 6 novembre 2026 : le STUFF de 20 niveaux
+
+## Ce qui change en jeu
+
+1. **Ton stuff a 20 niveaux max.** Chaque niveau d'arme ou de bonus compte (ton arme de départ = 1/20). Une jauge de
+   20 cases colorées sous les cartes montre où sont partis tes niveaux ; la barre d'XP affiche « Stuff 12/20 ».
+   - Les **évolutions sont gratuites** (hors stuff) : 3 armes au Nv 5 + leurs 3 partenaires = 18 niveaux = 3 évolutions.
+   - Prendre un peu de tout = beaucoup d'objets faibles (des synergies I/II, mais pas d'évolution). Se spécialiser paye.
+   - Chaque main de cartes propose **toujours au moins une carte pour monter une de tes armes**, et une arme au Nv 5
+     voit **toujours son bonus partenaire** proposé (pour pouvoir te spécialiser et évoluer).
+   - Les cartes rares/épiques donnent toujours +2/+3 niveaux, mais coûtent autant dans le stuff (c'est de l'avance, pas plus de puissance).
+2. **Stuff complet = « primes de niveau ».** Plus d'écran de cartes : chaque niveau fait une onde de choc qui nettoie autour
+   de toi, soigne 10 % et donne des points (40 × ton niveau). La barre d'XP devient dorée. Si une évolution est prête,
+   l'écran s'ouvre avec seulement l'évolution.
+3. **3 armes absentes à chaque partie** (« ARSENAL DE LA PARTIE » au début, rappel dans le menu pause et à la fin).
+   Jamais ton arme de départ. En défi du jour / de la semaine elles sont les mêmes pour tout le monde et affichées dans les règles.
+4. **Étiquettes sur les cartes** : chaque carte porte ses familles (FEU, EXPLOSIF, LAME…) ou UTILITAIRE.
+   L'évolution s'écrit « Évolution : Nv 5 + Adrénaline », chaque condition déjà remplie en vert ; un bonus partenaire dit
+   « Fait évoluer : Revolver (Nv 3/5) ».
+5. **Nouvelle menace (NG+)** : « Bagage léger », stuff limité à 16 niveaux, +20 % de score.
+
+## Mesures avec le bot (Classique, il joue comme un humain moyen)
+
+| Façon de choisir | Mort à | Score | Stuff complet | Évolutions |
+|---|---|---|---|---|
+| Spécialisé (3 armes + partenaires) | 13:00 – 16:56 | 216 000 – 332 000 | 3:30 – 5:12 | 2 – 3 |
+| Large (4 armes) | 13:42 | 217 000 | 4:28 | 3 |
+| Au hasard | 3:40 – 7:05 | 16 000 – 62 000 | – | 0 |
+
+Le hasard ne mène jamais aux grosses améliorations, un stuff cohérent fait 5 à 20x plus de points : c'est la règle que tu voulais.
+À tester toi-même : est-ce que le stuff complet arrive trop tôt ou trop tard pour toi (réglage : `PlayerXP.xpLate`),
+et est-ce que les primes de niveau sont assez fun.
+
+## Corrigé pendant la passe « cohérence »
+
+- **Boss garé hors écran** : tant qu'un boss vit il n'y a plus de hordes ; le semer permettait de farmer le score du temps.
+  Il te rattrape maintenant après 6 s hors écran. Et deux boss ne se superposent plus.
+- **Défi du jour** : reliques et pactes proposés sont maintenant les mêmes pour tout le monde (comme les cartes).
+- **Les événements de pression** ne tombent plus pendant un boss ou un pic de vague. Les **autels de pacte** ne se prennent
+  plus par accident en courant (1,5 s pour lire). La **zone sûre** ne peut plus apparaître hors de la carte.
+- **XP perdue** : quand il y a trop de gemmes au sol, l'XP va dans la gemme la plus proche (avant : une gemme au hasard sur la carte).
+- **Cadavres explosifs** profitent enfin d'Artificier (zone, réplique) et des réactions, comme les grenades.
+- **Chargeur étendu** accélère la Gatling du Diable (avant : aucun effet). **Rage** donne vraiment +12 %.
+- Étoile « santé » de la campagne : plus gagnable après une mort + revive (pub) ou la plume de phénix.
+- Pièces / viande / aimants oubliés très loin disparaissent (perf mobile). Les coffres restent.
+- ~25 textes corrigés (descriptions qui ne disaient pas la vérité : Fil de cuivre, Balles incendiaires, Lame dentelée,
+  Peste noire, Grenades, Famine, camp « NG+ bientôt »…) et un seul mot partout : **stuff**.
+
+# (Avant) Guide de test — nuit du 6 novembre 2026
 
 Tout compile, 0 erreur pendant les parties de test. Rien n'est commité dans git (tout est dans ta copie de travail).
 

@@ -47,7 +47,7 @@ namespace Survivor
         public override string Summary => "Explosions dévastatrices là où la foule est dense.";
         public override string EvolutionName => "Bombe à sous-munitions";
         public override string EvolutionPassive => "corpse";
-        public override string EvolutionText => "Chaque explosion projette 5 mini-bombes. Réaction en chaîne.";
+        public override string EvolutionText => "Chaque grenade éclate en 5 mini-bombes.";
         public override ItemTag Tags => ItemTag.Explosif;
 
         float timer;

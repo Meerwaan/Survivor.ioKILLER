@@ -229,12 +229,17 @@ namespace Survivor
                 if (i >= pending.Count || pending[i].time > now) continue;
                 var p = pending[i];
                 pending.RemoveAt(i);
-                Explosion(p.position, p.radius, p.damage, 7f, p.color);
+                // Corpse explosions (Cadavres explosifs, Mèche courte) are the player's explosions: they get the
+                // Explosif set bonuses and reactions (Artificier, Fusion, Dispersion) like grenades do.
+                if (p.corpse) Synergies.Explosion(p.position, p.radius, p.damage, 7f, p.color, ItemTag.Explosif);
+                else Explosion(p.position, p.radius, p.damage, 7f, p.color);
                 if (p.corpse && GameFX.Instance) GameFX.Instance.Blood(p.position + Vector3.up * 0.5f, 12);
                 if (p.playerDamage > 0f) HurtPlayer(p.position, p.radius, p.playerDamage);
             }
 
             // Mobile safety: never let a chain reaction pile up hundreds of explosions.
+            for (int i = 0; i < pending.Count && pending.Count > 40; i++)
+                if (pending[i].corpse) pending.RemoveAt(i--);
             if (pending.Count > 40) pending.RemoveRange(0, pending.Count - 40);
         }
 

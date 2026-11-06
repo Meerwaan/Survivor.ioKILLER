@@ -193,7 +193,7 @@ namespace Survivor
                 liveUpdate += () => { if (subtitle) subtitle.text = $"Défi du {GameModes.DayLabel(GameModes.Today)}  ·  nouveau défi dans {GameModes.FormatSpan(GameModes.UntilNextDaily)}"; };
             else if (mode == GameMode.Weekly)
                 liveUpdate += () => { if (subtitle) subtitle.text = $"Semaine {GameModes.ThisWeek % 100}  ·  fin dans {GameModes.FormatSpan(GameModes.UntilNextWeek)}"; };
-            else subtitle.text = "Survie infinie  ·  le hasard fait ton set";
+            else subtitle.text = "Survie infinie  ·  le hasard fait ton stuff";
 
             var content = MetaUI.Scroll(page, new Vector2(0, -10), new Vector2(1000, 1260), out pageScroll);
             float y = 0f;
@@ -223,6 +223,15 @@ namespace Survivor
             }, 38);
         }
 
+        /// <summary>Seeded runs: the absent weapons are known in advance, show them before the (single) ranked attempt.</summary>
+        static void AddAbsent(List<string> list, string startId, int seed, ItemTag boosted)
+        {
+            var um = UpgradeManager.Instance;
+            if (!um) return;
+            string names = um.AbsentNamesFor(startId, seed, boosted);
+            if (names.Length > 0) list.Add($"Armes absentes : <color=#BBBBBB>{names}</color>");
+        }
+
         static List<string> RuleLines(GameMode mode)
         {
             var list = new List<string>();
@@ -233,6 +242,7 @@ namespace Survivor
                     int day = GameModes.Today;
                     list.Add("La même partie pour tout le monde aujourd'hui");
                     list.Add($"Arme imposée : <color=#{MetaUI.GoldHex}>{GameModes.WeaponName(GameModes.DailyWeapon(day))}</color>");
+                    AddAbsent(list, GameModes.DailyWeapon(day), GameModes.DailySeed(day), ItemTag.None);
                     foreach (var t in Threats.InMask(GameModes.DailyThreats(day)))
                         list.Add($"Menace : <color=#FF8080>{t.name}</color>  <size=28>{t.description} (+{t.Percent} %)</size>");
                     list.Add("Cartes tirées dans le même ordre pour tous (mêmes choix = mêmes cartes)");
@@ -250,6 +260,7 @@ namespace Survivor
                     list.Add($"Élément de la semaine : <color=#{GameModes.ElementHex(el)}>{name}</color>, le même pour tout le monde");
                     list.Add($"Arme imposée : <color=#{MetaUI.GoldHex}>{GameModes.WeaponName(GameModes.WeeklyWeapon(week))}</color>");
                     list.Add($"Les cartes {name} sortent 2 fois plus souvent");
+                    AddAbsent(list, GameModes.WeeklyWeapon(week), GameModes.WeeklySeed(week), el);
                     foreach (var t in Threats.InMask(GameModes.WeeklyThreats(week)))
                         list.Add($"Menace : <color=#FF8080>{t.name}</color>  <size=28>{t.description} (+{t.Percent} %)</size>");
                     list.Add("Cartes tirées dans le même ordre pour tous (mêmes choix = mêmes cartes)");
@@ -259,10 +270,21 @@ namespace Survivor
                 default:
                     list.Add("Survie infinie, sans menace : les règles pures");
                     list.Add("Tout le monde commence pareil, aucun bonus permanent");
-                    list.Add("C'est le hasard (et tes choix) qui fait ton set en jeu");
+                    list.Add("C'est le hasard (et tes choix) qui fait ton stuff en jeu");
+                    list.Add("Stuff de 20 niveaux max, 3 armes absentes au hasard à chaque partie");
                     list.Add("Arme de départ : celle choisie dans le Codex");
-                    list.Add("Score = points des ennemis tués + 2 par seconde survécue");
+                    list.Add("Score = ennemis tués + 2 pts/s + primes de niveau (stuff complet)");
                     break;
+            }
+
+            // Every ranked mode is endless: the danger climbs, and your own records are the first thing to beat.
+            list.Add("Toutes les 2 min 30, le <color=#FF7A50>DANGER</color> monte d'un palier : une nouvelle règle, annoncée");
+            var prog = RunProgress.Find(GameModes.BoardOf(mode));
+            if (prog != null && prog.runs > 0)
+            {
+                list.Add($"<color=#{MetaUI.GoldHex}>Tes records</color> : Danger {prog.bestDanger}  ·  partie la plus longue {UIKit.FormatTime(Mathf.FloorToInt(prog.bestSeconds))}  ·  {prog.runs} partie{(prog.runs > 1 ? "s" : "")}");
+                string recent = RunProgress.RecentText(prog, 5);
+                if (recent.Length > 0) list.Add($"Tes dernières : {recent}");
             }
             return list;
         }
@@ -316,7 +338,7 @@ namespace Survivor
         {
             int best = Leaderboard.PersonalBest(GameModes.MenacesBoard);
             var m = Medals.For(GameModes.MenacesBoard, best);
-            Header("MENACES", best > 0 ? $"NG+  ·  Record {Medals.FormatScore(best)}  ·  {Medals.Name(m)}" : "NG+  ·  chaque menace multiplie ton score");
+            Header("MENACES", best > 0 ? $"NG+  ·  Record {Medals.FormatScore(best)}  ·  {Medals.Name(m)}" : "NG+  ·  chaque menace augmente ton multiplicateur");
             BackButton(Page.Home);
 
             if (!GameModes.MenacesUnlocked)
