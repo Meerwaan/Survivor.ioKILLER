@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951d701778a9b5743a169772cb280c95, type: 3}
+  m_Name: Splitter
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.EnemyData
+  displayName: Scindeur
+  prefab: {fileID: 2787210104301769612, guid: 2c1dfb490f2a40047b5d43bec07b6994, type: 3}
+  behaviour: 0
+  maxHealth: 30
+  moveSpeed: 2
+  damage: 9
+  attackInterval: 0.8
+  hitRadius: 0.48
+  knockbackResist: 0
+  canBeElite: 1
+  projectilePrefab: {fileID: 0}
+  projectileDamage: 8
+  projectileSpeed: 7
+  fireInterval: 2.5
+  preferredRange: 7
+  ringCount: 12
+  fuseRange: 2.2
+  fuseTime: 0.7
+  deathExplosionRadius: 0
+  deathExplosionDamage: 0
+  explosionColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  splitInto: {fileID: 11400000, guid: 30808e2b5e089c649b262bd7c2d079bd, type: 2}
+  splitCount: 3
+  escapeTime: 12
+  xp: 2
+  score: 25
+  loot: 0
+  bloodAmount: 30
+  bleeds: 1
+  hitSound: 7
+  deathSound: 9

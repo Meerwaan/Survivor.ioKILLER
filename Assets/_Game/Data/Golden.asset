@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951d701778a9b5743a169772cb280c95, type: 3}
+  m_Name: Golden
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.EnemyData
+  displayName: "Zombie dor\xE9"
+  prefab: {fileID: 1926516880807019863, guid: e16aef4a5436316429b9c400978798d3, type: 3}
+  behaviour: 0
+  maxHealth: 12
+  moveSpeed: 3.6
+  damage: 5
+  attackInterval: 0.8
+  hitRadius: 0.4
+  knockbackResist: 0
+  canBeElite: 0
+  projectilePrefab: {fileID: 0}
+  projectileDamage: 8
+  projectileSpeed: 7
+  fireInterval: 2.5
+  preferredRange: 7
+  ringCount: 12
+  fuseRange: 2.2
+  fuseTime: 0.7
+  deathExplosionRadius: 0
+  deathExplosionDamage: 0
+  explosionColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  splitInto: {fileID: 0}
+  splitCount: 0
+  escapeTime: 12
+  xp: 4
+  score: 30
+  loot: 4
+  bloodAmount: 18
+  bleeds: 1
+  hitSound: 7
+  deathSound: 8
