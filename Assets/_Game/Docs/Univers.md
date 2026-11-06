@@ -1,6 +1,6 @@
-# KARST — Bible de l'univers et direction artistique
+# CORDON — Bible de l'univers et direction artistique
 
-Version 2 — 6 novembre 2026. Nom de code provisoire : **KARST** (alternatives : *La Crue*, *Ambrés*, *Relais 17*, *Dravna*).
+Version 3 — 6 novembre 2026. Noms définitifs, choisis le 6 novembre : le jeu et la zone s'appellent **CORDON**, le labo **REGEN** (sa sécurité REGEN-SEC, son sérum RG-9), la ville **OSTROV**. Le mot « karst » ne désigne plus que la géologie du plateau.
 
 Ce qui change par rapport à la v1 : l'origine de la catastrophe est désormais **visible dans chaque carte** (les Bassins, la Dalle, les Six Tours, la Ligne) au lieu d'une cuve cachée dans une galerie ; le lore est **ancré dans des événements réels** (section 2.5) ; le bestiaire complet, avec les attaques, les signaux et les parades, est dans `Bestiaire.md` ; une section nouvelle explique comment **le lore se joue** et fait revenir le joueur (section 7) ; quelques contradictions corrigées (les Ambrés ne voient pas mais sentent et entendent, leur bouche n'est jamais scellée, les chiens ont des crocs d'ambre et non la mâchoire scellée).
 
@@ -9,7 +9,7 @@ Ce qui change par rapport à la v1 : l'origine de la catastrophe est désormais 
 Sommaire
 0. Le pitch en dix lignes
 1. Les cinq piliers
-2. Le monde : le Karst, Dravna, la chronologie, le Cordon, les ancrages réels, les repères visibles
+2. Le monde : le Cordon, Ostrov, la chronologie, la ligne, les ancrages réels, les repères visibles
 3. La Sève : ce que c'est, comment ça se transmet, les stades, les règles d'or
 4. Les factions
 5. Le bestiaire (résumé ; le détail est dans `Bestiaire.md`)
@@ -25,20 +25,20 @@ Sommaire
 
 ## 0. Le pitch en dix lignes
 
-Il y a deux ans, dans un bassin minier de l'Est qu'on appelle **le Karst**, le laboratoire privé **ARKHE** produisait sous contrat militaire un sérum de régénération. Ses résidus de production dormaient dans trois bassins de rétention à ciel ouvert, sur les anciens crassiers du Combinat. Après trois semaines de pluie, la digue du Bassin 3 a cédé : deux millions de mètres cubes de boue d'ambre ont traversé la ville en une nuit, puis sont descendus dans les gouffres jusqu'à la nappe. On a appelé ça **la Crue**.
+Il y a deux ans, dans un bassin minier de l'Est que tout le monde appelle aujourd'hui **le Cordon**, le laboratoire privé **REGEN** produisait sous contrat militaire un sérum de régénération. Ses résidus de production dormaient dans trois bassins de rétention à ciel ouvert, sur les anciens crassiers du Combinat. Après trois semaines de pluie, la digue du Bassin 3 a cédé : deux millions de mètres cubes de boue d'ambre ont traversé la ville en une nuit, puis sont descendus dans les gouffres jusqu'à la nappe. On a appelé ça **la Crue**.
 
 Les contaminés ne sont pas des morts-vivants. Ils sont vivants, affamés, et leur corps n'arrête plus de pousser : une croûte d'ambre leur ferme les yeux, scelle leurs plaies et leur pousse sur le dos une bosse dont la forme dit ce qu'ils sont devenus. On les appelle **les Ambrés**.
 
-L'armée a tracé un **Cordon** autour du Karst et tire sur tout ce qui bouge à l'intérieur. Dedans, trois groupes se disputent les ruines : les **Charognards** qui pillent, les **Fervents** qui vénèrent la Sève, et les mercenaires d'ARKHE, qui veulent récupérer leurs données et effacer les témoins.
+L'armée a tracé une ligne à 40 km autour du bassin et tire sur tout ce qui bouge à l'intérieur : c'est de cette ligne que la zone tient son nom. Dedans, trois groupes se disputent les ruines : les **Charognards** qui pillent, les **Fervents** qui vénèrent la Sève, et les mercenaires de REGEN, qui veulent récupérer leurs données et effacer les témoins.
 
-Toi, tu es un **Passeur**. Tu franchis le Cordon pour ramener de l'or et des vivres au **Relais 17**, un relais routier devenu camp. Ton injecteur transforme les **éclats** d'ambre des Ambrés que tu abats en boosts temporaires : plus tu en prends, plus tu deviens fort, et plus ils viennent à toi. Tout s'évapore quand tu ressors. Chaque sortie repart de zéro. Seul le **Registre des Passeurs** garde le score.
+Toi, tu es un **Passeur**. Tu t'enfonces dans le Cordon pour ramener de l'or et des vivres au **Relais 17**, un relais routier devenu camp. Ton injecteur transforme les **éclats** d'ambre des Ambrés que tu abats en boosts temporaires : plus tu en prends, plus tu deviens fort, et plus ils viennent à toi. Tout s'évapore quand tu ressors. Chaque sortie repart de zéro. Seul le **Registre des Passeurs** garde le score.
 
 ---
 
 ## 1. Les cinq piliers
 
 1. **Sale, pas fantastique.** Semi-réaliste. Tout a une explication matérielle : un produit, une digue, une nappe d'eau, un implant, un contrat. Pas de magie, pas de morts-vivants, pas de démons, pas d'aliens.
-2. **Une seule cause, mille formes.** Tout ce qui est hostile dans le Karst découle de la Sève : les Ambrés directement, les animaux par l'eau, les Greffés par le labo, les Fervents par la foi, les Charognards par la faim, ARKHE par la peur du scandale. Un ennemi sans lien avec la Sève n'entre pas.
+2. **Une seule cause, mille formes.** Tout ce qui est hostile dans le Cordon découle de la Sève : les Ambrés directement, les animaux par l'eau, les Greffés par le labo, les Fervents par la foi, les Charognards par la faim, REGEN par la peur du scandale. Un ennemi sans lien avec la Sève n'entre pas.
 3. **La guerre dehors, la faim dedans.** L'ambiance Tarkov : équipement usé, factions humaines dangereuses, radio qui grésille, artillerie au loin, économie de la débrouille. Le danger n'est jamais seulement « les monstres ».
 4. **Trash, mais pas gratuit.** Le carnage est satisfaisant (éclaboussures, croûtes qui volent, explosions) mais stylisé et cadré pour rester accessible aux ados (cible PEGI 16). Règles précises en 9.10.
 5. **Le lore se joue, il ne se lit pas.** Jamais un mur de texte. Le monde arrive par ce qu'on tue (le Carnet), ce qu'on ramasse (les Trouvailles), ce qu'on entend (la radio d'Irena) et ce qu'on voit (les repères). Section 7.
@@ -47,57 +47,57 @@ Toi, tu es un **Passeur**. Tu franchis le Cordon pour ramener de l'or et des viv
 
 ## 2. Le monde
 
-### 2.1 Le Karst
+### 2.1 Le Cordon
 
-Un plateau calcaire de 60 km de large, quelque part dans un pays de l'Est qu'on ne nomme jamais. Collines rases, gouffres, grottes, rivières qui disparaissent sous terre et ressortent dix kilomètres plus loin (les **résurgences**). Sous le plateau, l'eau circule dans un réseau de galeries naturelles : c'est ce qui a rendu la catastrophe possible. La boue de la Crue a trouvé les gouffres, et la nappe a fait le reste.
+Le Cordon, c'est d'abord la ligne militaire tracée à 40 km autour du bassin, et très vite le nom de tout ce qu'elle enferme. Dedans : un plateau calcaire (un karst) de 60 km de large, quelque part dans un pays de l'Est qu'on ne nomme jamais. Collines rases, gouffres, grottes, rivières qui disparaissent sous terre et ressortent dix kilomètres plus loin (les **résurgences**). Sous le plateau, l'eau circule dans un réseau de galeries naturelles : c'est ce qui a rendu la catastrophe possible. La boue de la Crue a trouvé les gouffres, et la nappe a fait le reste.
 
-Le bassin a vécu de la mine et de l'acier pendant un siècle. Quand le Combinat a fermé, la région s'est vidée, et ARKHE a racheté la friche pour une bouchée de pain.
+Le bassin a vécu de la mine et de l'acier pendant un siècle. Quand le Combinat a fermé, la région s'est vidée, et REGEN a racheté la friche pour une bouchée de pain.
 
 Pour les panneaux, enseignes et graffitis : alphabet latin avec diacritiques (č, ž, š, ř), jamais de cyrillique, jamais de drapeau réel. Le pays doit rester « l'Est » sans être un pays existant. Pour le décor, on pioche dans l'Europe centrale post-soviétique (barres à panneaux, voitures compactes, gares, kiosques), sans jamais citer un lieu.
 
-### 2.2 Dravna
+### 2.2 Ostrov
 
-La ville du bassin, 180 000 habitants avant la Crue. Du sud au nord, et de l'ouest à l'est :
+La ville du bassin, 180 000 habitants avant la Crue. Ostrov veut dire « île » : depuis la Crue, c'en est une. Du sud au nord, et de l'ouest à l'est :
 
 | Zone | Ce qu'on y trouve | Chapitre |
 |---|---|---|
 | **La Lisière** (périphérie) | villages, champs, checkpoints abandonnés, le Relais 17 | Prologue et le camp |
-| **Dravna-Sud** (banlieue) | lotissements de pavillons, le centre commercial *Galeria Dravna*, parkings | 1 |
-| **Dravna-Centre** | la gare, le métro (2 lignes), la place de la mairie et sa fontaine | 2 |
-| **Le Combinat** (est) | l'ancienne aciérie, et le site de production ARKHE construit dessus : **les Six Tours**, la raffinerie (l'unité de purification), la centrale thermique, les entrepôts | 3 |
-| **Hôpital Central** | l'aile Nord financée par ARKHE, où ont eu lieu les essais | 4 |
+| **Ostrov-Sud** (banlieue) | lotissements de pavillons, le centre commercial *Galeria Ostrov*, parkings | 1 |
+| **Ostrov-Centre** | la gare, le métro (2 lignes), la place de la mairie et sa fontaine | 2 |
+| **Le Combinat** (est) | l'ancienne aciérie, et le site de production REGEN construit dessus : **les Six Tours**, la raffinerie (l'unité de purification), la centrale thermique, les entrepôts | 3 |
+| **Hôpital Central** | l'aile Nord financée par REGEN, où ont eu lieu les essais | 4 |
 | **La Gare de triage et la Casse** (est) | wagons, conteneurs, le fief des Charognards | 5 |
 | **Les Bassins** (au-delà du Combinat) | les trois bassins de rétention vidés, devenus **le Désert d'ambre**, la brèche de la digue, et **la Dalle** coulée dessus | 6 |
 | **La Carrière de Belsk** (ouest) | carrière de calcaire à ciel ouvert, terrasses blanches, et sous elle le Berceau | 7 |
-| **La Forêt de Hlad** (nord) | pinède, cabanes de chasse, un relais de ski, **l'Antenne** d'ARKHE | 8 |
+| **La Forêt de Hlad** (nord) | pinède, cabanes de chasse, un relais de ski, **l'Antenne** de REGEN | 8 |
 | **Le Barrage de Stronje et les marais** (nord-est) | barrage hydroélectrique, lac, roselières, village noyé | 9 |
 | **Les Galeries de Kameny** (sous le plateau) | anciennes mines, grottes, le réseau d'eau, là où la boue s'est accumulée | 10 |
-| **Le Berceau** (sous la carrière) | le laboratoire de recherche ARKHE, salles blanches, l'origine | 11 |
+| **Le Berceau** (sous la carrière) | le laboratoire de recherche REGEN, salles blanches, l'origine | 11 |
 
 ### 2.3 Chronologie
 
 | Quand | Quoi |
 |---|---|
-| J−9 ans | Fermeture du Combinat Dravna-Métal. La région s'effondre. |
-| J−8 ans | ARKHE rachète la friche. Elle bâtit son site de production à côté de l'aciérie (les Six Tours, des bioréacteurs de 60 m) et creuse ses bassins de rétention sur les crassiers. Image publique : « 1 200 emplois pour Dravna ». |
-| J−6 ans | Contrat militaire secret : **programme ARK**, régénération accélérée des blessés pour le conflit gelé de la frontière (« la guerre dehors », jamais détaillée). La production commence. |
+| J−9 ans | Fermeture du Combinat Ostrov-Métal. La région s'effondre. |
+| J−8 ans | REGEN rachète la friche. Elle bâtit son site de production à côté de l'aciérie (les Six Tours, des bioréacteurs de 60 m) et creuse ses bassins de rétention sur les crassiers. Image publique : « 1 200 emplois pour Ostrov ». |
+| J−6 ans | Contrat militaire secret : **programme RG**, régénération accélérée des blessés pour le conflit gelé de la frontière (« la guerre dehors », jamais détaillée). La production commence. |
 | J−4 ans | Premiers essais humains à l'hôpital. **Sujet 01**, Milan Doubek, mineur volontaire, 41 ans. Résultats spectaculaires, puis le sujet est « transféré ». |
 | J−8 mois | Un audit interne signale que la digue du Bassin 3 est sous-dimensionnée et que les boues ne sont pas inactivées (trop cher). L'auditeur est racheté, le rapport enterré. |
 | J−3 semaines | Les pluies commencent. Record d'automne. |
-| **Jour 0, 4 h 12** | Crue de karst : la nappe remonte, les crassiers se gorgent d'eau, la digue du Bassin 3 cède. Deux millions de mètres cubes de boue d'ambre descendent sur le Combinat, la gare de triage, Dravna-Est, puis la rivière Vorna. Une partie plonge dans les gouffres. En 72 h, l'eau du robinet est contaminée. |
+| **Jour 0, 4 h 12** | Crue de karst : la nappe remonte, les crassiers se gorgent d'eau, la digue du Bassin 3 cède. Deux millions de mètres cubes de boue d'ambre descendent sur le Combinat, la gare de triage, Ostrov-Est, puis la rivière Vorna. Une partie plonge dans les gouffres. En 72 h, l'eau du robinet est contaminée. |
 | Jour 1 à 3 | « La Fièvre » : des milliers de malades, les urgences débordent. |
 | Jour 4 | Premières attaques. Personne ne comprend encore. |
 | Jour 6 | L'armée arrive. Le **Cordon** est tracé à 40 km. Évacuation partielle : un tiers de la ville sort. On abandonne les chiens. |
-| Jour 20 | Dravna est abandonnée. Les évacués sont parqués en quarantaine dehors ; beaucoup sont refoulés. |
-| Mois 2 | L'armée et ARKHE coulent du béton sur la brèche et sur ce qui reste des bassins : **la Dalle**. |
+| Jour 20 | Ostrov est abandonnée. Les évacués sont parqués en quarantaine dehors ; beaucoup sont refoulés. |
+| Mois 2 | L'armée et REGEN coulent du béton sur la brèche et sur ce qui reste des bassins : **la Dalle**. |
 | Mois 3 | Le Cordon se fige : conteneurs, miradors, artillerie. Doctrine officielle : tout ce qui bouge en zone profonde est une cible. |
 | Mois 6 | Fondation du **Relais 17** par des refoulés, sur un relais routier de la Lisière, à l'intérieur du Cordon. |
-| An 1 | ARKHE revient en hélicoptère avec sa sécurité privée, s'installe sur la Dalle et rouvre le Berceau. Les Fervents apparaissent autour du Barrage. Les Charognards s'organisent à la gare de triage. |
+| An 1 | REGEN revient en hélicoptère avec sa sécurité privée, s'installe sur la Dalle et rouvre le Berceau. Les Fervents apparaissent autour du Barrage. Les Charognards s'organisent à la gare de triage. |
 | **An 2, aujourd'hui** | Chaque automne, la nappe remonte : la **saison de Crue**, où les résurgences se multiplient. Le jeu se passe maintenant. |
 
-### 2.4 Le Cordon et « la guerre dehors »
+### 2.4 La ligne et « la guerre dehors »
 
-L'armée n'est jamais un ennemi à abattre (on évite tout sujet politique). C'est un **décor et une menace d'environnement** : miradors au loin, hélicoptères qui passent, et surtout **l'artillerie** qui frappe les zones où elle détecte du mouvement. C'est ce qui justifie l'événement « cercles de visée à éviter » (6.5). Le dehors est un pays en guerre froide avec son voisin, fauché, qui a signé le contrat ARK et préfère que le Karst reste fermé.
+L'armée n'est jamais un ennemi à abattre (on évite tout sujet politique). C'est un **décor et une menace d'environnement** : miradors au loin, hélicoptères qui passent, et surtout **l'artillerie** qui frappe les zones où elle détecte du mouvement. C'est ce qui justifie l'événement « cercles de visée à éviter » (6.5). Le dehors est un pays en guerre froide avec son voisin, fauché, qui a signé le contrat RG et préfère que le Cordon reste fermé.
 
 Les Passeurs commercent avec des soldats du Cordon corrompus, **les Guichets** : on passe de l'or, on reçoit des graines, des médicaments, des pièces. C'est l'économie du camp.
 
@@ -107,15 +107,15 @@ Comme Tarkov avec Tchernobyl, les SMP et les zones économiques spéciales : rie
 
 | Élément du jeu | Ce qui a existé | Ce qu'on en prend |
 |---|---|---|
-| Le Karst | le Kras, plateau calcaire de Slovénie qui a donné son nom au mot ; gouffres, grottes, résurgences | la géologie, l'eau qui circule sous terre |
-| Dravna | Pripyat (ville modèle abandonnée en 1986), Ostrava et Nowa Huta (villes d'acier) | la ville-usine, les barres, la fierté industrielle |
+| Le plateau | le Kras, plateau calcaire de Slovénie, qui a donné le mot « karst » ; gouffres, grottes, résurgences | la géologie, l'eau qui circule sous terre |
+| Ostrov | Pripyat (ville modèle abandonnée en 1986), Ostrava et Nowa Huta (villes d'acier) | la ville-usine, les barres, la fierté industrielle |
 | La Crue | Baia Mare 2000 (une digue de bassin de rétention de cyanure cède après des pluies, le poison descend la Tisza) ; Ajka 2010 (la boue rouge d'une usine d'alumine envahit des villages, laisse une ligne sur chaque mur) ; Brumadinho 2019 (rupture de digue de résidus miniers) | la digue, la vague, la ligne de marée, la boue séchée |
 | La Dalle | le sarcophage de Tchernobyl | couler du béton sur le problème |
 | Le Cordon et l'évacuation | la zone d'exclusion de Tchernobyl, Fukushima 2011 | le périmètre, les checkpoints, les gens refoulés |
-| ARKHE et le secret | Sverdlovsk 1979 (fuite d'anthrax d'une usine militaire, maquillée en viande avariée) ; Bhopal 1984 (économies sur la sécurité) ; Biopreparat | la négligence couverte, le contrat d'État |
+| REGEN et le secret | Sverdlovsk 1979 (fuite d'anthrax d'une usine militaire, maquillée en viande avariée) ; Bhopal 1984 (économies sur la sécurité) ; Biopreparat | la négligence couverte, le contrat d'État |
 | La Sève | la régénération de l'axolotl, les facteurs de croissance, la production de protéines en bioréacteur | un produit plausible, pas un virus de film |
 | GREFFE | les programmes de soldat augmenté, les stimulants de guerre | le volontaire endetté, l'implant |
-| ARKHE-SEC | les sociétés militaires privées | des pros sans visage |
+| REGEN-SEC | les sociétés militaires privées | des pros sans visage |
 | Les Charognards | les pillards de Pripyat, les ferrailleurs de la zone | la récup comme économie |
 | Les Fervents | les *samosely* (ceux qui sont revenus vivre dans la zone de Tchernobyl), les sectes de fin du monde | rester là où personne ne reste |
 | La Meute | les chiens de Tchernobyl, descendants des animaux abandonnés | |
@@ -134,26 +134,26 @@ L'origine ne doit pas être un texte : elle doit se voir. Au moins **un repère 
 | **La Ligne** | la ligne de marée de la Crue sur les murs : 2 m à l'est, 40 cm au centre, rien au sud | sur chaque façade des chapitres 2, 3, 5, 6 |
 | **La Croûte** | la boue d'ambre séchée, craquelée, dans les rues basses | chapitres 3, 5, 6 |
 | **La Brèche** | la digue éventrée du Bassin 3 | chapitre 6 |
-| **La Dalle** | le béton gris coulé sur les bassins, marquages cyan, base d'ARKHE-SEC dessus | chapitre 6, visible depuis la carrière |
+| **La Dalle** | le béton gris coulé sur les bassins, marquages cyan, base de REGEN-SEC dessus | chapitre 6, visible depuis la carrière |
 | **Le Désert d'ambre** | les bassins vidés, fond craquelé, flaques qui pulsent | chapitre 6 |
-| **L'Antenne** | la tour-relais rouge et blanche d'ARKHE, au-dessus des pins | chapitre 8, visible du barrage |
+| **L'Antenne** | la tour-relais rouge et blanche de REGEN, au-dessus des pins | chapitre 8, visible du barrage |
 | **Les résurgences** | flaques d'ambre lumineuses, la nappe qui remonte | partout, de plus en plus vers le nord et vers le bas |
 
 ---
 
-## 3. La Sève (ARK-9)
+## 3. La Sève (RG-9)
 
 ### 3.1 Ce que c'est
 
-Un facteur de régénération synthétique, conçu pour refermer une plaie de guerre en quelques heures. Il reprogramme la croissance cellulaire. Produit par des cultures cellulaires dans les Six Tours, purifié à la raffinerie, conditionné pour l'armée. Le problème n'était pas le produit fini : c'étaient **les boues**, le milieu de culture usé, encore chargé d'agent actif, qu'ARKHE aurait dû inactiver et qu'elle a stockées à ciel ouvert pendant six ans parce que l'inactivation coûtait trop cher.
+Un facteur de régénération synthétique, conçu pour refermer une plaie de guerre en quelques heures. Il reprogramme la croissance cellulaire. Produit par des cultures cellulaires dans les Six Tours, purifié à la raffinerie, conditionné pour l'armée. Le problème n'était pas le produit fini : c'étaient **les boues**, le milieu de culture usé, encore chargé d'agent actif, que REGEN aurait dû inactiver et qu'elle a stockées à ciel ouvert pendant six ans parce que l'inactivation coûtait trop cher.
 
-Au contact de l'eau du Karst, chargée en calcaire et en fer, l'agent s'est **stabilisé** au lieu de se dégrader. Dans un corps, rien ne l'arrête : les tissus surconstruisent, et l'excès sécrète un polymère protéique chargé en minéraux qui durcit à l'air comme une sève d'arbre. C'est **l'ambre**. D'où le nom.
+Au contact de l'eau du plateau, chargée en calcaire et en fer, l'agent s'est **stabilisé** au lieu de se dégrader. Dans un corps, rien ne l'arrête : les tissus surconstruisent, et l'excès sécrète un polymère protéique chargé en minéraux qui durcit à l'air comme une sève d'arbre. C'est **l'ambre**. D'où le nom.
 
 ### 3.2 Comment ça se transmet
 
 1. **L'eau.** La cause de la Crue. Boire, se laver, respirer la brume d'une résurgence. Aujourd'hui la majorité des nouveaux cas.
 2. **La morsure et la plaie.** La Sève est concentrée dans la salive et la croûte. Une morsure profonde = contamination.
-3. **L'injection.** Ce que fait le joueur, à dose contrôlée et temporaire (6.1). Ce que faisait ARKHE à ses Greffés.
+3. **L'injection.** Ce que fait le joueur, à dose contrôlée et temporaire (6.1). Ce que faisait REGEN à ses Greffés.
 
 On ne l'attrape pas par l'air en conditions normales. Un Passeur bien équipé (masque, gourde filtrante) tient une sortie.
 
@@ -180,7 +180,7 @@ Le cerveau : le système limbique s'emballe (faim, agression), le cortex s'effac
 - La Sève ne ressuscite rien. Un Ambré mort reste mort.
 - Elle n'est pas intelligente, ne communique pas, n'a pas de volonté. Elle a des **stimuli** : l'odeur de la sève, le son, la chaleur. Les Fervents croient le contraire : ils ont tort.
 - Elle ne se transmet pas en touchant une croûte sèche.
-- Il n'y a pas de remède. ARKHE cherche un **régulateur**, pas un antidote.
+- Il n'y a pas de remède. REGEN cherche un **régulateur**, pas un antidote.
 - Rien ne vole grâce à la Sève. Les seuls volants sont des corneilles et des drones.
 - Toute attaque d'un ennemi a une cause dans son corps : une gorge, des cuisses, des bras, un ventre, des poumons. Pas de « pouvoir ».
 
@@ -190,13 +190,13 @@ Le cerveau : le système limbique s'emballe (faim, agression), le cortex s'effac
 
 Chaque faction a une couleur, une silhouette et un mot pour désigner les infectés. C'est ce qui rend une vague lisible d'un coup d'œil.
 
-### 4.1 ARKHE — blanc et cyan
+### 4.1 REGEN — blanc et cyan
 
-Biotech privée, façade régionale, contrat militaire derrière. PDG : **Konrad Vell**, jamais vu, seulement signé. Directrice du site de Dravna et de l'aile Nord : **Dr Ilona Marek**, disparue le Jour 20 (voir 7.4). Après la Crue, ARKHE a d'abord disparu, puis est revenue avec **ARKHE-SEC**, sa sécurité privée (ex-militaires sous contrat), installée sur la Dalle. Objectifs : récupérer les données et les échantillons, détruire les preuves, ramener des Souches vivantes, et surtout **récupérer les injecteurs** (7.4). Le joueur est pour eux un témoin, un voleur, et une donnée.
+Biotech privée, façade régionale, contrat militaire derrière. PDG : **Konrad Vell**, jamais vu, seulement signé. Directrice du site d'Ostrov et de l'aile Nord : **Dr Ilona Marek**, disparue le Jour 20 (voir 7.4). Après la Crue, REGEN a d'abord disparu, puis est revenue avec **REGEN-SEC**, sa sécurité privée (ex-militaires sous contrat), installée sur la Dalle. Objectifs : récupérer les données et les échantillons, détruire les preuves, ramener des Souches vivantes, et surtout **récupérer les injecteurs** (7.4). Le joueur est pour eux un témoin, un voleur, et une donnée.
 
-- **Look** : plaques pare-balles gris clair, combinaisons blanches salies, respirateurs intégraux à visière cyan (on ne voit jamais un visage ARKHE). Chevrons cyan sur les épaules. Conteneurs blancs à bande cyan.
+- **Look** : plaques pare-balles gris clair, combinaisons blanches salies, respirateurs intégraux à visière cyan (on ne voit jamais un visage REGEN). Chevrons cyan sur les épaules. Conteneurs blancs à bande cyan.
 - **Mot pour les infectés** : « sujets IR » (Infectés Régénératifs).
-- **Programme GREFFE** : des volontaires endettés reçoivent le **Régulateur R-3**, un implant spinal à trois diodes, et des micro-doses de Sève : régénération et force sans perdre la tête. Tant que l'implant tient. Dans le Karst, la concentration ambiante fait dérailler le Régulateur : les diodes passent du cyan à l'ambre, puis au rouge, et le Greffé devient un **Déréglé**. C'est la touche « modifié génétiquement / cyber » : la fusion des deux couleurs signature se lit immédiatement comme « ARKHE + infection ». **Sujet 04** est le premier Déréglé, abandonné sur la Dalle. **Sujet 07, Anton Rask**, est le seul Greffé stable : le Greffé Prime.
+- **Programme GREFFE** : des volontaires endettés reçoivent le **Régulateur R-3**, un implant spinal à trois diodes, et des micro-doses de Sève : régénération et force sans perdre la tête. Tant que l'implant tient. Dans le Cordon, la concentration ambiante fait dérailler le Régulateur : les diodes passent du cyan à l'ambre, puis au rouge, et le Greffé devient un **Déréglé**. C'est la touche « modifié génétiquement / cyber » : la fusion des deux couleurs signature se lit immédiatement comme « REGEN + infection ». **Sujet 04** est le premier Déréglé, abandonné sur la Dalle. **Sujet 07, Anton Rask**, est le seul Greffé stable : le Greffé Prime.
 
 ### 4.2 Le Cordon (l'armée) — jamais un ennemi
 
@@ -204,7 +204,7 @@ Décor et menace d'environnement (2.4). Commandé par « le Colonel », jamais v
 
 ### 4.3 Les Charognards — bleu de travail et bandes réfléchissantes
 
-Les gens qui ne sont pas sortis et ne se sont pas convertis. Des pillards organisés en réseau souple depuis la gare de triage, autour d'un receleur qu'on appelle **le Ferrailleur** (« Ferro »). Ils vivent de ce que Dravna contient encore et vendent aux Guichets, comme les Passeurs. Le joueur est un concurrent, et ARKHE a mis une prime sur les Passeurs.
+Les gens qui ne sont pas sortis et ne se sont pas convertis. Des pillards organisés en réseau souple depuis la gare de triage, autour d'un receleur qu'on appelle **le Ferrailleur** (« Ferro »). Ils vivent de ce qu'Ostrov contient encore et vendent aux Guichets, comme les Passeurs. Le joueur est un concurrent, et REGEN a mis une prime sur les Passeurs.
 
 - **Look** : vêtements civils superposés, vestes de travail bleues du Combinat, gilets et bandes réfléchissantes argent (lisibles de loin en vue de dessus), bandanas, tags à la bombe. Armes improvisées : battes, cloueurs, fusils de chasse, cocktails.
 - **Mot pour les infectés** : « les Gueules ».
@@ -212,7 +212,7 @@ Les gens qui ne sont pas sortis et ne se sont pas convertis. Des pillards organi
 
 ### 4.4 Les Fervents (« la Résurgence ») — blanc sale et violet
 
-Des survivants qui ont décidé que la Sève était un don : la vie qui déborde. Ils vivent autour du Barrage, se couvrent de sève diluée (**l'Onction**) qui fait que les Ambrés les ignorent, et **conduisent les hordes** vers les intrus avec des cloches. Leur cheffe, **la Mère des Sources**, est une infectée de stade III restée lucide, un cas unique qu'ARKHE voudrait récupérer plus que tout.
+Des survivants qui ont décidé que la Sève était un don : la vie qui déborde. Ils vivent autour du Barrage, se couvrent de sève diluée (**l'Onction**) qui fait que les Ambrés les ignorent, et **conduisent les hordes** vers les intrus avec des cloches. Leur cheffe, **la Mère des Sources**, est une infectée de stade III restée lucide, un cas unique que REGEN voudrait récupérer plus que tout.
 
 - **Look** : chiffons et draps blancs tachés d'ambre, marques violettes (un pigment de teinturerie trouvé dans les stocks du Combinat), cloches, bâtons, pieds nus. Pas d'iconographie religieuse réelle : des cercles, des spirales d'eau, des mains ouvertes.
 - **Mot pour les infectés** : « les Éveillés ».
@@ -235,9 +235,9 @@ Le détail complet est dans `Bestiaire.md` : rôle, attaque, télégraphe, parad
 - **Six rôles** qui composent une vague : Pression, Mur, Perçage, Déni, Contrôle, Opportunité. Une vague sans Perçage est molle, une vague avec trois Contrôles est injuste.
 - **Douze Ambrés** : Ambré, Fiévreux, Masse, Cracheur, Kyste, Colonie, Rejeton, Bondisseur, Hurleur, Accrocheur, Rampant, Cristallisé. Huit existent déjà sous d'autres noms.
 - **Cinq animaux** : Nuée, Meute, Nuée noire, Sanglier, l'Ours.
-- **Quatorze humains et hybrides** en trois factions : Charognards (Pilleur, Porteur, Cogneur, Fusilier, Lanceur, le Ferrailleur), Fervents (Fervent, Berger, Martyr, la Mère des Sources), ARKHE (Opérateur, Bouclier, Drone, Greffé, Déréglé, Greffé Prime).
+- **Quatorze humains et hybrides** en trois factions : Charognards (Pilleur, Porteur, Cogneur, Fusilier, Lanceur, le Ferrailleur), Fervents (Fervent, Berger, Martyr, la Mère des Sources), REGEN (Opérateur, Bouclier, Drone, Greffé, Déréglé, Greffé Prime).
 - **Huit affixes** d'élite (cinq existent), **onze Souches** (une existe), **trois props** dont la Résurgence, un nid.
-- **Chaque attaque est expliquée par le corps** : une gorge sous pression crache, des cuisses surconstruites sautent, des bras à crochets attrapent, un ventre plein de sève éclate, des poumons surconstruits hurlent. Les humains tirent, lancent, sonnent. ARKHE régénère et bloque.
+- **Chaque attaque est expliquée par le corps** : une gorge sous pression crache, des cuisses surconstruites sautent, des bras à crochets attrapent, un ventre plein de sève éclate, des poumons surconstruits hurlent. Les humains tirent, lancent, sonnent. REGEN régénère et bloque.
 - **Chaque attaque a un signal** d'au moins 0,5 s et une parade apprise.
 
 ---
@@ -246,7 +246,7 @@ Le détail complet est dans `Bestiaire.md` : rôle, attaque, télégraphe, parad
 
 ### 6.1 L'injecteur, les éclats, la remise à zéro
 
-Le Passeur porte à l'avant-bras un **injecteur ARKHE de terrain**. Les Ambrés abattus lâchent des **éclats** d'ambre (les gemmes d'XP actuelles). L'injecteur les dissout en micro-doses : réflexes, force, endurance, c'est la montée de niveau. Chaque palier, le Passeur **adapte son kit** (les cartes de niveau) avec ce qu'il a dans le sac et ce qu'il ramasse.
+Le Passeur porte à l'avant-bras un **injecteur REGEN de terrain**. Les Ambrés abattus lâchent des **éclats** d'ambre (les gemmes d'XP actuelles). L'injecteur les dissout en micro-doses : réflexes, force, endurance, c'est la montée de niveau. Chaque palier, le Passeur **adapte son kit** (les cartes de niveau) avec ce qu'il a dans le sac et ce qu'il ramasse.
 
 La dose **brûle en quelques heures**. Rien ne reste quand on ressort. C'est l'explication en univers de la règle de design « tout le monde part à égalité » : aucun Passeur ne peut stocker de la puissance. En prendre trop longtemps, c'est devenir Ambré.
 
@@ -261,8 +261,8 @@ D'où viennent les injecteurs ? Le camp croit les avoir récupérés sur des Gre
 | Éclats (gemmes d'XP) | éclats d'ambre, dissous par l'injecteur |
 | Or | or au sens propre : bijoux, pièces, or dentaire, la seule chose que les Guichets acceptent. Ça sert au camp, jamais à la force du Passeur. |
 | Viande (soin) | à renommer **Ration** : conserves et barres, lâchées par les humains et les caisses, pas par les Ambrés |
-| Aimant | collecteur ARKHE : l'ambre est faiblement magnétique (sels de fer de la nappe), l'outil attire les éclats |
-| Coffre | caisse de largage ARKHE ou cache de Charognard |
+| Aimant | collecteur REGEN : l'ambre est faiblement magnétique (sels de fer de la nappe), l'outil attire les éclats |
+| Coffre | caisse de largage REGEN ou cache de Charognard |
 | Relique (zone, prime) | **échantillon** : une souche rare que les Guichets paient très cher |
 
 ### 6.3 Le Relais 17 (le camp)
@@ -283,12 +283,12 @@ Le confort du camp est le vrai but de l'or : l'eau filtrée, la chaleur, les lit
 
 ### 6.4 Missions, registre, modes
 
-- **Missions** = **contrats** captés par la Radio : « la Gare entend qu'un Cristallisé traîne au métro », « ARKHE largue des caisses à l'entrepôt ce soir ».
+- **Missions** = **contrats** captés par la Radio : « la Gare entend qu'un Cristallisé traîne au métro », « REGEN largue des caisses à l'entrepôt ce soir ».
 - **Classement** = **le Registre des Passeurs**, le cahier tenu par Irena, affiché au mur du restaurant. Les titres et tenues des joueurs y figurent : c'est la vitrine des cosmétiques.
 - **Défi du jour** = **l'Appel du jour** : une fréquence captée le matin, même sortie pour tous les Passeurs de tous les relais.
 - **Défi hebdo** = **la météo de la Crue** : la nappe de la semaine favorise un élément (eau haute = électricité, sécheresse = feu, etc.).
 - **Menaces (NG+)** = **conditions de sortie** que le Passeur accepte avant de partir : saison de Crue dense, Ambrés enragés, etc. Le Registre tient des pages séparées.
-- **Campagne** = **la carte de Dravna** que le Relais reconstitue sortie après sortie, du sud vers le nord, vers le Berceau. C'est aussi une enquête (7.6).
+- **Campagne** = **la carte d'Ostrov** que le Relais reconstitue sortie après sortie, du sud vers le nord, vers le Berceau. C'est aussi une enquête (7.6).
 - **Étoiles** = ce que le camp apprend d'une zone (durée tenue, pas de blessure grave, boss abattu).
 
 ### 6.5 Les événements en cours de partie, renommés
@@ -309,10 +309,10 @@ Les mécaniques existent et restent identiques. Seuls les noms et les effets vis
 | ZONE SÛRE | **NUAGE DE SÈVE !** | une résurgence crève et la brume brûle tout sauf la poche d'air ventilée (le cercle) |
 | ZONE MAUDITE | **CERCLE DES FERVENTS** | tiens le rituel pour voler l'échantillon ; déjà violet, cohérent |
 | AUTEL DES PACTES | **AUTELS DES FERVENTS** | leurs offrandes : un pacte, c'est prendre ce qu'ils ont laissé |
-| CHASSE À LA PRIME | **PRIME ARKHE** | ARKHE paye pour un Alpha précis, les Guichets relaient |
+| CHASSE À LA PRIME | **PRIME REGEN** | REGEN paye pour un Alpha précis, les Guichets relaient |
 | EMBUSCADE | EMBUSCADE (garde) | |
 | UN FUYARD | **UN PORTEUR !** | un Charognard avec une caisse |
-| MALÉDICTION DU CAMPEUR | **DRONE TRAQUEUR** | un drone ARKHE te verrouille : immobile, tu te fais frapper |
+| MALÉDICTION DU CAMPEUR | **DRONE TRAQUEUR** | un drone REGEN te verrouille : immobile, tu te fais frapper |
 | ACCALMIE | ACCALMIE (garde) | |
 | « Tue 5 000 zombies » | « Tue 5 000 Ambrés » | partout où le mot zombie apparaît |
 
@@ -320,16 +320,16 @@ Paliers de danger (8, optionnel, dans l'ordre) : Suintement, Montée, Crue, Déb
 
 ### 6.6 Les armes
 
-Tout est de la récup ou du matériel ARKHE détourné. Une ligne par arme suffit dans le Carnet :
+Tout est de la récup ou du matériel REGEN détourné. Une ligne par arme suffit dans le Carnet :
 
 | Arme | Origine |
 |---|---|
-| Revolver | l'arme de service d'un policier de Dravna, trouvée au commissariat |
+| Revolver | l'arme de service d'un policier d'Ostrov, trouvée au commissariat |
 | Fusil | fusil de chasse de la forêt de Hlad |
 | Machettes | outils de débroussaillage de la voirie |
 | Molotov | la recette des Charognards, l'arme la plus efficace contre la croûte |
-| Gaz | bonbonnes de neutralisant ARKHE : ça devait dissoudre l'ambre, ça empoisonne tout le reste |
-| Tesla | prototype d'arc ARKHE prévu pour immobiliser les sujets IR |
+| Gaz | bonbonnes de neutralisant REGEN : ça devait dissoudre l'ambre, ça empoisonne tout le reste |
+| Tesla | prototype d'arc REGEN prévu pour immobiliser les sujets IR |
 | Grenades | stock du Cordon, passé par les Guichets |
 | Scie | lames de scie circulaire du Combinat, lancées par un moteur de meuleuse |
 | Lance-flammes | désherbeur thermique du Combinat, bricolé par Baz |
@@ -338,22 +338,22 @@ Les évolutions sont des **bricolages** faits au garage du Relais, avec un ingr�
 
 ### 6.7 Les cosmétiques
 
-Règle : une tenue est soit **une tenue de Passeur crédible**, soit **un costume trouvé dans une boutique de Dravna**. La Galeria avait un magasin de déguisements, **Maskarada**, et le Théâtre de Dravna avait une réserve de costumes. C'est ce qui autorise les tenues fantaisie sans casser l'univers, et c'est même une blague récurrente du camp.
+Règle : une tenue est soit **une tenue de Passeur crédible**, soit **un costume trouvé dans une boutique d'Ostrov**. La Galeria avait un magasin de déguisements, **Maskarada**, et le Théâtre d'Ostrov avait une réserve de costumes. C'est ce qui autorise les tenues fantaisie sans casser l'univers, et c'est même une blague récurrente du camp.
 
 | Skin actuel | Lecture univers |
 |---|---|
 | Survivant | la tenue de base du Passeur |
 | Camouflage | surplus du Cordon, acheté aux Guichets |
-| Shérif | l'uniforme d'un policier de Dravna, plus l'étoile de Maskarada |
-| Punk | la scène des squats de Dravna-Centre, d'avant la Crue |
+| Shérif | l'uniforme d'un policier d'Ostrov, plus l'étoile de Maskarada |
+| Punk | la scène des squats d'Ostrov-Centre, d'avant la Crue |
 | Médecin | une blouse de l'aile Nord ; Doc Vesna n'aime pas qu'on la porte |
-| Roi du camp | costume du Théâtre de Dravna, offert par le camp au meilleur contributeur |
+| Roi du camp | costume du Théâtre d'Ostrov, offert par le camp au meilleur contributeur |
 | Viking | rayon Halloween de Maskarada |
 | NRBC | combinaison du Cordon, la vraie, échangée contre beaucoup d'or |
 | Ange gardien | Maskarada, encore |
 | Démon | Maskarada, rayon adulte, « aura de braise » = lanterne au cou |
 | Néon | à renommer **Greffé** : un harnais de Régulateur volé, diodes cyan. Cohérent et vendeur. |
-| Fondateur | la tenue de parade de l'Opéra de Dravna, portée par celui qui a fondé le Relais |
+| Fondateur | la tenue de parade de l'Opéra d'Ostrov, portée par celui qui a fondé le Relais |
 
 Les titres actuels rentrent tous. Futurs titres liés au lore : Passeur de première, Guichetier, Fervent repenti, Sujet 08, Liquidateur.
 
@@ -401,16 +401,16 @@ Les 28 autres entrées s'écrivent sur ce modèle, à partir de `Bestiaire.md` (
 
 ### 7.3 Les Trouvailles et les Dossiers
 
-Pendant une sortie, un petit objet papier peut apparaître au sol (comme une relique) : une **Trouvaille**. Elle est révélée sur l'écran de résultat (« Tu as trouvé : *Note interne ARKHE, Bassin 3* »), puis rangée dans un **Dossier**. Huit dossiers de cinq documents. Un dossier complet = un titre et un élément de tenue. Chaque document fait trois ou quatre lignes.
+Pendant une sortie, un petit objet papier peut apparaître au sol (comme une relique) : une **Trouvaille**. Elle est révélée sur l'écran de résultat (« Tu as trouvé : *Note interne REGEN, Bassin 3* »), puis rangée dans un **Dossier**. Huit dossiers de cinq documents. Un dossier complet = un titre et un élément de tenue. Chaque document fait trois ou quatre lignes.
 
-Où tombent les Trouvailles : les **caisses ARKHE** donnent ARKHE et GREFFE ; les **Pilleurs** donnent Charognards ; les **autels** et **Bergers** donnent la Résurgence ; les **barils et cratères** donnent le Cordon ; les **Souches** donnent le document clé de leur dossier ; le **camp** (récoltes, missions) donne Relais 17.
+Où tombent les Trouvailles : les **caisses REGEN** donnent REGEN et GREFFE ; les **Pilleurs** donnent Charognards ; les **autels** et **Bergers** donnent la Résurgence ; les **barils et cratères** donnent le Cordon ; les **Souches** donnent le document clé de leur dossier ; le **camp** (récoltes, missions) donne Relais 17.
 
 | Dossier | Les cinq documents |
 |---|---|
 | **1. La Crue** | Bulletin météo du 14 · Note interne « Bassin 3, niveau 97 % » · Témoignage d'un pompier : la vague · Photo : la Ligne sur la mairie · Rapport d'évacuation, Jour 6 |
-| **2. ARKHE** | Plaquette « 1 200 emplois » · Audit de la digue, J−8 mois · Contrat ARK, annexe 4 · Mémo « Inactivation des boues : reportée » · Lettre de K. Vell : « Rien ne sort de Dravna » |
-| **3. Le Cordon** | Tract largué « L'aide arrive » · Ordre du jour du Colonel · Carnet d'un soldat · Bordereau de Guichet · Rapport « ARKHE finance les rotations » |
-| **4. Les Charognards** | Tag : la carte des caches · Les règles de Ferro · Liste de prix de la casse · Lettre jamais envoyée · Avis de prime ARKHE sur les Passeurs |
+| **2. REGEN** | Plaquette « 1 200 emplois » · Audit de la digue, J−8 mois · Contrat RG, annexe 4 · Mémo « Inactivation des boues : reportée » · Lettre de K. Vell : « Rien ne sort d'Ostrov » |
+| **3. Le Cordon** | Tract largué « L'aide arrive » · Ordre du jour du Colonel · Carnet d'un soldat · Bordereau de Guichet · Rapport « REGEN finance les rotations » |
+| **4. Les Charognards** | Tag : la carte des caches · Les règles de Ferro · Liste de prix de la casse · Lettre jamais envoyée · Avis de prime REGEN sur les Passeurs |
 | **5. La Résurgence** | Le credo « La vie qui déborde » · Recette de l'Onction · Journal de la Mère, page 1 (signée I. Marek) · Journal de la Mère, page 40 (plus de nom) · Le chant des cloches |
 | **6. GREFFE** | Formulaire de volontariat (dette effacée) · Fiche du Régulateur R-3 · Rapport d'incident : Sujet 04 · Note « R-4 : essai en conditions réelles, lot "perdu" au km 17 » · Fiche Sujet 07 Rask : stable |
 | **7. Sujet 01** | Admission de Milan Doubek, 41 ans · Jour 12 : « la main a repoussé » · Jour 60 : « il ne dort plus, il mange » · Note de Vesna : « ils l'ont descendu au sous-sol » · Fiche de transfert : « conservé » |
@@ -418,7 +418,7 @@ Où tombent les Trouvailles : les **caisses ARKHE** donnent ARKHE et GREFFE ; le
 
 Un document par dossier, pour le ton :
 
-- *Note interne ARKHE, site de Dravna, Bassin 3.* « Niveau 97 %. Pompage impossible, la nappe est au-dessus du fond. Demande d'évacuation du bassin vers la raffinerie. » Réponse manuscrite : « Tenir jusqu'à la fin des pluies. »
+- *Note interne REGEN, site d'Ostrov, Bassin 3.* « Niveau 97 %. Pompage impossible, la nappe est au-dessus du fond. Demande d'évacuation du bassin vers la raffinerie. » Réponse manuscrite : « Tenir jusqu'à la fin des pluies. »
 - *Audit de la digue, confidentiel.* « Digue en remblai sur crassier, non compactée, dimensionnée pour une pluie décennale. Boues non inactivées. Risque de rupture : élevé. » Tampon : « Reçu. Classé. »
 - *Carnet d'un soldat du Cordon.* « Ils disent que tout ce qui bouge est infecté. J'ai vu un gars avec un sac à dos et une gourde. Un infecté ne porte pas de gourde. J'ai tiré à côté. »
 - *Les règles de Ferro.* « On ne prend pas aux Passeurs. Sauf s'ils ont pris avant. Et ils ont toujours pris avant. »
@@ -434,12 +434,12 @@ Le joueur se pose ces questions sans qu'on les lui pose. Chacune a une réponse,
 | Question | Réponse (à ne pas révéler avant l'endroit prévu) | Où |
 |---|---|---|
 | **Pourquoi la digue a cédé ?** | Négligence connue et couverte : l'audit enterré, les boues jamais inactivées, « tenir jusqu'à la fin des pluies ». | Dossiers 1 et 2, chapitres 1 à 3 ; la Brèche au chapitre 6 |
-| **Où est Sujet 01 ?** | Au sous-sol de l'aile Nord, « conservé » depuis quatre ans. C'est le boss du chapitre 4. Après sa chute, ARKHE-SEC vient chercher le corps : Irena l'annonce à la radio. | Dossier 7, chapitre 4 |
-| **Pourquoi le Cordon tire sur des survivants ?** | La doctrine officielle, plus l'argent : ARKHE finance les rotations du Cordon pour que la zone reste fermée le temps de tout récupérer. Les Guichets sont la fissure de ce système. | Dossier 3, chapitres 5 et 6 |
+| **Où est Sujet 01 ?** | Au sous-sol de l'aile Nord, « conservé » depuis quatre ans. C'est le boss du chapitre 4. Après sa chute, REGEN-SEC vient chercher le corps : Irena l'annonce à la radio. | Dossier 7, chapitre 4 |
+| **Pourquoi le Cordon tire sur des survivants ?** | La doctrine officielle, plus l'argent : REGEN finance les rotations du Cordon pour que la zone reste fermée le temps de tout récupérer. Les Guichets sont la fissure de ce système. | Dossier 3, chapitres 5 et 6 |
 | **Qui est la Mère des Sources ?** | Dr Ilona Marek, la directrice du site. Elle s'est injecté la Sève avec un prototype de Régulateur, par culpabilité ou par curiosité ; elle est restée lucide. La secte est sa culpabilité devenue foi. Doc Vesna l'a connue. | Dossier 5, chapitre 9 |
-| **À quoi sert le Karst pour ARKHE ?** | À tester. ARKHE ne cherche pas un remède : elle cherche un produit, la Sève sous contrôle. Le Régulateur R-4, c'est **l'injecteur du joueur**. Le lot a été « perdu » au km 17 exprès. Chaque sortie remonte par l'Antenne. Le Passeur était le sujet depuis le début. | Dossier 6, chapitre 11 |
+| **À quoi sert le Cordon pour REGEN ?** | À tester. REGEN ne cherche pas un remède : elle cherche un produit, la Sève sous contrôle. Le Régulateur R-4, c'est **l'injecteur du joueur**. Le lot a été « perdu » au km 17 exprès. Chaque sortie remonte par l'Antenne. Le Passeur était le sujet depuis le début. | Dossier 6, chapitre 11 |
 
-Et après la réponse à la cinquième question : ARKHE sait que le Relais sait. Les **conditions de sortie** (les Menaces du NG+) deviennent, en univers, ARKHE qui ferme le piège : plus de Crue, plus d'Alphas, plus de Cordon. Le joueur continue parce que c'est **lui** qu'ils veulent, et qu'il tient le Registre.
+Et après la réponse à la cinquième question : REGEN sait que le Relais sait. Les **conditions de sortie** (les Menaces du NG+) deviennent, en univers, REGEN qui ferme le piège : plus de Crue, plus d'Alphas, plus de Cordon. Le joueur continue parce que c'est **lui** qu'ils veulent, et qu'il tient le Registre.
 
 ### 7.5 Irena à la radio
 
@@ -449,7 +449,7 @@ Une ligne au départ, une ligne à l'arrivée, parfois une au milieu. Jamais plu
 |---|---|
 | Départ, chapitre 1 | « Relais 17 à Passeur. La banlieue est calme ce matin. Calme, ça veut dire qu'ils dorment. » |
 | Départ, survie infinie | « Pas de contrat aujourd'hui. Tu rentres quand tu rentres. » |
-| Départ, Appel du jour | « J'ai capté une fréquence ARKHE au métro cette nuit. Tout le monde l'a entendue. Premier arrivé. » |
+| Départ, Appel du jour | « J'ai capté une fréquence REGEN au métro cette nuit. Tout le monde l'a entendue. Premier arrivé. » |
 | Départ, Menaces | « Tu as lu les conditions. Je les ai écrites dans le Registre, à côté de ton nom. » |
 | Souche | « C'est lui. Le Boucher. Tu le sens à l'odeur de croûte brûlée. » |
 | Crue | « Ça monte. Bouge. » |
@@ -465,8 +465,8 @@ Chaque chapitre apporte un morceau de réponse, un nouveau repère visible, et d
 
 | Chapitre | Ce que le joueur découvre | Le repère |
 |---|---|---|
-| 1 Dravna-Sud | comment c'est arrivé aux gens (la Fièvre, les maisons) | la Galeria, Maskarada |
-| 2 Dravna-Centre | la Ligne sur la mairie, le Maire qui n'a pas voulu partir | la Ligne |
+| 1 Ostrov-Sud | comment c'est arrivé aux gens (la Fièvre, les maisons) | la Galeria, Maskarada |
+| 2 Ostrov-Centre | la Ligne sur la mairie, le Maire qui n'a pas voulu partir | la Ligne |
 | 3 Le Combinat | d'où vient le produit | les Six Tours de près |
 | 4 Hôpital | qui l'a testé, et sur qui | le sous-sol |
 | 5 Gare de triage | qui en vit aujourd'hui, et la prime sur les Passeurs | la Casse |
@@ -495,8 +495,8 @@ Chaque carte a une heure, une météo, une palette dominante, un repère visible
 | # | Chapitre | Étapes | Heure et météo | Palette dominante | Repère | Souche |
 |---|---|---|---|---|---|---|
 | 0 | **La Lisière** (prologue) | champs, village, checkpoint | fin d'après-midi dorée, le seul moment « chaud » du jeu | blé, bois, tôle | les Six Tours très loin | aucune |
-| 1 | **Dravna-Sud** | lotissement, Galeria, parking souterrain | après-midi gris, bruine | béton clair, pelouses jaunies, toits délavés | la Galeria, l'enseigne Maskarada | Le Boucher |
-| 2 | **Dravna-Centre** | gare, métro, place de la mairie | crépuscule puis nuit, brouillard, lampadaires froids | bitume mouillé, pierre sombre, lumière blanche-bleue | la Ligne (40 cm), la fontaine-résurgence | Le Maire |
+| 1 | **Ostrov-Sud** | lotissement, Galeria, parking souterrain | après-midi gris, bruine | béton clair, pelouses jaunies, toits délavés | la Galeria, l'enseigne Maskarada | Le Boucher |
+| 2 | **Ostrov-Centre** | gare, métro, place de la mairie | crépuscule puis nuit, brouillard, lampadaires froids | bitume mouillé, pierre sombre, lumière blanche-bleue | la Ligne (40 cm), la fontaine-résurgence | Le Maire |
 | 3 | **Le Combinat** | entrepôt, raffinerie, centrale | nuit, projecteurs, torchères | rouille, acier, orange des flammes au loin | les Six Tours de près, la Ligne (2 m), la Croûte | Le Contremaître |
 | 4 | **Hôpital Central** | urgences, bloc, laboratoire | intérieur, néons froids, lumière rouge de secours | carrelage blanc taché d'ambre, rideaux, inox | le sous-sol | Sujet 01 |
 | 5 | **La Gare de triage et la Casse** | triage, casse, dépôt | aube, pluie fine | wagons, conteneurs, carcasses, bleu de travail | la Ligne sur les wagons | Le Ferrailleur |
@@ -534,7 +534,7 @@ Références d'ambiance (pour chercher, pas pour copier) : Escape from Tarkov (�
 - Le sol est **sombre et peu contrasté** (boue, bitume mouillé, calcaire sale) pour que tout ce qui compte ressorte : le joueur, les projectiles, les éclats, les cercles d'événement.
 - **On voit les dos.** Tout ce qui identifie un ennemi est sur le dos ou dans la silhouette, jamais sur le visage : la bosse des Ambrés, l'objet porté des humains, les diodes des Greffés (`Bestiaire.md` 2).
 - Les ennemis sont **plus sombres que le sol au contour, plus clairs au centre** (rim light froid cuit + la bosse d'ambre, légèrement émissive, visible de nuit).
-- Les télégraphes au sol (cercles, lignes, arcs) ont tous le même langage : un contour fin qui se remplit pendant le délai, dans la couleur de la source (ambre pour un Ambré, blanc pour le Cordon, orange pour le feu, cyan pour ARKHE, violet pour les Fervents).
+- Les télégraphes au sol (cercles, lignes, arcs) ont tous le même langage : un contour fin qui se remplit pendant le délai, dans la couleur de la source (ambre pour un Ambré, blanc pour le Cordon, orange pour le feu, cyan pour REGEN, violet pour les Fervents).
 
 ### 9.4 La palette
 
@@ -562,15 +562,15 @@ Références d'ambiance (pour chercher, pas pour copier) : Escape from Tarkov (�
 | Ambre lumineux | `#E58E2B` | résurgences, boss, élites, télégraphes des Ambrés | émissif seulement sur ces cas, et faiblement sur les bosses de nuit |
 | Veines | `#221006` | les veines noires sous la croûte, l'ichor | le « sang » des Ambrés |
 | Feu | `#FFC43D` → `#FF6A2A` | Molotov, lance-flammes, incendiaire, torchères, Lanceurs | toujours animé, toujours avec de la fumée `#3A3A3A` |
-| Cyan ARKHE | `#2CB1C4` | ARKHE, implants, caisses, les Six Tours, UI | ne sert jamais à un effet d'arme |
-| Blanc ARKHE | `#E9EEF0` | armures, salles blanches | |
+| Cyan REGEN | `#2CB1C4` | REGEN, implants, caisses, les Six Tours, UI | ne sert jamais à un effet d'arme |
+| Blanc REGEN | `#E9EEF0` | armures, salles blanches | |
 | Bleu de travail | `#2F4F7A` | Charognards | avec réfléchissant argent `#D9DEE3` |
 | Violet Fervents | `#7E4FC7` | la secte, ses cercles, ses autels | |
 | Or | `#F4C84A` | pièces, récompenses, texte de butin | jamais sur un ennemi ni un décor |
 | Rouge | `#B8322A` | danger, sang humain, bannières d'alerte, diodes d'un Déréglé | le sang humain, en petite quantité |
 | Vert sûr | `#5FD08A` | soin, cercle d'air, validation | |
 | Toxique | `#A6D23C` | gaz, poison | |
-| Électrique | `#9ADCFF` | Tesla, surcharge | plus blanc que le cyan ARKHE, et animé |
+| Électrique | `#9ADCFF` | Tesla, surcharge | plus blanc que le cyan REGEN, et animé |
 | Blanc Cordon | `#F2F2EE` | cercles de visée de l'artillerie | |
 
 Test rapide : si on désature l'image, les ennemis doivent encore se lire par la valeur (clair/sombre) et la silhouette. La couleur vient confirmer, pas porter.
@@ -578,15 +578,15 @@ Test rapide : si on désature l'image, les ennemis doivent encore se lire par la
 ### 9.5 Lumière et post-traitement
 
 - Une **lumière directionnelle basse et froide** (ciel couvert), ambiance bleu-gris. Les cartes de nuit ajoutent des projecteurs blancs-bleus (jamais de sodium orange, pour ne pas concurrencer le feu et l'ambre). Les Bassins font exception : midi blanc, sans ombre, écrasant.
-- Émissif réservé à : ambre lumineux (résurgences, boss, élites, bosses de nuit), feu, cyan ARKHE, électrique, cercles d'événement.
+- Émissif réservé à : ambre lumineux (résurgences, boss, élites, bosses de nuit), feu, cyan REGEN, électrique, cercles d'événement.
 - Post : **étalonnage** (noirs légèrement bleutés, saturation −20 %, hautes lumières un peu chaudes), **bloom** à seuil haut (seuls les émissifs fleurissent), **vignette** douce, **grain** léger. Pas d'aberration chromatique, pas de flou de mouvement (lisibilité et batterie).
 - Brouillard de distance presque toujours présent : il fond le haut de l'écran, cache le bord du monde, et laisse deviner les Six Tours.
 
 ### 9.6 Matières et décor
 
-- Tout est **mouillé** : flaques, coulures, reflets sur le bitume. C'est l'identité du Karst, l'eau partout.
+- Tout est **mouillé** : flaques, coulures, reflets sur le bitume. C'est l'identité du Cordon, l'eau partout.
 - Décor de l'Est post-industriel : barres d'immeubles à panneaux, voitures compactes carrées, wagons, tuyauteries, clôtures béton, sacs de sable, abribus, kiosques. Affichage en alphabet latin à diacritiques.
-- Signalétique ARKHE : blanche, propre, cyan, typographie sans-serif stricte ; elle tranche volontairement avec le reste (le propre est suspect).
+- Signalétique REGEN : blanche, propre, cyan, typographie sans-serif stricte ; elle tranche volontairement avec le reste (le propre est suspect).
 - **Traces de la Crue** : la Ligne sur les murs (hauteur selon la carte, 8), la Croûte dans les rues basses, des voitures poussées contre les façades, de la boue séchée dans les escaliers, des coulures d'ambre dans les joints, objets abandonnés en évacuation (valises, poussettes vides, jamais d'enfant).
 - Traces du Cordon : cratères, carcasses calcinées, tracts largués.
 
@@ -598,7 +598,7 @@ Test rapide : si on désature l'image, les ennemis doivent encore se lire par la
 | Animaux | silhouette naturelle + plaques dorsales | poil terne, croûte | crocs d'ambre |
 | Charognards | couches, sangles, objets accrochés | tissu, cuir, plastique de chantier | bandes réfléchissantes |
 | Fervents | drapé, vertical, pieds nus | tissu blanc sale | marques violettes, cloches |
-| ARKHE-SEC | anguleux, propre, symétrique | polymère blanc, plaques grises | visière cyan, pas de visage |
+| REGEN-SEC | anguleux, propre, symétrique | polymère blanc, plaques grises | visière cyan, pas de visage |
 | Greffés | humain athlétique + un corps étranger dans le dos | peau + polymère | les trois diodes |
 | Passeur | couches usées, ergonomique, du vécu | tissu, nylon, métal rayé | l'injecteur à l'avant-bras |
 
@@ -614,7 +614,7 @@ Le Passeur par défaut (skin Survivant) : sweat à capuche sous un gilet porte-p
 |---|---|
 | Coup sur un Ambré | éclaboussure d'ichor (veines `#221006` + ambre), éclats de croûte qui volent |
 | Coup sur un humain | petite bouffée rouge, tissu, pas de giclée |
-| Coup sur ARKHE | étincelles et éclats blancs |
+| Coup sur REGEN | étincelles et éclats blancs |
 | Mort d'un Ambré | le corps se fissure, s'affaisse, laisse une flaque d'ambre collante qui disparaît en 3 s |
 | Mort d'un Kyste | explosion d'ambre, flaque large, les autres Ambrés dedans sont blessés |
 | Mort d'un humain | chute, un décalque rouge, disparition en 2 s |
@@ -652,7 +652,7 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 | Élément | Choix |
 |---|---|
 | Fond | `#14171B`, panneaux `#1F242A`, traits `#3A424B`, texte `#E6E9EC`, texte atténué `#8C949C` |
-| Accent interface | cyan ARKHE (les écrans du Passeur viennent de matériel ARKHE, et on comprend pourquoi en 7.4) |
+| Accent interface | cyan REGEN (les écrans du Passeur viennent de matériel REGEN, et on comprend pourquoi en 7.4) |
 | Récompense | or `#F4C84A` |
 | Danger | rouge `#B8322A` |
 | Titres | une condensée type stencil (Bebas Neue ou Oswald, gratuites) |
@@ -664,12 +664,12 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 | Camp | **le Relais** |
 | Missions | **Contrats** |
 | Écran de résultat | la Trouvaille du jour, les paliers du Carnet franchis, la ligne d'Irena |
-| Tampons | « CONFIDENTIEL ARKHE », « ZONE INTERDITE », « KM 17 » sur les écrans de chargement |
+| Tampons | « CONFIDENTIEL REGEN », « ZONE INTERDITE », « KM 17 » sur les écrans de chargement |
 
 ### 9.12 Le son
 
 - Ambrés : clics humides, craquements de croûte (comme de la glace qui cède), souffle. Pas de râle de zombie classique. Le Hurleur a le seul « cri » du jeu, et on l'entend avant de le voir.
-- Humains : cris courts dans une langue inventée à consonance slave, grésillement radio pour ARKHE, cloches pour les Fervents.
+- Humains : cris courts dans une langue inventée à consonance slave, grésillement radio pour REGEN, cloches pour les Fervents.
 - Monde : vent, gouttes, tôle qui grince, et **l'artillerie au loin**, tout le temps, même au Relais.
 - Musique : nappes électroniques froides, percussions industrielles, un motif de cordes folk (cymbalum) pour le menu et le camp. Stingers courts pour CRUE, SOUCHE, ALPHA.
 - La radio : la voix d'Irena, compressée, avec du souffle. Une phrase, jamais un monologue.
@@ -681,19 +681,19 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 
 | Terme | Définition |
 |---|---|
-| Le Karst | la zone d'exclusion, le plateau calcaire |
-| Dravna | la ville ; la Vorna, sa rivière |
-| ARKHE | le laboratoire ; ARKHE-SEC, sa sécurité privée ; Konrad Vell, son PDG ; Ilona Marek, l'ancienne directrice du site |
-| ARK-9, la Sève | le sérum de régénération ; les boues, ses résidus de production |
+| Le Cordon | la ligne militaire tracée à 40 km, et tout ce qu'elle enferme : la zone d'exclusion, un plateau calcaire (un karst) ; « tir du Cordon » = artillerie |
+| Ostrov | la ville (« île » : depuis la Crue, c'en est une) ; la Vorna, sa rivière |
+| REGEN | le laboratoire ; REGEN-SEC, sa sécurité privée ; Konrad Vell, son PDG ; Ilona Marek, l'ancienne directrice du site |
+| RG-9, la Sève | le sérum de régénération ; les boues, ses résidus de production |
 | L'ambre | la croûte que la Sève fait pousser ; la bosse, sa forme sur le dos |
 | Les Six Tours, la raffinerie | le site de production, sur le Combinat |
 | Les Bassins, la Brèche, la Dalle, le Désert d'ambre | l'origine visible de la Crue |
 | La Ligne, la Croûte | la marque de la Crue sur les murs et dans les rues |
 | La Crue | la catastrophe (Jour 0) ; aussi une horde (« CRUE ! ») |
 | La saison de Crue | l'automne, quand la nappe remonte |
-| Le Cordon, le Colonel | le périmètre militaire et son chef jamais vu ; « tir du Cordon » = artillerie |
+| Le Colonel | le chef de la ligne, jamais vu |
 | Les Guichets | les soldats corrompus qui commercent |
-| Les Ambrés | les infectés (mot des Passeurs) ; « Gueules » pour les Charognards, « Éveillés » pour les Fervents, « sujets IR » pour ARKHE |
+| Les Ambrés | les infectés (mot des Passeurs) ; « Gueules » pour les Charognards, « Éveillés » pour les Fervents, « sujets IR » pour REGEN |
 | Fiévreux, Masse, Cracheur, Kyste, Colonie, Rejeton, Bondisseur, Hurleur, Accrocheur, Rampant, Cristallisé | les types d'Ambrés |
 | Alpha | une élite |
 | Souche | un boss |
@@ -703,7 +703,7 @@ Style « militaire utilitaire » : panneaux sombres, traits fins, coins coupés,
 | Greffé, Régulateur R-3, Déréglé, Sujet 04, Sujet 07 (Rask) | le programme GREFFE |
 | Sujet 01 (Milan Doubek) | le premier essai, le boss de l'hôpital |
 | Le Berceau | le laboratoire de recherche, sous la carrière |
-| L'Antenne | la tour-relais ARKHE dans la forêt, par où remonte la télémétrie |
+| L'Antenne | la tour-relais REGEN dans la forêt, par où remonte la télémétrie |
 | Passeur | le joueur |
 | Le Relais 17 | le camp ; Irena, Baz, Doc Vesna, Mila, Pavo, Dušan |
 | L'injecteur (R-4), les éclats, une dose | l'XP et les niveaux |
@@ -734,7 +734,7 @@ cartoon, anime, chibi, neon cyberpunk city, skeletons, undead, magic glow, fanta
 Variantes par sujet :
 - Ambré : `infected human seen from behind, grey pale skin, a dome of dark amber resin grown on the upper back, resin sealing the eyes, mouth open, hunched, torn civilian clothes, alive not undead`
 - Spécial (ex. Cracheur) : `infected human with a swollen translucent amber throat sac, neck wider than the head, hunched, grey skin, torn work jacket`
-- ARKHE-SEC : `private security operator, light grey plate carrier, dirty white suit, full-face respirator with cyan visor, no visible face, cyan chevrons`
+- REGEN-SEC : `private security operator, light grey plate carrier, dirty white suit, full-face respirator with cyan visor, no visible face, cyan chevrons`
 - Charognard : `looter, layered civilian clothes, blue work jacket, silver reflective tape, bandana, baseball bat, spray paint tags`
 - Fervent : `cultist in dirty white sheets stained amber, violet painted spirals, bare feet, hand bell, no religious symbols`
 - Passeur : `smuggler survivor, hoodie under cheap plate carrier, cargo pants, gas mask hanging on the neck, forearm injector with an amber vial, small backpack`
@@ -772,6 +772,6 @@ Avant d'ajouter un ennemi, un lieu, un skin, un texte :
 - Pas d'enfants, dans aucun état.
 - Pas d'armée ennemie à abattre : le Cordon est une menace d'environnement.
 - Pas de lumière orange de ville (sodium) : l'orange appartient au feu, l'ambre à la Sève.
-- Pas de néon partout : le cyan appartient à ARKHE et reste rare.
+- Pas de néon partout : le cyan appartient à REGEN et reste rare.
 - Pas de mur de texte : trois lignes, un compteur, une récompense.
 - Pas de « c'est cool » sans justification.

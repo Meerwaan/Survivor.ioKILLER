@@ -1,4 +1,4 @@
-# KARST — Bestiaire et catalogue des menaces
+# CORDON — Bestiaire et catalogue des menaces
 
 Version 1 — 6 novembre 2026. Complément de `Univers.md` (le monde, les factions, la DA). Ici : ce que chaque ennemi **fait** au joueur, comment il le **signale**, comment on s'en **sort**, **quand** il arrive, et pourquoi il existe.
 
@@ -8,7 +8,7 @@ Sommaire
 0. Les neuf règles qui font qu'un ennemi est « pro »
 1. Les six rôles
 2. Lire de dessus : la bosse et les silhouettes
-3. Le catalogue (Ambrés, animaux, Charognards, Fervents, ARKHE, élites, Souches, props)
+3. Le catalogue (Ambrés, animaux, Charognards, Fervents, REGEN, élites, Souches, props)
 4. La variété : grille d'apparition, composition des vagues, variantes, plafonds
 5. Ce qu'il faut coder, par priorité
 
@@ -143,7 +143,7 @@ Le mot des Charognards : Nuée « Si tu prends le temps de les compter, t'es mor
 | **Lanceur** | nouveau | Déni | cocktail en cloche : **flaque de feu** 4 s, moyen par tic ; brûle aussi les Ambrés | l'arc du lancer s'affiche 0,6 s | sortir de l'arc, retourner son feu contre la horde | 8:30 / ch. 3 |
 | **Le Ferrailleur** | boss | voir 3.7 | | | | ch. 5 |
 
-Pourquoi : des gens, pas des monstres. Ils t'attaquent parce que tu es un concurrent et qu'ARKHE a mis une prime sur les Passeurs. Ils tiennent mieux qu'un Ambré (ils esquivent), mais ils sont moins nombreux. Ils ne sont jamais démembrés et tombent sans agonie.
+Pourquoi : des gens, pas des monstres. Ils t'attaquent parce que tu es un concurrent et que REGEN a mis une prime sur les Passeurs. Ils tiennent mieux qu'un Ambré (ils esquivent), mais ils sont moins nombreux. Ils ne sont jamais démembrés et tombent sans agonie.
 
 Le mot des Charognards sur eux-mêmes : Pilleur « Un Pilleur, c'est de l'or qui court. » Cogneur « Il a une famille à la casse. Toi aussi t'as une famille. » Fusilier « Il tire une fois. Fais en sorte qu'il n'y ait pas de deuxième. » Lanceur « Son feu brûle tout le monde. Pense-y. »
 
@@ -160,7 +160,7 @@ Pourquoi : l'Onction (sève diluée sur la peau) fait que les Ambrés les prenne
 
 Le mot des Charognards : Fervent « Ils chantent. C'est pour pas entendre ce qu'ils font. » Berger « Tue la cloche, le troupeau se perd. » Martyr « Un gars qui court vers toi en souriant, c'est jamais bon. »
 
-### 3.5 ARKHE
+### 3.5 REGEN
 
 | Nom | Asset | Rôle | Attaque | Télégraphe | Parade | Apparition |
 |---|---|---|---|---|---|---|
@@ -206,16 +206,16 @@ Chaque Souche a deux ou trois attaques télégraphiées, des phases, et une **es
 | **Sujet 04, « le Déréglé »** | 6, la Dalle | le premier Greffé dont le Régulateur a lâché, abandonné sur la Dalle | frappe tout ce qui bouge ; éclats de croûte en anneau ; à 50 % les diodes passent au rouge et il double de vitesse | Opérateurs qui tirent sur lui autant que sur toi |
 | **Le Foreur** | 7, la carrière | conducteur de foreuse de Belsk | s'enfouit, un cercle apparaît sous toi, il ressort (sortir du cercle) ; balayage de tarière (arc) | Rampants dans les gravats |
 | **L'Ours de Hlad** | 8, la forêt | un ours brun, stade IV | charge longue (ligne) ; coup de patte (arc) ; rugissement qui appelle la Meute | Meute |
-| **La Mère des Sources** | 9, le barrage | Dr Ilona Marek, l'ancienne directrice du site ARKHE (voir `Univers.md` 7.4) | ne frappe pas ; trois **cloches** autour d'elle font émerger des Ambrés, il faut les briser pour percer sa garde ; des Martyrs en défense | Bergers, Martyrs |
+| **La Mère des Sources** | 9, le barrage | Dr Ilona Marek, l'ancienne directrice du site REGEN (voir `Univers.md` 7.4) | ne frappe pas ; trois **cloches** autour d'elle font émerger des Ambrés, il faut les briser pour percer sa garde ; des Martyrs en défense | Bergers, Martyrs |
 | **La Résurgence Mère** | 10, les Galeries | pas une personne : le point où la boue de la Crue s'est accumulée sous terre | immobile ; quatre **pores** à détruire ; chaque pore détruit libère une bouffée (cercle) ; Fiévreux en continu | tout stade III |
-| **Greffé Prime, Sujet 07** | 11, le Berceau | Anton Rask, ex-soldat, le seul Greffé stable | phase 1 : contact rapide et régénération (brûle-le) ; phase 2 : deux Drones ; phase 3 : les diodes passent au rouge, il devient Déréglé et frappe tout, ARKHE compris | Opérateurs, Boucliers |
+| **Greffé Prime, Sujet 07** | 11, le Berceau | Anton Rask, ex-soldat, le seul Greffé stable | phase 1 : contact rapide et régénération (brûle-le) ; phase 2 : deux Drones ; phase 3 : les diodes passent au rouge, il devient Déréglé et frappe tout, REGEN compris | Opérateurs, Boucliers |
 
 ### 3.8 Les props et les nids
 
 | Nom | Asset | Ce que c'est | Effet |
 |---|---|---|---|
-| **Baril** | **(existe)** | fût de carburant, ou de réactif ARKHE (blanc à bande cyan) | explose, blesse tout le monde |
-| **Caisse** | **(existe)** | caisse de ravitaillement larguée par ARKHE pour ses équipes | butin : le joueur l'intercepte |
+| **Baril** | **(existe)** | fût de carburant, ou de réactif REGEN (blanc à bande cyan) | explose, blesse tout le monde |
+| **Caisse** | **(existe)** | caisse de ravitaillement larguée par REGEN pour ses équipes | butin : le joueur l'intercepte |
 | **Résurgence** | nouveau, `Prop` vivant | une flaque d'ambre qui pulse ; un **Fiévreux en émerge toutes les 6 s** tant qu'elle n'est pas détruite ; brille (le seul ambre vraiment lumineux hors boss) | la détruire lâche un coffre ; en laisser une est un choix (elle nourrit le combo, mais elle nourrit la Crue) |
 
 ---
@@ -246,7 +246,7 @@ L'ordre compte plus que les minutes exactes. Une nouveauté toutes les 90 s envi
 | 8:30 | Lanceur | le feu est à tout le monde |
 | 9:00 | Fervent, Martyr | les vagues mixtes |
 | 10:00 | Berger, Souche 3 | tuer la cloche |
-| 11:00 | Opérateur, Drone | ARKHE entre en scène |
+| 11:00 | Opérateur, Drone | REGEN entre en scène |
 | 12:00 | Bouclier, Greffé | contourner, brûler |
 | 13:20 | Souche 4 | |
 | 14:00 | Déréglé | laisser faire |
@@ -256,17 +256,17 @@ L'ordre compte plus que les minutes exactes. Une nouveauté toutes les 90 s envi
 
 | Chapitre | Nouveautés | Hazard introduit | Souche |
 |---|---|---|---|
-| 1 Dravna-Sud | Ambré, Fiévreux, Nuée, Kyste, Masse, Pilleur, Meute | embuscade, barils | Le Boucher |
-| 2 Dravna-Centre | Cracheur, Colonie, Cristallisé, Cogneur, Fusilier | tir du Cordon, la fontaine est une Résurgence | Le Maire |
+| 1 Ostrov-Sud | Ambré, Fiévreux, Nuée, Kyste, Masse, Pilleur, Meute | embuscade, barils | Le Boucher |
+| 2 Ostrov-Centre | Cracheur, Colonie, Cristallisé, Cogneur, Fusilier | tir du Cordon, la fontaine est une Résurgence | Le Maire |
 | 3 Le Combinat | Bondisseur, Hurleur, Lanceur | largage incendiaire, barils en chaîne | Le Contremaître |
 | 4 Hôpital Central | Accrocheur, Opérateur, Bouclier, Drone, Greffé | drone traqueur, nuage de sève | Sujet 01 |
 | 5 Gare de triage et casse | tout le roster Charognard, Porteurs | pièges, primes | Le Ferrailleur |
-| 6 Les Bassins | Déréglé | la Dalle : ARKHE partout, tir du Cordon dense | Sujet 04 |
+| 6 Les Bassins | Déréglé | la Dalle : REGEN partout, tir du Cordon dense | Sujet 04 |
 | 7 La Carrière | Rampant, Nuée noire | éboulements, pas de couvert | Le Foreur |
 | 8 La Forêt de Hlad | Sanglier | visibilité, Rampants dans l'herbe | L'Ours |
 | 9 Le Barrage | Fervent, Berger, Martyr | cercles et autels des Fervents | La Mère des Sources |
 | 10 Les Galeries | Résurgences partout, Cristallisés | nuages de sève, effondrements | La Résurgence Mère |
-| 11 Le Berceau | tout ARKHE | tout | Greffé Prime |
+| 11 Le Berceau | tout REGEN | tout | Greffé Prime |
 
 ### 4.3 Les Crues : tirage, variété, montée
 
@@ -371,8 +371,8 @@ Même mesh, autre texture, parfois un accessoire. C'est la façon la moins chèr
 
 | Carte | Ambrés et Fiévreux | Détail |
 |---|---|---|
-| Dravna-Sud | civils, un peu de sport, pyjamas | ils ont été pris chez eux |
-| Dravna-Centre | costumes, uniformes de la gare, du métro, de la mairie | |
+| Ostrov-Sud | civils, un peu de sport, pyjamas | ils ont été pris chez eux |
+| Ostrov-Centre | costumes, uniformes de la gare, du métro, de la mairie | |
 | Le Combinat | ouvriers, casques, vestes bleues | plus de Masses |
 | Hôpital | blouses, patients en chemise, un soignant sur deux | |
 | Les Bassins | **couverts de boue d'ambre séchée**, craquelés | les plus proches de l'origine |
