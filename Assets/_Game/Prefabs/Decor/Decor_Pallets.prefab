@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2568384919667683535}
   - component: {fileID: 4792599993299088277}
   - component: {fileID: 3594020371248127431}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Pallets
   m_TagString: Untagged
   m_Icon: {fileID: 0}

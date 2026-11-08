@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 895696768605659921}
   - component: {fileID: 8046171036372550623}
   - component: {fileID: 2606742059918492072}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Container_Regen
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -48,9 +48,10 @@ namespace Survivor
             }
         }
 
-        public void TakeDamage(float amount)
+        /// <summary>Returns false when nothing was taken (dead, not playing, or still invulnerable from the last hit).</summary>
+        public bool TakeDamage(float amount)
         {
-            if (dead || GameManager.Instance.State != GameState.Playing || Time.time < invulnerableUntil) return;
+            if (dead || GameManager.Instance.State != GameState.Playing || Time.time < invulnerableUntil) return false;
             invulnerableUntil = Time.time + invulnerability;
             regenResumeAt = Time.time + regenDelayAfterHit;
 
@@ -73,6 +74,7 @@ namespace Survivor
                 if (anim) anim.SetDead(true);
                 GameManager.Instance.PlayerDied();
             }
+            return true;
         }
 
         public void Heal(float amount)

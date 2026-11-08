@@ -41,13 +41,65 @@ namespace Survivor.EditorTools
             sun.transform.rotation = Quaternion.Euler(52f, -32f, 0f);
         }
 
+        /// <summary>
+        /// Frictionless contacts for everything (project default physics material): bodies pushing into a car or a
+        /// wall at an angle slide along it instead of sticking (Unity's default friction 0.6 stops anything
+        /// that hits a surface at less than ~31° from straight on). Also makes sure the "Decor" layer exists.
+        /// </summary>
+        static void PhysicsDefaults()
+        {
+            const string path = Root + "/Settings/PM_Frictionless.physicMaterial";
+            var pm = AssetDatabase.LoadAssetAtPath<PhysicsMaterial>(path);
+            if (!pm)
+            {
+                pm = new PhysicsMaterial("PM_Frictionless");
+                AssetDatabase.CreateAsset(pm, path);
+            }
+            pm.dynamicFriction = 0f;
+            pm.staticFriction = 0f;
+            pm.bounciness = 0f;
+            pm.frictionCombine = PhysicsMaterialCombine.Minimum;
+            pm.bounceCombine = PhysicsMaterialCombine.Minimum;
+            EditorUtility.SetDirty(pm);
+
+            var dynamics = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/DynamicsManager.asset");
+            if (dynamics.Length > 0)
+            {
+                var so = new SerializedObject(dynamics[0]);
+                var prop = so.FindProperty("m_DefaultMaterial");
+                if (prop != null && prop.objectReferenceValue != pm)
+                {
+                    prop.objectReferenceValue = pm;
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+            }
+
+            if (LayerMask.NameToLayer("Decor") < 0)
+            {
+                var tags = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+                if (tags.Length > 0)
+                {
+                    var so = new SerializedObject(tags[0]);
+                    var layers = so.FindProperty("layers");
+                    for (int i = 8; i < layers.arraySize; i++)
+                    {
+                        var l = layers.GetArrayElementAtIndex(i);
+                        if (!string.IsNullOrEmpty(l.stringValue)) continue;
+                        l.stringValue = "Decor";
+                        so.ApplyModifiedPropertiesWithoutUndo();
+                        break;
+                    }
+                }
+            }
+        }
+
         static Material CordonGround()
         {
             var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(GroundTex);
             if (!tex) return null;
             var mat = LoadOrCreate("M_GroundOstrov", "Universal Render Pipeline/Lit", out bool created);
             mat.SetTexture("_BaseMap", tex);
-            mat.SetTextureScale("_BaseMap", new Vector2(50f, 50f)); // 400 m plane, one tile = 8 m
+            mat.SetTextureScale("_BaseMap", new Vector2(60f, 60f)); // 480 m plane, one tile = 8 m
             if (created)
             {
                 mat.SetColor("_BaseColor", Color.white);
@@ -66,38 +118,43 @@ namespace Survivor.EditorTools
             if (artMats == null) return null;
             string path = Root + "/Settings/PostFX_Cordon.asset";
             var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(path);
-            if (profile) return profile;
+            if (!profile)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                AssetDatabase.CreateAsset(profile, path);
+            }
 
-            profile = ScriptableObject.CreateInstance<VolumeProfile>();
-            AssetDatabase.CreateAsset(profile, path);
-            var tonemap = profile.Add<Tonemapping>();
-            tonemap.mode.Override(TonemappingMode.ACES);
-            var color = profile.Add<ColorAdjustments>();
-            color.postExposure.Override(0.55f);
+            // Values are re-applied on every build (an existing profile used to be kept as is).
+            T Get<T>() where T : VolumeComponent
+            {
+                if (profile.TryGet(out T c)) return c;
+                c = profile.Add<T>();
+                c.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+                AssetDatabase.AddObjectToAsset(c, profile);
+                return c;
+            }
+
+            Get<Tonemapping>().mode.Override(TonemappingMode.ACES);
+            var color = Get<ColorAdjustments>();
+            color.postExposure.Override(0.45f); // was 0.55: effects (HDR ~1.5) no longer blow out to flat white; phones stay bright enough
             color.contrast.Override(14f);
             color.saturation.Override(-18f);
-            var wb = profile.Add<WhiteBalance>();
-            wb.temperature.Override(-6f);
-            var smh = profile.Add<ShadowsMidtonesHighlights>();
+            Get<WhiteBalance>().temperature.Override(-6f);
+            var smh = Get<ShadowsMidtonesHighlights>();
             smh.shadows.Override(new Vector4(0.93f, 0.98f, 1.08f, 0f));   // bluish blacks
             smh.highlights.Override(new Vector4(1.04f, 1.01f, 0.96f, 0f)); // slightly warm highs
-            var bloom = profile.Add<Bloom>();
-            bloom.threshold.Override(1.05f);
-            bloom.intensity.Override(0.65f);
+            var bloom = Get<Bloom>();
+            bloom.threshold.Override(1.15f); // only emissives bloom (amber, fire, electric)
+            bloom.intensity.Override(0.55f);
             bloom.scatter.Override(0.62f);
-            var vignette = profile.Add<Vignette>();
+            var vignette = Get<Vignette>();
             vignette.intensity.Override(0.34f);
             vignette.smoothness.Override(0.45f);
             vignette.color.Override(new Color(0.02f, 0.03f, 0.05f));
-            var grain = profile.Add<FilmGrain>();
+            var grain = Get<FilmGrain>();
             grain.type.Override(FilmGrainLookup.Thin1);
             grain.intensity.Override(0.16f);
             grain.response.Override(0.8f);
-            foreach (var component in profile.components)
-            {
-                component.hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
-                AssetDatabase.AddObjectToAsset(component, profile);
-            }
             EditorUtility.SetDirty(profile);
             return profile;
         }
@@ -130,6 +187,7 @@ namespace Survivor.EditorTools
         /// and a WorldDresser that scatters them around the player.</summary>
         static void BuildDecor(GameObject game)
         {
+            PhysicsDefaults();
             BuildBackdrop();
             if (artMats == null || !File.Exists(DecorFbx) || !File.Exists(DecorManifest)) return;
             string json = File.ReadAllText(DecorManifest).Trim();
@@ -167,6 +225,9 @@ namespace Survivor.EditorTools
                 r.reflectionProbeUsage = ReflectionProbeUsage.Off;
                 if (e.blocks && e.collider != null && e.collider.Length == 3)
                 {
+                    // Own layer, so spawns can test "is this spot inside a car / wall?" (SpawnSafety).
+                    int decorLayer = LayerMask.NameToLayer("Decor");
+                    if (decorLayer >= 0) go.layer = decorLayer;
                     var box = go.AddComponent<BoxCollider>();
                     box.size = new Vector3(e.collider[0], Mathf.Max(1f, e.collider[1]), e.collider[2]);
                     box.center = e.collider_center != null && e.collider_center.Length == 3

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6748433398234923225}
   - component: {fileID: 8017852481415472306}
   - component: {fileID: 2270737566763022056}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_BusShelter
   m_TagString: Untagged
   m_Icon: {fileID: 0}

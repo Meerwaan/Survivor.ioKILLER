@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4892839590187117535}
   - component: {fileID: 7140906543306769291}
   - component: {fileID: 3845655739890076194}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Car_Burnt
   m_TagString: Untagged
   m_Icon: {fileID: 0}

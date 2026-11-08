@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3392035662398199388}
   - component: {fileID: 4255940774605783942}
   - component: {fileID: 6891528057210592415}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Bench
   m_TagString: Untagged
   m_Icon: {fileID: 0}

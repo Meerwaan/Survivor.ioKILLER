@@ -53,6 +53,19 @@ namespace Survivor
         [Range(0f, 1f)] public float knockbackResist = 0f;
         public bool canBeElite = true;
 
+        [Header("Approach and melee")]
+        [Tooltip("How wide it curves around the player on the way in (0 = straight at you, 1 = a wide arc). Each spawn " +
+                 "picks its own side, so a crowd fans out instead of making a conga line. Fades out near contact.")]
+        [Range(0f, 1.2f)] public float flank = 0.3f;
+        [Tooltip("How much it heads for where the player is going instead of where he is (0 = no lead, 1 = full intercept).")]
+        [Range(0f, 1f)] public float lead = 0f;
+        [Tooltip("Melee: seconds between the swing starting (attack anim) and the hit landing; the hit needs the player still in reach.")]
+        public float swingTime = 0.15f;
+        [Tooltip("> 0: the melee hit is a ground slam of this radius in front of it, telegraphed for swingTime, then it stays rooted a moment.")]
+        public float slamRadius = 0f;
+        [Tooltip("Keeps away from the player instead of chasing (Cristallisé: the player hunts it).")]
+        public bool evasive;
+
         [Header("Shooting (Ranged / Boss)")]
         public GameObject projectilePrefab;
         public float projectileDamage = 8f;

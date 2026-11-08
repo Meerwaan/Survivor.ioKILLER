@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6512610164493163269}
   - component: {fileID: 5763384363571245291}
   - component: {fileID: 3424844296311416315}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Wall_Ruin_B
   m_TagString: Untagged
   m_Icon: {fileID: 0}

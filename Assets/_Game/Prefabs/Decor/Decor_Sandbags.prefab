@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9061703077630871451}
   - component: {fileID: 1792227006903543815}
   - component: {fileID: 7457413693650510101}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Sandbags
   m_TagString: Untagged
   m_Icon: {fileID: 0}

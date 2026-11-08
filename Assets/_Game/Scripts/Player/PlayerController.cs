@@ -25,6 +25,17 @@ namespace Survivor
         public Vector3 Position => rb.position;
         public float Radius => radius;
         public Vector3 Facing { get; private set; } = Vector3.forward;
+        /// <summary>Ground velocity right now (m/s): enemies lead their approach / aim with it.</summary>
+        public Vector3 Velocity
+        {
+            get
+            {
+                if (!rb) return Vector3.zero;
+                Vector3 v = rb.linearVelocity;
+                v.y = 0f;
+                return v;
+            }
+        }
 
         public bool JoystickActive { get; private set; }
         public Vector2 JoystickOrigin { get; private set; }
@@ -132,10 +143,14 @@ namespace Survivor
 
         void FixedUpdate()
         {
-            rb.linearVelocity = moveDir * Stats.moveSpeed;
+            Vector3 v = moveDir * Stats.moveSpeed;
+            Vector3 p = rb.position;
+            // At the map edge, drop the outward part of the velocity: slides along the border instead of jittering on the clamp.
+            if ((p.x >= mapHalfSize && v.x > 0f) || (p.x <= -mapHalfSize && v.x < 0f)) v.x = 0f;
+            if ((p.z >= mapHalfSize && v.z > 0f) || (p.z <= -mapHalfSize && v.z < 0f)) v.z = 0f;
+            rb.linearVelocity = v;
             if (moveDir.sqrMagnitude > 0.01f) rb.rotation = Quaternion.LookRotation(Facing);
 
-            Vector3 p = rb.position;
             if (Mathf.Abs(p.x) > mapHalfSize || Mathf.Abs(p.z) > mapHalfSize)
             {
                 p.x = Mathf.Clamp(p.x, -mapHalfSize, mapHalfSize);

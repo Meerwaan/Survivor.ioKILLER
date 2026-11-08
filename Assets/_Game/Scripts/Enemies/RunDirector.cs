@@ -54,6 +54,10 @@ namespace Survivor
         public float spawnMargin = 2f;
         [Tooltip("Share of the stream that spawns where the player is heading (±60°) instead of anywhere around the screen.")]
         [Range(0f, 1f)] public float aheadChance = 0.15f;
+        [Tooltip("Extra margin on the far (top) side of the screen, and for the boss (tall bodies poke into view).")]
+        public float farSpawnExtra = 3f, bossSpawnExtra = 5f;
+        [Tooltip("Most shooters (Cracheurs) alive at once (Bestiaire 4.5); past it, the pick is rerolled / swapped for a runner.")]
+        public int maxShooters = 6;
 
         [Header("Stream (picks per second; a pick is one enemy, or a whole pack for grouped entries)")]
         [Tooltip("Picks per second at 0:00.")]
@@ -114,6 +118,14 @@ namespace Survivor
         public int hordeBaseCount = 12;
         public float hordeCountPerMinute = 6f;
         public int hordeMaxCount = 100;
+        [Tooltip("Width (m) of each of the two breaches left in a horde ring (Bestiaire: choisir une brèche).")]
+        public float ringGap = 4f;
+        [Tooltip("Peaks (horde / assault / pincer) and rat swarms: the edge glows where they come from this long before they spawn.")]
+        public float crueWarnTime = 1.2f;
+        [Tooltip("The peak lands up to this many seconds earlier or later each wave (never at the same second: Bestiaire 4.3 e).")]
+        public float peakJitter = 6f;
+        [Tooltip("Pincer (two columns from opposite sides) joins the formation draw from this minute.")]
+        public float pincerFromMinute = 5f;
 
         [Header("Assaults (peak of even waves): a dense mixed column from where the player is heading")]
         [Tooltip("Spitters mixed into assaults.")]
@@ -241,16 +253,29 @@ namespace Survivor
         struct QueuedSpawn
         {
             public EnemyData data;
+            /// <summary>World position, or an offset from the player when <see cref="relative"/> (warned crues: they must
+            /// still land off-screen if the player ran during the warning).</summary>
             public Vector3 position, push;
-            public float health, damage, xp;
+            public float health, damage, xp, at;
+            public bool relative;
         }
 
-        readonly List<QueuedSpawn> queued = new(32);
+        readonly List<QueuedSpawn> queued = new(128);
+
+        /// <summary>Peak formations (Bestiaire 4.3 a): drawn each peak, never the same twice in a row.</summary>
+        enum Formation { Ring, Column, Pincer }
+        Formation lastFormation = Formation.Column; // the first peak is a ring, as before
+
+        const float CrueWarnRadius = 1.5f, CrueWarnMargin = 0.1f, MinLull = 4f;
+        /// <summary>Hash streams of this file's draws (seeded runs: same peaks for everyone).</summary>
+        const int JitterStream = 71, FormationStream = 73;
 
         float pending;
         float nextBoss, nextElite, nextRats, nextGolden, nextThief;
         float lastEvent = -99f;
         int bossCount, lastPeakWave;
+        /// <summary>Unseeded runs: a per-run salt for the peak draws.</summary>
+        int runSalt = 1;
 
         void Awake() => Instance = this;
 
@@ -264,6 +289,19 @@ namespace Survivor
             nextGolden = firstGoldenTime;
             nextThief = firstThiefTime;
             lastPeakWave = 0; // wave 0's peak is stream only (no horde in the first minute)
+            lastFormation = Formation.Column;
+            runSalt = Random.Range(1, int.MaxValue);
+        }
+
+        /// <summary>Seed of a draw: the mode's seed in daily / weekly runs (same for everyone), else this run's salt.</summary>
+        int DrawSeed(int stream, int index) => GameModes.Hash(RunConfig.Seed != 0 ? RunConfig.Seed : runSalt, stream * 1000003 + index, 0);
+
+        /// <summary>How early (-) or late (+) this wave's peak lands. Wave 0 keeps the usual opening.</summary>
+        float PeakOffset(int wave)
+        {
+            if (wave <= 0 || peakJitter <= 0f) return 0f;
+            int h = DrawSeed(JitterStream, wave);
+            return ((h & 0xFFFF) / 65535f * 2f - 1f) * peakJitter;
         }
 
         public float HealthMult(float minutes) => (1f + healthPerMinute * minutes
@@ -319,8 +357,7 @@ namespace Survivor
                 if (!bossAlive)
                 {
                     lastEvent = time;
-                    if (WaveIndex % 2 == 1) SpawnHorde(minutes);
-                    else SpawnAssault(minutes);
+                    SpawnPeak(minutes);
                 }
             }
 
@@ -356,7 +393,9 @@ namespace Survivor
             float length = Mathf.Max(10f, waveLength);
             int index = Mathf.FloorToInt(time / length);
             float t = time - index * length;
-            float build = Mathf.Clamp(buildTime, 1f, length);
+            // The peak moves a few seconds each wave (never on the same second), keeping at least MinLull of breather.
+            float build = Mathf.Min(buildTime + PeakOffset(index), Mathf.Max(buildTime, length - peakTime - MinLull));
+            build = Mathf.Clamp(build, 1f, length);
             float peakEnd = Mathf.Clamp(build + peakTime, build, length);
 
             WavePhase phase;
@@ -422,65 +461,129 @@ namespace Survivor
             SFX.Play(SfxId.Alert, 0.7f, 0.85f);
         }
 
-        void SpawnHorde(float minutes)
+        /// <summary>
+        /// The peak event: a formation drawn among the unlocked ones, never the same twice in a row (Bestiaire 4.3).
+        /// Daily / weekly runs draw from the mode's seed. Every formation is announced: banner, sound, and an amber glow
+        /// on the screen edge where it comes from, <see cref="crueWarnTime"/> before the enemies spawn.
+        /// </summary>
+        void SpawnPeak(float minutes)
         {
             if (!hordeEnemy) return;
+            var rng = new System.Random(DrawSeed(FormationStream, WaveIndex));
+            float ring = lastFormation == Formation.Ring ? 0f : 3f;
+            float column = lastFormation == Formation.Column ? 0f : 3f;
+            float pincer = lastFormation == Formation.Pincer || minutes < pincerFromMinute ? 0f : 2f;
+            float roll = (float)rng.NextDouble() * (ring + column + pincer);
+            var f = roll < ring ? Formation.Ring : roll < ring + column ? Formation.Column : Formation.Pincer;
+            lastFormation = f;
+            switch (f)
+            {
+                case Formation.Ring: SpawnHorde(minutes, rng); break;
+                case Formation.Column: SpawnAssault(minutes, rng); break;
+                default: SpawnPincer(minutes, rng); break;
+            }
+        }
 
+        /// <summary>A ring all around the screen, with two breaches to choose from.</summary>
+        void SpawnHorde(float minutes, System.Random rng)
+        {
             // Evenly spread all around the screen edges: the player is surrounded whatever the orientation.
             int count = Mathf.RoundToInt((hordeBaseCount + hordeCountPerMinute * minutes) * RunConfig.SpawnRateMult * DangerHordeMult);
             count = Mathf.Min(count, hordeMaxCount, hardCap - Enemy.Active.Count);
             if (count <= 0) return;
 
-            var r = ViewRect(spawnMargin);
+            var r = SpawnRect(spawnMargin);
             float perimeter = 2f * (r.width + r.height);
-            float offset = Random.value * perimeter;
+            float gap = Mathf.Min(ringGap, perimeter * 0.08f);
+            float usable = perimeter - 2f * gap;
+            float offset = (float)rng.NextDouble() * perimeter;
+            // First breach at [0, gap), the second one somewhere across the ring.
+            float gap2 = gap + usable * Mathf.Lerp(0.35f, 0.65f, (float)rng.NextDouble());
+            int warnEvery = Mathf.Max(1, Mathf.CeilToInt(count / 8f)); // ~8 glows around the edge
             for (int i = 0; i < count; i++)
             {
                 var data = hordeEnemy;
                 if (hordeFastEnemy && minutes >= 2f && i % 3 == 0) data = hordeFastEnemy;
                 if (hordeHeavyEnemy && minutes >= hordeHeavyFromMinute && i % 9 == 4) data = hordeHeavyEnemy;
                 if (hordeKamikaze && minutes >= 3f && i % 11 == 5) data = hordeKamikaze;
-                Spawn(data, PerimeterPoint(r, offset + perimeter * i / count), minutes, 1f);
+                float d = gap + usable * (i + 0.5f) / count;
+                if (d >= gap2) d += gap;
+                Vector3 at = PerimeterPoint(r, offset + d);
+                QueueCrue(data, at, minutes, crueWarnTime);
+                if (i % warnEvery == warnEvery / 2) WarnFrom(at, crueWarnTime);
             }
 
-            GameHUD.Instance.ShowBanner("CRUE !", UIKit.Blood);
+            GameHUD.Instance.ShowBanner("CRUE !\n<size=50>Trouve la brèche</size>", UIKit.Blood, 1.8f);
             SFX.Play(SfxId.Horde);
             if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.25f);
         }
 
-        /// <summary>
-        /// A dense mixed column charging from where the player is heading: runners in front, brutes and spitters
-        /// behind them. Can't be dodged by running away, has to be cut through.
-        /// </summary>
-        void SpawnAssault(float minutes)
+        int AssaultCount(float minutes)
         {
-            if (!hordeEnemy) return;
-
             int count = Mathf.RoundToInt((assaultBaseCount + assaultCountPerMinute * minutes) * RunConfig.SpawnRateMult * DangerHordeMult);
-            count = Mathf.Min(count, assaultMaxCount, hardCap - Enemy.Active.Count);
+            return Mathf.Min(count, assaultMaxCount, hardCap - Enemy.Active.Count);
+        }
+
+        /// <summary>
+        /// A dense mixed column: runners in front, brutes and spitters behind them. From where the player is heading
+        /// (60%), from a side (25%) or from behind (15%). Has to be cut through.
+        /// </summary>
+        void SpawnAssault(float minutes, System.Random rng)
+        {
+            int count = AssaultCount(minutes);
             if (count <= 0) return;
 
-            bool mixed = minutes >= assaultMixFromMinute;
+            float roll = (float)rng.NextDouble();
+            float side = rng.NextDouble() < 0.5 ? -1f : 1f;
+            float angle = roll < 0.6f ? 0f : roll < 0.85f ? 90f * side : 180f;
+            Vector3 dir = Quaternion.Euler(0f, angle, 0f) * PlayerController.Instance.Facing;
+            SpawnColumn(dir, count, 50f, minutes, 0);
+
+            string from = angle == 0f ? "Ils arrivent devant" : angle == 180f ? "Ils arrivent DERRIÈRE" : "Ils arrivent sur le côté";
+            GameHUD.Instance.ShowBanner($"ASSAUT !\n<size=50>{from}</size>", new Color(1f, 0.5f, 0.15f), 1.6f);
+            SFX.Play(SfxId.Horde, 0.8f, 1.15f);
+            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.2f);
+        }
+
+        /// <summary>Two columns from opposite sides of the player's heading: get out ahead or behind.</summary>
+        void SpawnPincer(float minutes, System.Random rng)
+        {
+            int count = AssaultCount(minutes);
+            if (count <= 1) return;
+
+            float angle = 90f + Mathf.Lerp(-20f, 20f, (float)rng.NextDouble());
             Vector3 facing = PlayerController.Instance.Facing;
+            int half = count / 2;
+            SpawnColumn(Quaternion.Euler(0f, angle, 0f) * facing, half, 35f, minutes, 0);
+            SpawnColumn(Quaternion.Euler(0f, angle + 180f, 0f) * facing, count - half, 35f, minutes, 1);
+
+            GameHUD.Instance.ShowBanner("TENAILLE !\n<size=50>Ils arrivent des deux côtés</size>", new Color(1f, 0.5f, 0.15f), 1.6f);
+            SFX.Play(SfxId.Horde, 0.85f, 1.05f);
+            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.22f);
+        }
+
+        /// <summary>Queues a warned column spread over ±<paramref name="spread"/>° around <paramref name="dir"/>.</summary>
+        void SpawnColumn(Vector3 dir, int count, float spread, float minutes, int mixOffset)
+        {
+            bool mixed = minutes >= assaultMixFromMinute;
             for (int i = 0; i < count; i++)
             {
                 EnemyData data;
-                switch (i % 4)
+                switch ((i + mixOffset) % 4)
                 {
                     case 2: data = mixed && hordeHeavyEnemy ? hordeHeavyEnemy : hordeEnemy; break;
                     case 3: data = mixed && assaultRangedEnemy ? assaultRangedEnemy : hordeFastEnemy ? hordeFastEnemy : hordeEnemy; break;
                     default: data = hordeFastEnemy ? hordeFastEnemy : hordeEnemy; break;
                 }
-                float angle = count > 1 ? Mathf.Lerp(-50f, 50f, (float)i / (count - 1)) : 0f;
-                Vector3 dir = Quaternion.Euler(0f, angle, 0f) * facing;
+                float angle = count > 1 ? Mathf.Lerp(-spread, spread, (float)i / (count - 1)) : 0f;
+                Vector3 d = Quaternion.Euler(0f, angle, 0f) * dir;
                 Vector2 jitter = Random.insideUnitCircle * 0.8f;
-                Vector3 at = EdgePointToward(dir, spawnMargin + Random.Range(0f, 2.5f)) + new Vector3(jitter.x, 0f, jitter.y);
-                Spawn(data, at, minutes, 1f);
+                Vector3 at = EdgePointToward(d, spawnMargin + Random.Range(0f, 2.5f)) + new Vector3(jitter.x, 0f, jitter.y);
+                QueueCrue(data, at, minutes, crueWarnTime);
             }
-
-            GameHUD.Instance.ShowBanner("ASSAUT !\n<size=50>Ils arrivent devant</size>", new Color(1f, 0.5f, 0.15f), 1.6f);
-            SFX.Play(SfxId.Horde, 0.8f, 1.15f);
-            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.2f);
+            // The glow: the front of the column, left / centre / right.
+            for (int k = -1; k <= 1; k++)
+                WarnFrom(EdgePointToward(Quaternion.Euler(0f, spread * 0.6f * k, 0f) * dir, spawnMargin), crueWarnTime);
         }
 
         /// <summary>A tight pack of rats pouring in from one side: tiny, fast, one hit each. Multi-kill heaven.</summary>
@@ -495,12 +598,55 @@ namespace Survivor
             for (int i = 0; i < count; i++)
             {
                 Vector2 c = Random.insideUnitCircle * 3f;
-                Spawn(ratEnemy, center + new Vector3(c.x, 0f, c.y), minutes, 1f);
+                QueueCrue(ratEnemy, center + new Vector3(c.x, 0f, c.y), minutes, crueWarnTime);
             }
+            WarnFrom(center, crueWarnTime);
 
             GameHUD.Instance.ShowBanner("NUÉE !", new Color(0.85f, 0.75f, 0.6f), 1.6f);
             SFX.Play(SfxId.Squeak);
             SFX.Play(SfxId.Alert, 0.6f, 1.3f);
+        }
+
+        /// <summary>Queues a crue enemy: spawns after <paramref name="delay"/>, at the same place RELATIVE to the player
+        /// (so it still lands off-screen if he ran meanwhile), with the scaling of <paramref name="minutes"/>.</summary>
+        void QueueCrue(EnemyData data, Vector3 at, float minutes, float delay)
+        {
+            if (!data) return;
+            Vector3 offset = at - PlayerController.Instance.Position;
+            offset.y = 0f;
+            queued.Add(new QueuedSpawn
+            {
+                data = data, position = offset, relative = true, at = Time.time + delay,
+                health = HealthMult(minutes) * RunConfig.EnemyHealthMult,
+                damage = DamageMult(minutes) * RunConfig.EnemyDamageMult,
+                xp = XPMult(minutes),
+            });
+        }
+
+        /// <summary>Amber glow on the screen edge, on the line from the player to an off-screen spawn point.</summary>
+        void WarnFrom(Vector3 at, float duration)
+        {
+            var fx = GameFX.Instance;
+            var player = PlayerController.Instance;
+            if (!fx || !player) return;
+            Vector3 inside = player.Position, outside = at;
+            inside.y = outside.y = 0f;
+            var view = CameraFollow.Instance;
+            if (view)
+            {
+                if (view.IsOnScreen(outside, CrueWarnMargin)) inside = outside;
+                else
+                {
+                    // Binary search of the last point still well on screen.
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Vector3 m = (inside + outside) * 0.5f;
+                        if (view.IsOnScreen(m, CrueWarnMargin)) inside = m;
+                        else outside = m;
+                    }
+                }
+            }
+            fx.Telegraph(inside, CrueWarnRadius, Enemy.Amber * 2f, duration);
         }
 
         /// <summary>A line of glowing golden zombies: big XP and gold if you catch them all.</summary>
@@ -509,7 +655,7 @@ namespace Survivor
             int count = Mathf.Min(goldenCount, hardCap - Enemy.Active.Count);
             if (count <= 0) return;
 
-            var r = ViewRect(spawnMargin);
+            var r = SpawnRect(spawnMargin);
             float perimeter = 2f * (r.width + r.height);
             float start = Random.value * perimeter;
             for (int i = 0; i < count; i++)
@@ -523,18 +669,23 @@ namespace Survivor
         void SpawnThief(float minutes)
         {
             var player = PlayerController.Instance;
+            var view = CameraFollow.Instance;
             var r = ViewRect(-1.5f);
             Vector3 at = player.Position + Vector3.forward * 5f;
-            for (int tries = 0; tries < 10; tries++)
+            for (int tries = 0; tries < 16; tries++)
             {
                 var p = new Vector3(Random.Range(r.xMin, r.xMax), 0f, Random.Range(r.yMin, r.yMax));
                 if ((p - player.Position).sqrMagnitude < 16f) continue;
+                // The ground rect's bottom corners are off the picture: really on screen, or try again.
+                if (view && !view.IsOnScreen(p, 0.1f)) continue;
+                if (SpawnSafety.Blocked(p, thiefEnemy.hitRadius)) continue;
                 at = p;
                 break;
             }
             at.y = 0f;
 
-            Spawn(thiefEnemy, at, minutes, 1f);
+            var thief = Spawn(thiefEnemy, at, minutes, 1f);
+            if (thief) at = thief.transform.position;
             GameHUD.Instance.ShowBanner("PILLEUR !\n<size=50>Attrape-le avant qu'il file</size>", UIKit.Gold, 2f);
             SFX.Play(SfxId.Alert, 1f, 1.2f);
             if (GameFX.Instance) GameFX.Instance.Ring(at, 2.5f, new Color(2.5f, 2f, 0.6f), 0.5f);
@@ -546,7 +697,7 @@ namespace Survivor
 
             bossCount++;
             float healthBonus = 1f + bossHealthGrowth * (bossCount - 1);
-            CurrentBoss = Spawn(boss, EdgePointToward(PlayerController.Instance.Facing, spawnMargin + 2f), minutes, healthBonus);
+            CurrentBoss = Spawn(boss, EdgePointToward(PlayerController.Instance.Facing, spawnMargin + bossSpawnExtra), minutes, healthBonus);
 
             string name = string.IsNullOrEmpty(boss.displayName) ? "Une Souche" : "Le " + boss.displayName;
             GameHUD.Instance.ShowBanner($"SOUCHE !\n<size=56>{name} arrive</size>", UIKit.Gold, 2.5f);
@@ -560,7 +711,9 @@ namespace Survivor
 
         Enemy Spawn(EnemyData data, Vector3 position, float minutes, float extraHealth, bool elite = false)
         {
+            data = CapShooters(data);
             if (!data || !data.prefab) return null;
+            position = SafeSpawnPoint(position, data.hitRadius);
             var enemy = Pool.Instance.Spawn<Enemy>(data.prefab, position, Quaternion.identity);
             enemy.Init(data,
                 HealthMult(minutes) * extraHealth * RunConfig.EnemyHealthMult,
@@ -587,21 +740,97 @@ namespace Survivor
             queued.Add(new QueuedSpawn { data = data, position = position, push = push, health = healthMult, damage = damageMult, xp = xpMult });
         }
 
+        /// <summary>
+        /// Like <see cref="QueueSpawn"/>, but telegraphed: a ground circle in <paramref name="color"/> fills where it
+        /// will crawl out, and it spawns <paramref name="delay"/> seconds later (summons: nothing pops out of thin air).
+        /// </summary>
+        public void QueueSpawnWarned(EnemyData data, Vector3 position, float healthMult, float damageMult, float xpMult,
+            Vector3 push, float delay, Color color)
+        {
+            if (!data) return;
+            position = SafeSpawnPoint(position, data.hitRadius);
+            if (GameFX.Instance) GameFX.Instance.Telegraph(position, Mathf.Max(0.7f, data.hitRadius + 0.4f), color, delay);
+            queued.Add(new QueuedSpawn
+            {
+                data = data, position = position, push = push, health = healthMult, damage = damageMult, xp = xpMult,
+                at = Time.time + delay,
+            });
+        }
+
+        /// <summary><see cref="QueueSpawnWarned"/> with the current run scaling (ritual summons, boss escort).</summary>
+        public void SpawnWarned(EnemyData data, Vector3 position, float delay, Color color)
+        {
+            float m = Minutes;
+            QueueSpawnWarned(data, position, HealthMult(m) * RunConfig.EnemyHealthMult, DamageMult(m) * RunConfig.EnemyDamageMult,
+                XPMult(m), Vector3.zero, delay, color);
+        }
+
         void SpawnQueued()
         {
             if (queued.Count == 0) return;
+            float now = Time.time;
+            var player = PlayerController.Instance;
+            int keep = 0;
             for (int i = 0; i < queued.Count; i++)
             {
                 var q = queued[i];
-                if (!q.data.prefab || Enemy.Active.Count >= hardCap) continue;
-                var enemy = Pool.Instance.Spawn<Enemy>(q.data.prefab, q.position, Quaternion.identity);
-                enemy.Init(q.data, q.health, q.damage, q.xp, false);
-                enemy.Push(q.push);
+                if (q.at > now)
+                {
+                    queued[keep++] = q;
+                    continue;
+                }
+                var data = CapShooters(q.data);
+                if (!data || !data.prefab || Enemy.Active.Count >= hardCap) continue;
+                Vector3 pos = q.relative && player ? player.Position + q.position : q.position;
+                pos = SafeSpawnPoint(pos, data.hitRadius);
+                var enemy = Pool.Instance.Spawn<Enemy>(data.prefab, pos, Quaternion.identity);
+                enemy.Init(data, q.health, q.damage, q.xp, false);
+                if (q.push != Vector3.zero) enemy.Push(q.push);
             }
-            queued.Clear();
+            queued.RemoveRange(keep, queued.Count - keep);
+        }
+
+        bool ShootersCapped => Enemy.ShooterCount >= maxShooters;
+
+        /// <summary>Past the shooter cap, a spitter becomes a runner (or a zombie): six on the field is readable, more is noise.</summary>
+        EnemyData CapShooters(EnemyData data)
+        {
+            if (!data || data.behaviour != EnemyBehaviour.Ranged || !ShootersCapped) return data;
+            return hordeFastEnemy ? hordeFastEnemy : hordeEnemy ? hordeEnemy : data;
+        }
+
+        /// <summary>
+        /// A spawn point inside the playable map (the border barriers have no collider) and out of the decor
+        /// (cars, containers, walls: see <see cref="SpawnSafety"/>).
+        /// </summary>
+        public static Vector3 SafeSpawnPoint(Vector3 p, float radius)
+        {
+            p.y = 0f;
+            p = ClampToMap(p);
+            return ClampToMap(SpawnSafety.FreePoint(p, radius));
+        }
+
+        static Vector3 ClampToMap(Vector3 p)
+        {
+            var player = PlayerController.Instance;
+            float m = (player ? player.mapHalfSize : 190f) - 1f;
+            p.x = Mathf.Clamp(p.x, -m, m);
+            p.z = Mathf.Clamp(p.z, -m, m);
+            return p;
         }
 
         // ---------- Positions around the visible screen area ----------
+
+        /// <summary>
+        /// <see cref="ViewRect"/> for spawning off-screen: positive margins get <see cref="farSpawnExtra"/> more on the far
+        /// (top) side. Negative margins (points on screen) are left alone.
+        /// </summary>
+        Rect SpawnRect(float margin)
+        {
+            var r = ViewRect(margin);
+            if (margin > 0f) r.yMax += farSpawnExtra;
+            return r;
+        }
 
         /// <summary>Ground area on screen, grown by <paramref name="margin"/> meters on every side (negative shrinks it).</summary>
         public static Rect ViewRect(float margin)
@@ -637,14 +866,14 @@ namespace Survivor
         /// <summary>Random spot just off-screen (any side).</summary>
         public Vector3 RandomEdgePoint(float margin)
         {
-            var r = ViewRect(margin);
+            var r = SpawnRect(margin);
             return PerimeterPoint(r, Random.value * 2f * (r.width + r.height));
         }
 
-        /// <summary>Spot just off-screen in a given direction from the screen center.</summary>
+        /// <summary>Spot just off-screen in a given direction from the screen center (negative margin: on screen).</summary>
         public Vector3 EdgePointToward(Vector3 direction, float margin)
         {
-            var r = ViewRect(margin);
+            var r = SpawnRect(margin);
             Vector2 c = r.center;
             Vector2 d = new(direction.x, direction.z);
             if (d.sqrMagnitude < 0.0001f) d = Vector2.up;
@@ -656,22 +885,27 @@ namespace Survivor
             return new Vector3(hit.x, 0f, hit.y);
         }
 
+        /// <summary>Weighted pick among the active entries; shooters are left out of the draw while capped.</summary>
         SpawnEntry Pick(float time)
         {
             float minutes = time / 60f;
+            bool noShooters = ShootersCapped;
             float total = 0f;
             foreach (var e in entries)
-                if (e.enemy && time >= e.startTime && time < e.endTime) total += e.WeightAt(minutes) * DangerWeight(e.enemy);
+                if (Eligible(e, time, noShooters)) total += e.WeightAt(minutes) * DangerWeight(e.enemy);
             if (total <= 0f) return null;
 
             float roll = Random.value * total;
             foreach (var e in entries)
             {
-                if (!e.enemy || time < e.startTime || time >= e.endTime) continue;
+                if (!Eligible(e, time, noShooters)) continue;
                 roll -= e.WeightAt(minutes) * DangerWeight(e.enemy);
                 if (roll <= 0f) return e;
             }
             return null;
         }
+
+        static bool Eligible(SpawnEntry e, float time, bool noShooters) =>
+            e.enemy && time >= e.startTime && time < e.endTime && !(noShooters && e.enemy.behaviour == EnemyBehaviour.Ranged);
     }
 }

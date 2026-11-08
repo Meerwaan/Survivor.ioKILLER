@@ -64,6 +64,18 @@ namespace Survivor
             return p.x >= r.xMin - margin && p.x <= r.xMax + margin && p.z >= r.yMin - margin && p.z <= r.yMax + margin;
         }
 
+        /// <summary>
+        /// True if the point, 1 m above the ground (an enemy's chest), is really inside the picture, at least
+        /// <paramref name="margin"/> inside the edges (viewport units: 0.05 = 5% of the screen; negative = outside).
+        /// Unlike <see cref="IsInView"/> (the bounding box of the visible ground), the hidden bottom corners don't count.
+        /// </summary>
+        public bool IsOnScreen(Vector3 p, float margin = 0f)
+        {
+            if (!cam) return true;
+            Vector3 v = cam.WorldToViewportPoint(p + Vector3.up);
+            return v.z > 0f && v.x >= margin && v.x <= 1f - margin && v.y >= margin && v.y <= 1f - margin;
+        }
+
         void LateUpdate()
         {
             if (Screen.width != framedWidth || Screen.height != framedHeight) UpdateFraming();

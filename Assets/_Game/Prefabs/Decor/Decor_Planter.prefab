@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4060466947835519842}
   - component: {fileID: 6132888858151516278}
   - component: {fileID: 4059867749916807214}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Planter
   m_TagString: Untagged
   m_Icon: {fileID: 0}

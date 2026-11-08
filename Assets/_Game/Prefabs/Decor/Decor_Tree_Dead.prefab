@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4202202044997394789}
   - component: {fileID: 9056925937074866612}
   - component: {fileID: 5188108877484583514}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Tree_Dead
   m_TagString: Untagged
   m_Icon: {fileID: 0}

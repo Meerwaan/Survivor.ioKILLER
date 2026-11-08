@@ -21,6 +21,10 @@ namespace Survivor
         public float minSpeed = 0.35f, maxSpeed = 2.6f;
         [Tooltip("Below this ground speed (m/s) the Idle clip plays (when the controller has one).")]
         public float idleBelow = 0.3f;
+        [Tooltip("Back to the locomotion clip above this ground speed (m/s): the gap keeps Move/Idle from flickering.")]
+        public float moveAbove = 0.45f;
+        /// <summary>Hard ceiling on the locomotion playback speed, whatever the enemy's own speed.</summary>
+        const float PlaybackCeiling = 8f;
 
         public static readonly int SpeedId = Animator.StringToHash("Speed");
         public static readonly int MovingId = Animator.StringToHash("Moving");
@@ -37,6 +41,7 @@ namespace Survivor
         Rigidbody rb;
         Enemy enemy;
         Vector3 lastPos;
+        bool moving = true;
 
         /// <summary>The variant shown right now.</summary>
         public Renderer ActiveRenderer { get; private set; }
@@ -63,6 +68,7 @@ namespace Survivor
                 animator.SetBool(MovingId, true);
                 animator.Play(MoveState, 0, (float)LookRng.NextDouble());
             }
+            moving = true;
             lastPos = transform.position;
         }
 
@@ -76,8 +82,15 @@ namespace Survivor
             lastPos = transform.position;
             v.y = 0f;
             float speed = v.magnitude;
-            animator.SetFloat(SpeedId, Mathf.Clamp(speed / Mathf.Max(0.1f, naturalSpeed), minSpeed, maxSpeed));
-            animator.SetBool(MovingId, speed > idleBelow);
+            float natural = Mathf.Max(0.1f, naturalSpeed);
+            // Small clips (the rat's walks 0.96 m/s, it runs 5): never clamp below the enemy's own design speed,
+            // or its feet glide.
+            float max = maxSpeed;
+            if (enemy && enemy.Data) max = Mathf.Clamp(enemy.Data.moveSpeed * 1.3f / natural, maxSpeed, PlaybackCeiling);
+            animator.SetFloat(SpeedId, Mathf.Clamp(speed / natural, minSpeed, max));
+            // Hysteresis: one threshold flickered Move/Idle on enemies hovering around it.
+            if (moving ? speed < idleBelow : speed > Mathf.Max(moveAbove, idleBelow + 0.05f)) moving = !moving;
+            animator.SetBool(MovingId, moving);
         }
 
         public void Attack() { if (animator) animator.SetTrigger(AttackId); }

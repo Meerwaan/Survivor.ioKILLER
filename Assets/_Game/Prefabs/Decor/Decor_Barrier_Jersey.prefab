@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2989489988441882547}
   - component: {fileID: 8626470288749867418}
   - component: {fileID: 377179930000024470}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Decor_Barrier_Jersey
   m_TagString: Untagged
   m_Icon: {fileID: 0}

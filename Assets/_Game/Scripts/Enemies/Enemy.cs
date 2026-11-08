@@ -23,7 +23,9 @@ namespace Survivor
     /// <summary>
     /// Enemy brain: chase (melee), keep distance and spit (ranged), chase, charge and fire rings (boss),
     /// swell up and blow up (kamikaze), run away with the loot (thief), or just sit there (barrels, crates).
-    /// Physics keeps enemies from stacking; hits are simple distance checks.
+    /// Movement is smoothed (velocity eases in, the body turns instead of snapping); chasers fan out on arcs
+    /// (<see cref="EnemyData.flank"/>), step aside when something blocks them, and every attack that isn't a plain
+    /// contact hit is telegraphed (Bestiaire rule 1). Physics keeps enemies from stacking; hits are distance checks.
     /// Also handles hit feedback (flash + squash + sound), burning, slowing, elites (and their affixes), bounty targets,
     /// splitting and death explosions. In-run pacts and relics plug in through <see cref="RunModifiers"/>.
     /// </summary>
@@ -36,8 +38,16 @@ namespace Survivor
         /// </summary>
         public static readonly List<Enemy> Active = new(512);
 
+        /// <summary>Living shooters (Cracheurs): RunDirector caps them (Bestiaire 4.5).</summary>
+        public static int ShooterCount { get; private set; }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetStatics() => Active.Clear();
+        static void ResetStatics()
+        {
+            Active.Clear();
+            ShooterCount = 0;
+            playerCacheTime = -1f;
+        }
 
         /// <summary>Enemies this many meters off-screen are moved back in front of the player.</summary>
         const float RelocateMargin = 12f;
@@ -46,8 +56,56 @@ namespace Survivor
         float bossAway;
         const float EliteScale = 1.4f;
 
+        // ---- Movement ----
+        /// <summary>Acceleration in "speeds per second": full speed in 0.25 s.</summary>
+        const float AccelPerSpeed = 4f;
+        /// <summary>Turn rates (degrees per second).</summary>
+        const float TurnRate = 540f, BossTurnRate = 200f, BossChargeTurnRate = 600f;
+        /// <summary>Knockback ceiling (m/s): point-blank shotgun stacks used to tunnel enemies through fences and cars.</summary>
+        const float MaxKnockback = 12f;
+        /// <summary>The flank curve fades out between these distances (no orbiting at contact).</summary>
+        const float FlankFadeNear = 2.5f, FlankFadeFar = 8f;
+        /// <summary>Lead: never aims further ahead than this many seconds of the player's run.</summary>
+        const float MaxLeadTime = 1.5f;
+        // Unstuck: under 30% of the wished progress for this long, farther than contact + UnstuckMinGap from the player
+        // (closer, it is just the crowd around him: no sidestep) -> a short sidestep. A car between them is wider than that.
+        const float StuckProgress = 0.3f, StuckDelay = 0.35f, SidestepTime = 0.7f, UnstuckMinGap = 1f;
+
+        // ---- Melee ----
+        const float ReachSlack = 0.25f, SwingReachBonus = 0.2f;
+        /// <summary>A swing that landed during the player's invulnerability tries again this soon (not a full cooldown).</summary>
+        const float RetryAfterAbsorbed = 0.25f;
+        /// <summary>Slowed for the swing and this long after (the attack clip plays on the legs too).</summary>
+        const float SwingSlowTail = 0.3f, SwingSlowMult = 0.3f;
+        /// <summary>Masse slam: starts this far beyond contact, hits this much harder than a contact hit (it is rarer and
+        /// dodgeable), lands this far in front, then the Masse stays rooted.</summary>
+        const float SlamTrigger = 0.6f, SlamDamageMult = 1.3f, SlamOffset = 0.45f, SlamRootTime = 0.6f;
+        /// <summary>The Masse clip's fists hit the ground ~0.3 s in: the clip starts that long before the impact.</summary>
+        const float SlamAnimLead = 0.3f;
+
+        // ---- Cracheur ----
+        /// <summary>Wind-up (stop, face, the sac swells and glows): the clip's spit leaves the mouth at ~0.57 s.</summary>
+        const float SpitWindup = 0.55f;
+        /// <summary>Aims at where half the player's run over the flight time will take him.</summary>
+        const float SpitLead = 0.5f;
+        /// <summary>Fires only after this long truly on screen, and within this many preferred ranges.</summary>
+        const float ShooterOnScreenDelay = 0.6f, ShooterMaxRange = 1.6f, ShooterScreenMargin = 0.04f;
+        const float StrafeMult = 0.45f;
+
+        // ---- Boss ----
+        const float ChargeWindupTime = 0.75f, ChargeLockBefore = 0.35f, ChargeTime = 0.8f, ChargeSpeedMult = 4.5f;
+        const float ChargeLeadTime = 0.3f, ChargeRecoverTime = 0.7f, RingWindupTime = 0.4f;
+        /// <summary>Phase 2 (under 50% HP): more shards per ring, faster rings, an escort of Fiévreux.</summary>
+        const int EnragedExtraShards = 6, EnragedEscort = 4;
+        const float EnragedFireMult = 0.7f, EnragedChargeMult = 0.85f;
+
+        /// <summary>Seconds of ground telegraph before a summoned enemy crawls out (Invocateur, boss escort).</summary>
+        public const float SummonWarn = 0.9f;
+
         static readonly Color ThiefSparkle = new(2.5f, 2f, 0.6f);
         static readonly Color DustColor = new(1.1f, 1f, 0.85f);
+        /// <summary>Amber of the Ambrés (#E58E2B): their telegraphs (Univers 9.3) and elite / boss deaths.</summary>
+        public static readonly Color Amber = new(0.898f, 0.557f, 0.169f);
 
         public Renderer bodyRenderer;
         public Material flashMaterial;
@@ -74,6 +132,8 @@ namespace Survivor
         /// <summary>Barrels and crates: don't move, don't count as kills.</summary>
         public bool IsProp => Data && Data.behaviour == EnemyBehaviour.Prop;
         public bool IsThief => Data && Data.behaviour == EnemyBehaviour.Thief;
+        /// <summary>Humans (the Pilleur is the only one so far): no crust chunks on death (Univers 9.9 / 9.10).</summary>
+        public bool IsHuman => IsThief;
         public float MaxHealth => maxHealth;
         public float HealthFraction => maxHealth > 0f ? Mathf.Clamp01(health / maxHealth) : 0f;
         /// <summary>New value on every (re)spawn: lets Synergies tell a pooled enemy's new life from its previous one.</summary>
@@ -110,6 +170,9 @@ namespace Survivor
         };
 
         Rigidbody rb;
+        CapsuleCollider capsule;
+        float capsuleRadius, capsuleHeight;
+        Vector3 capsuleCenter;
         Material baseMaterial, currentMaterial;
         Color bodyColor = Color.gray;
         Vector3 visualScale = Vector3.one, visualPos;
@@ -124,9 +187,29 @@ namespace Survivor
         // Two slow slots: the strongest running slow, and a weaker one that outlasts it (takes over when it ends).
         float slowFactor = 1f, slowUntil, weakSlowFactor = 1f, weakSlowUntil;
 
+        // Movement: smoothed velocity (knockback stays separate), this spawn's side of the arc and speed.
+        Vector3 moveVel;
+        float side, speedJitter = 1f;
+        // Unstuck
+        float stuckTime, sidestepUntil, lastSidestepEnd, sidestepSign = 1f;
+        Vector3 sidestepDir;
+
+        // Telegraph glow (amber pulse, then a white flash right before it acts)
+        float glowStart, glowUntil;
+        bool glowing;
+
+        // Melee swing / Masse slam
+        float swingHitAt, swingSlowUntil, rootedUntil, attackAnimAt;
+        Vector3 slamCenter, slamFace;
+
+        // Cracheur
+        bool backingOff, approaching, countedShooter;
+        float strafeSign = 1f, nextStrafeFlip, aimUntil, onScreenSince = -1f, strafeStuck;
+
         // Kamikaze
         bool fusing, selfDestruct;
         float fuseUntil;
+        Vector3 fuseCenter;
 
         // Thief
         float escapeAt, nextCoin, wobbleSeed;
@@ -139,15 +222,27 @@ namespace Survivor
         Color tagColor, auraColor;
         float nextSummon, nextAura;
 
-        // Boss charge
-        enum ChargeState { None, Windup, Charging }
-        ChargeState charge;
-        float chargeTimer;
+        // Boss: chase -> (ring wind-up -> ring) / (charge wind-up -> charge -> recovery: the punish window)
+        enum BossState { Chase, RingWindup, ChargeWindup, Charging, Recover }
+        BossState bossState;
+        float bossTimer, chargeTimer;
         Vector3 chargeDir;
+        bool chargeLocked, enraged;
+
+        // Player position / velocity, read once per physics step for every enemy.
+        static float playerCacheTime = -1f;
+        static Vector3 playerPos, playerVel;
 
         void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            capsule = GetComponent<CapsuleCollider>();
+            if (capsule)
+            {
+                capsuleRadius = capsule.radius;
+                capsuleHeight = capsule.height;
+                capsuleCenter = capsule.center;
+            }
             if (!visual && bodyRenderer) visual = bodyRenderer.transform;
             if (visual)
             {
@@ -172,6 +267,11 @@ namespace Survivor
         void OnDisable()
         {
             if (tagLabel != null) RunHUD.Unregister(this);
+            if (countedShooter)
+            {
+                countedShooter = false;
+                ShooterCount--;
+            }
             int last = Active.Count - 1;
             if (index >= 0 && index <= last && Active[index] == this)
             {
@@ -206,8 +306,38 @@ namespace Survivor
             burnUntil = 0f;
             slowUntil = weakSlowUntil = 0f;
             slowFactor = weakSlowFactor = 1f;
-            charge = ChargeState.None;
+
+            // Pooled: every per-life field starts over.
+            moveVel = Vector3.zero;
+            side = Random.Range(-1f, 1f);
+            speedJitter = Random.Range(0.92f, 1.08f);
+            stuckTime = 0f;
+            sidestepUntil = 0f;
+            lastSidestepEnd = -99f;
+            sidestepSign = side >= 0f ? 1f : -1f;
+            glowUntil = 0f;
+            glowing = false;
+            swingHitAt = swingSlowUntil = rootedUntil = attackAnimAt = 0f;
+            backingOff = approaching = false;
+            strafeSign = Random.value < 0.5f ? -1f : 1f;
+            nextStrafeFlip = Time.time + Random.Range(1.5f, 3f);
+            aimUntil = 0f;
+            onScreenSince = -1f;
+            strafeStuck = 0f;
+            bossState = BossState.Chase;
+            bossTimer = 0f;
             chargeTimer = 5f;
+            chargeLocked = enraged = false;
+            chargeDir = transform.forward;
+            if (anim) anim.SetCharging(false);
+
+            bool shooter = data.behaviour == EnemyBehaviour.Ranged;
+            if (shooter != countedShooter)
+            {
+                countedShooter = shooter;
+                ShooterCount += shooter ? 1 : -1;
+            }
+
             fusing = selfDestruct = false;
             fuseUntil = 0f;
             escapeAt = Time.time + data.escapeTime;
@@ -223,10 +353,18 @@ namespace Survivor
 
             currentMaterial = IsElite && eliteMaterial ? eliteMaterial : baseMaterial;
             if (bodyRenderer) bodyRenderer.sharedMaterial = currentMaterial;
+            float size = IsElite ? EliteScale : 1f;
             if (visual)
             {
-                visual.localScale = visualScale * (IsElite ? EliteScale : 1f);
+                visual.localScale = visualScale * size;
                 visual.localPosition = visualPos;
+            }
+            // The capsule grows with the model (an elite used to be 1.4x bigger than its collider).
+            if (capsule)
+            {
+                capsule.radius = capsuleRadius * size;
+                capsule.height = capsuleHeight * size;
+                capsule.center = capsuleCenter * size;
             }
         }
 
@@ -342,18 +480,20 @@ namespace Survivor
                     float minutes = director.Minutes;
                     float offset = Random.value * 360f;
                     Vector3 p = transform.position;
+                    Color c = AffixColor(EliteAffix.Invocateur);
+                    // Telegraphed: a ground circle where each one will crawl out, a moment before it does.
                     for (int i = 0; i < 3; i++)
                     {
                         Vector3 d = Quaternion.Euler(0f, offset + 120f * i, 0f) * Vector3.forward;
-                        director.QueueSpawn(minion, p + d * (Radius + 1f),
+                        director.QueueSpawnWarned(minion, p + d * (Radius + 1f),
                             director.HealthMult(minutes) * RunConfig.EnemyHealthMult,
                             director.DamageMult(minutes) * RunConfig.EnemyDamageMult,
-                            director.XPMult(minutes) * 0.5f, d * 4f);
+                            director.XPMult(minutes) * 0.5f, d * 4f, SummonWarn, c * 2f);
                     }
                     if (fx)
                     {
-                        fx.Ring(p, Radius + 2f, AffixColor(EliteAffix.Invocateur) * 2.5f, 0.5f);
-                        fx.Sparks(p + Vector3.up, AffixColor(EliteAffix.Invocateur) * 2f, 14, 1f);
+                        fx.Ring(p, Radius + 2f, c * 2.5f, 0.5f);
+                        fx.Sparks(p + Vector3.up, c * 2f, 14, 1f);
                     }
                     SFX.Play(SfxId.Whoosh, 0.7f, 1.4f);
                 }
@@ -419,7 +559,7 @@ namespace Survivor
         public void Push(Vector3 velocity)
         {
             velocity.y = 0f;
-            knockback += velocity;
+            knockback = Vector3.ClampMagnitude(knockback + velocity, MaxKnockback);
         }
 
         /// <summary>Supply drop: the visual falls from <paramref name="height"/> meters and lands with a thud.</summary>
@@ -436,15 +576,16 @@ namespace Survivor
         {
             float now = Time.time;
             float dt = Time.deltaTime;
-            if (flashUntil > 0f && now >= flashUntil && charge != ChargeState.Windup && !fusing)
+            UpdateGlow(now);
+            if (flashUntil > 0f && now >= flashUntil)
             {
-                bodyRenderer.sharedMaterial = currentMaterial;
                 flashUntil = 0f;
+                if (!glowing && bodyRenderer) bodyRenderer.sharedMaterial = currentMaterial;
             }
 
             if (dropHeight > 0f) UpdateDrop(dt);
             if (tagLabel != null && !IsDead)
-                UpdateAffixes(now, dt, !CameraFollow.Instance || CameraFollow.Instance.IsInView(transform.position, -0.5f));
+                UpdateAffixes(now, dt, !CameraFollow.Instance || CameraFollow.Instance.IsOnScreen(transform.position, 0.02f));
 
             if (visual && (punch > 0f || fusing))
             {
@@ -454,11 +595,9 @@ namespace Survivor
                 Vector3 squash = new(1f + 0.35f * p, 1f - 0.25f * p, 1f + 0.35f * p);
                 if (fusing)
                 {
-                    // Swells, wobbles and blinks faster and faster before blowing up.
+                    // Swells and wobbles faster and faster before blowing up (the glow blinks with it).
                     float k = 1f - Mathf.Clamp01((fuseUntil - now) / Mathf.Max(0.05f, Data.fuseTime));
                     squash *= 1f + 0.5f * k + Mathf.Sin(now * 40f) * 0.06f * k;
-                    bool on = Mathf.Repeat(now * (6f + 18f * k), 1f) < 0.5f;
-                    if (bodyRenderer && flashMaterial) bodyRenderer.sharedMaterial = on ? flashMaterial : currentMaterial;
                 }
                 visual.localScale = Vector3.Scale(visualScale, squash) * size;
             }
@@ -469,6 +608,36 @@ namespace Survivor
                 if (GameFX.Instance) GameFX.Instance.Embers(transform.position + Vector3.up, 0.3f, 2, Combat.ExplosionColor * 2f);
                 TakeDamage(burnDps * 0.4f, Vector3.zero, 0f, false, DamageNumbers.Kind.Burn);
             }
+        }
+
+        /// <summary>Starts the telegraph glow for <paramref name="duration"/> seconds.</summary>
+        void Glow(float duration)
+        {
+            glowStart = Time.time;
+            glowUntil = glowStart + Mathf.Max(0.05f, duration);
+        }
+
+        void StopGlow() => glowUntil = 0f;
+
+        /// <summary>Wind-up look: an amber pulse (the elite rim glow) that speeds up, then a white flash for the last
+        /// third, "now". Elites (already amber) pulse with the flash.</summary>
+        void UpdateGlow(float now)
+        {
+            if (now >= glowUntil)
+            {
+                if (glowing)
+                {
+                    glowing = false;
+                    if (bodyRenderer && flashUntil <= 0f) bodyRenderer.sharedMaterial = currentMaterial;
+                }
+                return;
+            }
+            glowing = true;
+            if (!bodyRenderer || !flashMaterial) return;
+            float k = Mathf.Clamp01((now - glowStart) / Mathf.Max(0.05f, glowUntil - glowStart));
+            var pulse = eliteMaterial && currentMaterial != eliteMaterial ? eliteMaterial : flashMaterial;
+            bool blink = Mathf.Repeat((now - glowStart) * (5f + 15f * k), 1f) < 0.5f;
+            bodyRenderer.sharedMaterial = k > 0.67f ? (blink ? flashMaterial : pulse) : (blink ? pulse : currentMaterial);
         }
 
         void UpdateDrop(float dt)
@@ -492,6 +661,15 @@ namespace Survivor
             if (visual) visual.localPosition = visualPos + Vector3.up * dropHeight;
         }
 
+        static void CachePlayer(PlayerController player)
+        {
+            float t = Time.fixedTime;
+            if (t == playerCacheTime) return;
+            playerCacheTime = t;
+            playerPos = player.Position;
+            playerVel = player.Velocity;
+        }
+
         void FixedUpdate()
         {
             var player = PlayerController.Instance;
@@ -507,14 +685,18 @@ namespace Survivor
                 return;
             }
 
-            Vector3 toPlayer = player.Position - rb.position;
+            float now = Time.time, dt = Time.fixedDeltaTime;
+            CachePlayer(player);
+            Vector3 actual = rb.linearVelocity; // after last step's collisions: tells when something blocks it
+            actual.y = 0f;
+            Vector3 toPlayer = playerPos - rb.position;
             toPlayer.y = 0f;
             float distance = toPlayer.magnitude;
-            Vector3 dir = distance > 0.001f ? toPlayer / distance : Vector3.zero;
+            Vector3 dir = distance > 0.001f ? toPlayer / distance : Flat(transform.forward);
 
             if (behaviour == EnemyBehaviour.Thief)
             {
-                UpdateThief(dir, view);
+                UpdateThief(dir, view, now, dt, actual);
                 return;
             }
 
@@ -532,7 +714,7 @@ namespace Survivor
             if (IsBoss && view)
             {
                 if (view.IsInView(rb.position, BossLeashMargin)) bossAway = 0f;
-                else if ((bossAway += Time.deltaTime) >= BossLeashDelay)
+                else if ((bossAway += dt) >= BossLeashDelay)
                 {
                     bossAway = 0f;
                     Relocate(player);
@@ -541,63 +723,358 @@ namespace Survivor
                 }
             }
 
-            Vector3 move = dir;
-            float speed = Data.moveSpeed * SlowMult(Time.time) * (IsElite ? 1.1f : 1f) * RunModifiers.EnemySpeedMult;
+            float speed = Data.moveSpeed * speedJitter * SlowMult(now) * (IsElite ? 1.1f : 1f) * RunModifiers.EnemySpeedMult;
             if (Has(EliteAffix.Rapide)) speed *= 1.45f;
+            float contact = Radius + player.Radius;
+            float reach = contact + ReachSlack;
 
-            if (behaviour == EnemyBehaviour.Ranged)
+            Vector3 desired; // wished direction, length = fraction of the speed
+            Vector3 face = Vector3.zero; // zero = face where it walks
+            float turn = IsBoss ? BossTurnRate : TurnRate;
+            float accel = AccelPerSpeed * Mathf.Max(1f, speed);
+            bool steer = true; // false: a deliberate move (stop, strafe, charge): no unstuck sidestep
+
+            switch (behaviour)
             {
-                if (distance < Data.preferredRange * 0.75f) move = -dir;
-                else if (distance < Data.preferredRange) move = Vector3.zero;
-            }
-            else if (IsBoss)
-            {
-                UpdateCharge(dir, ref move, ref speed);
-            }
-            else if (behaviour == EnemyBehaviour.Kamikaze)
-            {
-                if (fusing)
-                {
-                    speed *= 0.35f;
-                    if (Time.time >= fuseUntil)
+                case EnemyBehaviour.Ranged:
+                    desired = UpdateRanged(now, dt, distance, dir, view, speed, actual, ref face, ref steer);
+                    break;
+                case EnemyBehaviour.Boss:
+                    desired = UpdateBoss(now, dt, distance, dir, view, ref speed, ref face, ref accel, ref turn, ref steer);
+                    break;
+                case EnemyBehaviour.Kamikaze:
+                    if (fusing)
                     {
-                        Detonate();
-                        return;
+                        if (now >= fuseUntil)
+                        {
+                            Detonate();
+                            return;
+                        }
+                        desired = Vector3.zero;
+                        face = dir;
+                        steer = false;
                     }
-                }
-                else if (distance <= Data.fuseRange + Radius)
-                {
-                    StartFuse();
-                }
-            }
-
-            rb.linearVelocity = move * speed + knockback;
-            knockback = Vector3.MoveTowards(knockback, Vector3.zero, 25f * Time.fixedDeltaTime);
-            Vector3 face = charge == ChargeState.Charging ? chargeDir : dir;
-            if (face != Vector3.zero) rb.rotation = Quaternion.LookRotation(face);
-
-            // Shooters only fire while on screen, so the player always sees where shots come from.
-            bool onScreen = !view || view.IsInView(rb.position, -0.5f);
-            bool shooter = behaviour == EnemyBehaviour.Ranged || IsBoss;
-            if (shooter && charge == ChargeState.None && Time.time >= nextShot && onScreen)
-            {
-                nextShot = Time.time + Data.fireInterval;
-                Shoot(dir);
+                    else if (distance <= Data.fuseRange + Radius)
+                    {
+                        StartFuse();
+                        desired = Vector3.zero;
+                        face = dir;
+                        steer = false;
+                    }
+                    else desired = ChaseDir(distance, dir, speed);
+                    break;
+                default:
+                    desired = Data.evasive ? EvadeDir(now, distance, dir) : ChaseDir(distance, dir, speed);
+                    break;
             }
 
             // Kamikazes hurt with their explosion instead of contact.
-            if (behaviour != EnemyBehaviour.Kamikaze && Data.damage > 0f &&
-                distance <= Radius + player.Radius + 0.25f && Time.time >= nextAttack)
+            if (behaviour != EnemyBehaviour.Kamikaze && Data.damage > 0f)
+                UpdateMelee(now, distance, dir, contact, reach, ref desired, ref face, ref steer);
+
+            if (steer) desired = Unstick(now, dt, desired, actual, speed, distance, contact);
+            if (face == Vector3.zero && !Data.evasive && distance < reach + 0.5f) face = dir; // at the player: look at him, don't spin
+
+            Vector3 target = desired * speed;
+            // At contact, stop pushing into the player: the crowd no longer shoves him around or jitters on him
+            // (contact hits still reach out to +0.25 m). Same for the boss charge: it hits, it doesn't carry him.
+            if (distance < contact + 0.1f)
             {
-                nextAttack = Time.time + Data.attackInterval;
+                target -= dir * Mathf.Max(0f, Vector3.Dot(target, dir));
+                moveVel -= dir * Mathf.Max(0f, Vector3.Dot(moveVel, dir));
+            }
+            Move(target, accel, face, turn, dt);
+        }
+
+        static Vector3 Flat(Vector3 v)
+        {
+            v.y = 0f;
+            return v.sqrMagnitude > 0.0001f ? v.normalized : Vector3.forward;
+        }
+
+        /// <summary>Eases the velocity toward <paramref name="targetVel"/>, adds the knockback, turns the body.</summary>
+        void Move(Vector3 targetVel, float accel, Vector3 face, float turn, float dt)
+        {
+            moveVel = Vector3.MoveTowards(moveVel, targetVel, accel * dt);
+            rb.linearVelocity = moveVel + knockback;
+            knockback = Vector3.MoveTowards(knockback, Vector3.zero, 25f * dt);
+            Vector3 f = face.sqrMagnitude > 0.0001f ? face : moveVel.sqrMagnitude > 0.09f ? moveVel : Vector3.zero;
+            f.y = 0f;
+            if (f.sqrMagnitude > 0.0001f)
+                rb.rotation = Quaternion.RotateTowards(rb.rotation, Quaternion.LookRotation(f), turn * dt);
+        }
+
+        // ---------- Approach ----------
+
+        /// <summary>
+        /// Heads for the player (a little ahead of him for <see cref="EnemyData.lead"/>), curving on this spawn's side of
+        /// the arc (<see cref="EnemyData.flank"/>): a crowd fans out around him instead of queueing behind the first one.
+        /// The curve fades out close in, so they close the distance instead of orbiting.
+        /// </summary>
+        Vector3 ChaseDir(float distance, Vector3 dir, float speed)
+        {
+            Vector3 d = dir;
+            if (Data.lead > 0f && distance > 1.5f)
+            {
+                float t = Mathf.Min(distance / Mathf.Max(0.5f, speed), MaxLeadTime);
+                Vector3 to = playerPos + playerVel * (Data.lead * t) - rb.position;
+                to.y = 0f;
+                if (to.sqrMagnitude > 0.01f) d = to.normalized;
+            }
+            float flank = Data.flank * side * Mathf.Clamp01((distance - FlankFadeNear) / (FlankFadeFar - FlankFadeNear));
+            if (flank != 0f) d = (d + new Vector3(-d.z, 0f, d.x) * flank).normalized;
+            return d;
+        }
+
+        /// <summary>
+        /// Cristallisé: the player hunts it (Bestiaire). Walks in while far, drifts sideways at mid range,
+        /// slips away (zig-zagging, slower than the player) when he comes close.
+        /// </summary>
+        Vector3 EvadeDir(float now, float distance, Vector3 dir)
+        {
+            if (distance > 8f) return ChaseDir(distance, dir, 1f) * 0.8f;
+            float sign = side >= 0f ? 1f : -1f;
+            Vector3 around = new Vector3(-dir.z, 0f, dir.x) * sign;
+            if (distance > 5f) return around * 0.6f;
+            Vector3 away = Quaternion.Euler(0f, Mathf.Sin(now * 1.3f + wobbleSeed) * 45f, 0f) * (-dir + around * 0.4f).normalized;
+            return StayOnMap(away);
+        }
+
+        Vector3 StayOnMap(Vector3 d)
+        {
+            Vector3 p = rb.position;
+            p.y = 0f;
+            if (Mathf.Abs(p.x) > 170f || Mathf.Abs(p.z) > 170f) d = (d - p.normalized * 1.5f).normalized;
+            return d;
+        }
+
+        /// <summary>
+        /// Blocked (car, wall, a jam of bodies) while far from the player: steps aside for a moment, then tries again.
+        /// The same side as last time if that helped, the other one if it got stuck again right away.
+        /// </summary>
+        Vector3 Unstick(float now, float dt, Vector3 desired, Vector3 actual, float speed, float distance, float contact)
+        {
+            if (distance < contact + UnstuckMinGap)
+            {
+                // At the player (or the crowd around him): no sidestep, just press in.
+                stuckTime = 0f;
+                sidestepUntil = 0f;
+                return desired;
+            }
+            if (now < sidestepUntil) return sidestepDir * Mathf.Max(0.5f, desired.magnitude);
+            float want = desired.magnitude;
+            if (want < 0.5f || knockback.sqrMagnitude > 1f)
+            {
+                stuckTime = 0f;
+                return desired;
+            }
+            Vector3 d = desired / want;
+            float expected = speed * want;
+            bool pushing = Vector3.Dot(moveVel, d) > 0.7f * expected; // not just accelerating
+            if (pushing && Vector3.Dot(actual, d) < StuckProgress * expected) stuckTime += dt;
+            else stuckTime = Mathf.Max(0f, stuckTime - dt * 2f);
+            if (stuckTime < StuckDelay) return desired;
+
+            stuckTime = 0f;
+            if (now - lastSidestepEnd < 1.2f) sidestepSign = -sidestepSign;
+            sidestepDir = (new Vector3(-d.z, 0f, d.x) * sidestepSign + d * 0.25f).normalized;
+            sidestepUntil = now + SidestepTime;
+            lastSidestepEnd = sidestepUntil;
+            return sidestepDir * want;
+        }
+
+        // ---------- Melee ----------
+
+        /// <summary>
+        /// Contact attacks are visible swings: in reach and ready -> the attack clip starts, the hit lands
+        /// <see cref="EnemyData.swingTime"/> later if the player is still in reach. Masses slam the ground instead
+        /// (circle telegraph in front, then rooted: a punish window).
+        /// </summary>
+        void UpdateMelee(float now, float distance, Vector3 dir, float contact, float reach, ref Vector3 desired, ref Vector3 face, ref bool steer)
+        {
+            bool slam = Data.slamRadius > 0f;
+            if (attackAnimAt > 0f && now >= attackAnimAt)
+            {
+                attackAnimAt = 0f;
                 if (anim) anim.Attack();
-                PlayerHealth.Instance.TakeDamage(Data.damage * damageMult);
-                if (Has(EliteAffix.Vampire))
+            }
+
+            // The boss charge hits on contact, no swing.
+            if (IsBoss && bossState == BossState.Charging)
+            {
+                if (now >= nextAttack && distance <= reach)
+                    nextAttack = HitPlayer(1f) ? now + Data.attackInterval : now + RetryAfterAbsorbed;
+                return;
+            }
+
+            if (swingHitAt > 0f)
+            {
+                if (now >= swingHitAt)
                 {
-                    health = Mathf.Min(maxHealth, health + maxHealth * 0.12f);
-                    if (GameFX.Instance) GameFX.Instance.Ring(rb.position, Radius + 0.8f, AffixColor(EliteAffix.Vampire) * 2.5f, 0.35f);
+                    swingHitAt = 0f;
+                    if (slam) Slam();
+                    // Swallowed by the player's invulnerability: tries again soon instead of wasting a full cooldown.
+                    else if (distance <= reach + SwingReachBonus && !HitPlayer(1f)) nextAttack = now + RetryAfterAbsorbed;
                 }
             }
+            else if (now >= nextAttack && CanSwing() && distance <= (slam ? contact + SlamTrigger : reach))
+            {
+                StartSwing(now, dir);
+            }
+
+            if (now < rootedUntil)
+            {
+                desired = Vector3.zero;
+                face = slamFace;
+                steer = false;
+            }
+            else if (now < swingSlowUntil)
+            {
+                desired *= SwingSlowMult;
+                face = dir;
+                steer = false;
+            }
+        }
+
+        /// <summary>Not while spitting; the boss only swings while chasing (not in its wind-ups, nor in its recovery window).</summary>
+        bool CanSwing() => aimUntil <= 0f && (!IsBoss || bossState == BossState.Chase);
+
+        void StartSwing(float now, Vector3 dir)
+        {
+            float windup = Mathf.Max(0.02f, Data.swingTime);
+            swingHitAt = now + windup;
+            nextAttack = now + Data.attackInterval;
+            if (Data.slamRadius > 0f)
+            {
+                // Masse: stops, raises both fists (amber glow), a circle in front fills, the fists land in it.
+                slamFace = dir;
+                slamCenter = rb.position + dir * (Radius + SlamOffset);
+                slamCenter.y = 0f;
+                rootedUntil = swingHitAt + SlamRootTime;
+                nextAttack = Mathf.Max(nextAttack, rootedUntil);
+                moveVel = Vector3.zero;
+                attackAnimAt = Mathf.Max(now, swingHitAt - SlamAnimLead);
+                if (attackAnimAt <= now)
+                {
+                    attackAnimAt = 0f;
+                    if (anim) anim.Attack();
+                }
+                Glow(windup);
+                if (GameFX.Instance) GameFX.Instance.Telegraph(slamCenter, SlamRadius, Amber * 2f, windup);
+                SFX.Play(SfxId.Whoosh, 0.45f, 0.6f);
+            }
+            else
+            {
+                swingSlowUntil = swingHitAt + SwingSlowTail;
+                if (anim) anim.Attack();
+            }
+        }
+
+        float SlamRadius => Data.slamRadius * (IsElite ? EliteScale : 1f);
+
+        void Slam()
+        {
+            var fx = GameFX.Instance;
+            float r = SlamRadius;
+            if (fx)
+            {
+                fx.Ring(slamCenter, r, DustColor * 1.4f, 0.3f);
+                fx.Sparks(slamCenter + Vector3.up * 0.2f, DustColor, 10, 0.8f);
+            }
+            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.12f);
+            SFX.Play(SfxId.Thud, 0.8f, 0.8f);
+
+            var player = PlayerController.Instance;
+            if (!player) return;
+            Vector3 d = player.Position - slamCenter;
+            d.y = 0f;
+            float hr = r + player.Radius;
+            if (d.sqrMagnitude <= hr * hr) HitPlayer(SlamDamageMult);
+        }
+
+        /// <summary>Hurts the player; false when nothing was taken (invulnerable...). VAMPIRE heals on real hits only.</summary>
+        bool HitPlayer(float mult)
+        {
+            var ph = PlayerHealth.Instance;
+            if (!ph || !ph.TakeDamage(Data.damage * damageMult * mult)) return false;
+            if (Has(EliteAffix.Vampire))
+            {
+                health = Mathf.Min(maxHealth, health + maxHealth * 0.12f);
+                if (GameFX.Instance) GameFX.Instance.Ring(rb.position, Radius + 0.8f, AffixColor(EliteAffix.Vampire) * 2.5f, 0.35f);
+            }
+            return true;
+        }
+
+        // ---------- Cracheur ----------
+
+        /// <summary>
+        /// Keeps a distance band (with hysteresis, so it doesn't flicker on a threshold): backs off when the player is
+        /// too close, walks in when too far or off screen, strafes slowly in between. Fires after a 0.55 s wind-up
+        /// (stops, faces, the sac swells and glows, a hiss), only once it has been really on screen for a moment.
+        /// </summary>
+        Vector3 UpdateRanged(float now, float dt, float distance, Vector3 dir, CameraFollow view, float speed, Vector3 actual,
+            ref Vector3 face, ref bool steer)
+        {
+            float range = Mathf.Max(1f, Data.preferredRange);
+            bool onScreen = !view || view.IsOnScreen(rb.position, ShooterScreenMargin);
+            if (!onScreen) onScreenSince = -1f;
+            else if (onScreenSince < 0f) onScreenSince = now;
+
+            if (backingOff) { if (distance > range * 0.85f) backingOff = false; }
+            else if (distance < range * 0.7f) backingOff = true;
+            if (approaching) { if (distance < range * 0.95f && onScreen) approaching = false; }
+            else if (distance > range * 1.1f || !onScreen) approaching = true;
+
+            if (aimUntil > 0f)
+            {
+                face = dir;
+                steer = false;
+                if (now >= aimUntil)
+                {
+                    aimUntil = 0f;
+                    if (onScreen) Spit(distance);
+                    nextShot = now + Mathf.Max(0.5f, Data.fireInterval - SpitWindup); // same rate of fire as before the wind-up
+                }
+                return Vector3.zero;
+            }
+            if (now >= nextShot && onScreenSince >= 0f && now - onScreenSince >= ShooterOnScreenDelay &&
+                distance <= range * ShooterMaxRange)
+            {
+                aimUntil = now + SpitWindup;
+                if (anim) anim.Special();
+                Glow(SpitWindup);
+                SFX.Play(SfxId.Fuse, 0.35f, 1.7f);
+                face = dir;
+                steer = false;
+                return Vector3.zero;
+            }
+
+            if (backingOff) return -dir;
+            if (approaching) return ChaseDir(distance, dir, speed);
+
+            // In the band: a slow strafe that flips now and then (and right away if a wall stops it).
+            steer = false;
+            Vector3 strafe = new Vector3(-dir.z, 0f, dir.x) * strafeSign;
+            if (Vector3.Dot(moveVel, strafe) > 0.7f * StrafeMult * speed && Vector3.Dot(actual, strafe) < 0.3f * StrafeMult * speed)
+                strafeStuck += dt;
+            else strafeStuck = 0f;
+            if (now >= nextStrafeFlip || strafeStuck > 0.3f)
+            {
+                strafeSign = -strafeSign;
+                strafeStuck = 0f;
+                nextStrafeFlip = now + Random.Range(1.5f, 3f);
+            }
+            return strafe * StrafeMult;
+        }
+
+        void Spit(float distance)
+        {
+            if (!Data.projectilePrefab) return;
+            float flight = distance / Mathf.Max(1f, Data.projectileSpeed);
+            Vector3 aim = playerPos + playerVel * (SpitLead * flight) - rb.position;
+            aim.y = 0f;
+            Fire(rb.position + Vector3.up, aim.sqrMagnitude > 0.01f ? aim.normalized : Flat(transform.forward));
+            SFX.Play(SfxId.EnemyShoot, 0.6f);
         }
 
         // ---------- Kamikaze ----------
@@ -606,10 +1083,16 @@ namespace Survivor
         {
             fusing = true;
             fuseUntil = Time.time + Data.fuseTime;
+            // Stops dead (no knockback either), so the blast lands exactly on the circle.
+            fuseCenter = rb.position;
+            fuseCenter.y = 0f;
+            moveVel = Vector3.zero;
+            knockback = Vector3.zero;
             if (anim) anim.Special();
+            Glow(Data.fuseTime);
             SFX.Play(SfxId.Fuse);
-            // Telegraph the blast radius.
-            if (GameFX.Instance) GameFX.Instance.Ring(rb.position, Data.deathExplosionRadius * (IsElite ? 1.4f : 1f), Data.explosionColor * 1.6f, Data.fuseTime);
+            // The blast radius fills up on the ground (amber: an Ambré's telegraph).
+            if (GameFX.Instance) GameFX.Instance.Telegraph(fuseCenter, Data.deathExplosionRadius * (IsElite ? EliteScale : 1f), Amber * 2f, Data.fuseTime);
         }
 
         void Detonate()
@@ -622,28 +1105,24 @@ namespace Survivor
         // ---------- Thief ----------
 
         /// <summary>Runs away from the player, zig-zagging, and escapes if left alone too long.</summary>
-        void UpdateThief(Vector3 dir, CameraFollow view)
+        void UpdateThief(Vector3 dir, CameraFollow view, float now, float dt, Vector3 actual)
         {
-            float now = Time.time;
             if (now >= escapeAt || (view && !view.IsInView(rb.position, 5f)))
             {
                 Escape();
                 return;
             }
 
-            Vector3 away = dir == Vector3.zero ? transform.forward : -dir;
+            Vector3 away = -dir;
             away = Quaternion.Euler(0f, Mathf.Sin(now * 1.7f + wobbleSeed) * 40f, 0f) * away;
-            Vector3 p = rb.position;
-            p.y = 0f;
-            if (Mathf.Abs(p.x) > 170f || Mathf.Abs(p.z) > 170f) away = (away - p.normalized * 1.5f).normalized; // stay on the map
+            away = StayOnMap(away);
 
             float speed = Data.moveSpeed * SlowMult(now);
-            rb.linearVelocity = away * speed + knockback;
-            knockback = Vector3.MoveTowards(knockback, Vector3.zero, 25f * Time.fixedDeltaTime);
-            rb.rotation = Quaternion.LookRotation(away);
+            away = Unstick(now, dt, away, actual, speed, 99f, 0f);
+            Move(away * speed, AccelPerSpeed * Mathf.Max(1f, speed), Vector3.zero, TurnRate, dt);
 
             // Glittering trail, so it's easy to spot in the crowd.
-            if (GameFX.Instance && Random.value < 0.3f) GameFX.Instance.Sparks(p + Vector3.up * 1.3f, ThiefSparkle, 1, 0.3f);
+            if (GameFX.Instance && Random.value < 0.3f) GameFX.Instance.Sparks(rb.position + Vector3.up * 1.3f, ThiefSparkle, 1, 0.3f);
         }
 
         void Escape()
@@ -661,68 +1140,163 @@ namespace Survivor
 
         // ---------- Boss ----------
 
-        /// <summary>Boss: every few seconds it stops, flashes, then rushes in a straight line.</summary>
-        void UpdateCharge(Vector3 dir, ref Vector3 move, ref float speed)
+        /// <summary>
+        /// Boss: chases; every few seconds stops and glows, then fires a ring of shards; every 5.5-7.5 s winds up a charge
+        /// (the direction locks 0.35 s before it goes, and the lane fills on the ground), rushes, then stands winded
+        /// 0.7 s (the punish window). Under 50% HP it enrages (see <see cref="Enrage"/>).
+        /// </summary>
+        Vector3 UpdateBoss(float now, float dt, float distance, Vector3 dir, CameraFollow view, ref float speed,
+            ref Vector3 face, ref float accel, ref float turn, ref bool steer)
         {
-            chargeTimer -= Time.fixedDeltaTime;
-            switch (charge)
+            var fx = GameFX.Instance;
+            switch (bossState)
             {
-                case ChargeState.None:
+                case BossState.Chase:
+                    chargeTimer -= dt;
+                    if (swingHitAt > 0f || now < swingSlowUntil) return dir; // finish the swipe first
                     if (chargeTimer <= 0f)
                     {
-                        charge = ChargeState.Windup;
-                        chargeTimer = 0.75f;
+                        bossState = BossState.ChargeWindup;
+                        bossTimer = ChargeWindupTime;
+                        chargeLocked = false;
                         if (anim) anim.Windup();
-                        if (GameFX.Instance) GameFX.Instance.Ring(rb.position, 3.5f, new Color(2.5f, 0.2f, 0.1f), 0.7f);
+                        Glow(ChargeWindupTime);
+                        if (fx) fx.Ring(rb.position, 3.5f, Amber * 2.5f, 0.7f);
                         SFX.Play(SfxId.BossRoar, 0.55f, 1.15f);
+                        steer = false;
+                        return Vector3.zero;
                     }
-                    break;
-                case ChargeState.Windup:
-                    move = Vector3.zero;
-                    bool on = Mathf.Repeat(Time.time * 10f, 1f) < 0.5f;
-                    if (bodyRenderer && flashMaterial) bodyRenderer.sharedMaterial = on ? flashMaterial : currentMaterial;
-                    if (chargeTimer <= 0f)
+                    bool onScreen = !view || view.IsOnScreen(rb.position, 0f);
+                    if (now >= nextShot && onScreen && chargeTimer > 1f)
                     {
-                        charge = ChargeState.Charging;
-                        chargeTimer = 0.8f;
-                        chargeDir = dir == Vector3.zero ? transform.forward : dir;
+                        bossState = BossState.RingWindup;
+                        bossTimer = RingWindupTime;
+                        if (anim) anim.Special();
+                        Glow(RingWindupTime);
+                        SFX.Play(SfxId.Fuse, 0.6f, 0.55f);
+                        steer = false;
+                        return Vector3.zero;
+                    }
+                    return dir;
+
+                case BossState.RingWindup:
+                    face = dir;
+                    steer = false;
+                    if ((bossTimer -= dt) <= 0f)
+                    {
+                        FireRing();
+                        bossState = BossState.Chase;
+                        // The wind-up counts in the interval: same ring rate as before it existed (faster once enraged).
+                        nextShot = now + Mathf.Max(0.5f, Data.fireInterval * (enraged ? EnragedFireMult : 1f) - RingWindupTime);
+                    }
+                    return Vector3.zero;
+
+                case BossState.ChargeWindup:
+                    steer = false;
+                    bossTimer -= dt;
+                    if (!chargeLocked)
+                    {
+                        face = dir;
+                        if (bossTimer <= ChargeLockBefore) LockCharge(speed);
+                    }
+                    else
+                    {
+                        face = chargeDir;
+                        turn = BossChargeTurnRate;
+                    }
+                    if (bossTimer <= 0f)
+                    {
+                        if (!chargeLocked) LockCharge(speed);
+                        bossState = BossState.Charging;
+                        bossTimer = ChargeTime;
                         if (anim) anim.SetCharging(true);
-                        if (bodyRenderer) bodyRenderer.sharedMaterial = currentMaterial;
+                        StopGlow();
                         if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.15f);
                     }
-                    break;
-                case ChargeState.Charging:
-                    move = chargeDir;
-                    speed *= 4.5f;
-                    if (GameFX.Instance && Random.value < 0.5f) GameFX.Instance.Blood(rb.position + Vector3.up * 0.3f, 2, bloodA, bloodB);
-                    if (chargeTimer <= 0f)
+                    return Vector3.zero;
+
+                case BossState.Charging:
+                    steer = false;
+                    face = chargeDir;
+                    turn = BossChargeTurnRate;
+                    speed *= ChargeSpeedMult;
+                    accel = 60f;
+                    if (fx && Random.value < 0.5f) fx.Blood(rb.position + Vector3.up * 0.3f, 2, bloodA, bloodB);
+                    if ((bossTimer -= dt) <= 0f)
                     {
-                        charge = ChargeState.None;
+                        bossState = BossState.Recover;
+                        bossTimer = ChargeRecoverTime;
                         if (anim) anim.SetCharging(false);
-                        chargeTimer = Random.Range(5.5f, 7.5f);
+                        if (fx) fx.Ring(rb.position, 2.5f, DustColor, 0.4f);
                     }
-                    break;
+                    return chargeDir;
+
+                default: // Recover: winded, barely turns
+                    steer = false;
+                    accel = 60f;
+                    face = dir;
+                    turn = 90f;
+                    if ((bossTimer -= dt) <= 0f)
+                    {
+                        bossState = BossState.Chase;
+                        chargeTimer = Random.Range(5.5f, 7.5f) * (enraged ? EnragedChargeMult : 1f);
+                    }
+                    return Vector3.zero;
             }
         }
 
-        void Shoot(Vector3 dir)
+        /// <summary>Locks the charge (slightly ahead of the player) and draws its lane: circles that fill as it passes.</summary>
+        void LockCharge(float speed)
+        {
+            chargeLocked = true;
+            Vector3 to = playerPos + playerVel * ChargeLeadTime - rb.position;
+            to.y = 0f;
+            chargeDir = to.sqrMagnitude > 0.01f ? to.normalized : Flat(transform.forward);
+
+            var fx = GameFX.Instance;
+            if (!fx) return;
+            float v = Mathf.Max(1f, speed * ChargeSpeedMult);
+            float length = v * ChargeTime;
+            float r = Radius + 0.3f;
+            int n = Mathf.Clamp(Mathf.CeilToInt(length / (r * 1.6f)), 2, 6);
+            for (int i = 1; i <= n; i++)
+            {
+                float d = length * i / n;
+                fx.Telegraph(rb.position + chargeDir * d, r, Amber * 2.2f, Mathf.Max(0.5f, bossTimer + d / v));
+            }
+        }
+
+        void FireRing()
         {
             if (!Data.projectilePrefab) return;
-
             Vector3 origin = rb.position + Vector3.up * 1f;
-            if (anim) anim.Special();
-            if (Data.behaviour == EnemyBehaviour.Boss)
+            int n = Mathf.Max(1, Data.ringCount + (enraged ? EnragedExtraShards : 0));
+            float offset = Random.Range(0f, 360f);
+            for (int i = 0; i < n; i++)
+                Fire(origin, Quaternion.Euler(0f, offset + 360f * i / n, 0f) * Vector3.forward);
+            SFX.Play(SfxId.EnemyShoot, 1f, 0.7f);
+        }
+
+        /// <summary>Phase 2 (Bestiaire 3.7): tighter, faster rings, quicker charges, and it calls Fiévreux.</summary>
+        void Enrage()
+        {
+            enraged = true;
+            Vector3 p = transform.position;
+            string who = Data && !string.IsNullOrEmpty(Data.displayName) ? "LE " + Data.displayName.ToUpperInvariant() : "LA SOUCHE";
+            if (GameHUD.Instance) GameHUD.Instance.ShowBanner($"{who} S'ENRAGE !\n<size=50>Il appelle des Fiévreux</size>", UIKit.Blood, 1.8f);
+            SFX.Play(SfxId.BossRoar, 0.9f, 0.85f);
+            if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.3f);
+            if (GameFX.Instance) GameFX.Instance.Ring(p, 5f, Amber * 2.5f, 0.6f);
+
+            var director = RunDirector.Instance;
+            if (!director) return;
+            var escort = director.hordeFastEnemy ? director.hordeFastEnemy : director.hordeEnemy;
+            if (!escort) return;
+            float offset = Random.value * 360f;
+            for (int i = 0; i < EnragedEscort; i++)
             {
-                int n = Mathf.Max(1, Data.ringCount);
-                float offset = Random.Range(0f, 360f);
-                for (int i = 0; i < n; i++)
-                    Fire(origin, Quaternion.Euler(0f, offset + 360f * i / n, 0f) * Vector3.forward);
-                SFX.Play(SfxId.EnemyShoot, 1f, 0.7f);
-            }
-            else
-            {
-                Fire(origin, dir);
-                SFX.Play(SfxId.EnemyShoot, 0.6f);
+                Vector3 d = Quaternion.Euler(0f, offset + 360f * i / EnragedEscort, 0f) * Vector3.forward;
+                director.SpawnWarned(escort, p + d * (Radius + 2.5f), SummonWarn, Amber * 2f);
             }
         }
 
@@ -735,10 +1309,23 @@ namespace Survivor
         void Relocate(PlayerController player)
         {
             Vector3 ahead = Quaternion.Euler(0f, Random.Range(-60f, 60f), 0f) * player.Facing;
-            Vector3 pos = RunDirector.Instance.EdgePointToward(ahead, RunDirector.Instance.spawnMargin);
+            var director = RunDirector.Instance;
+            Vector3 pos = director.EdgePointToward(ahead, director.spawnMargin);
+            pos = RunDirector.SafeSpawnPoint(pos, Radius);
             rb.position = pos;
             transform.position = pos;
             knockback = Vector3.zero;
+            moveVel = Vector3.zero;
+            stuckTime = 0f;
+            sidestepUntil = 0f;
+            if (IsBoss && bossState != BossState.Chase)
+            {
+                // A charge / wind-up in progress no longer matches its lane: start over.
+                bossState = BossState.Chase;
+                chargeTimer = Mathf.Max(chargeTimer, 2f);
+                if (anim) anim.SetCharging(false);
+                StopGlow();
+            }
         }
 
         // ---------- Damage ----------
@@ -760,8 +1347,8 @@ namespace Survivor
             if (DamageNumbers.Instance) DamageNumbers.Instance.Show(transform.position, amount, crit ? DamageNumbers.Kind.Crit : kind);
 
             hitDirection.y = 0f;
-            if (hitDirection.sqrMagnitude > 0.0001f && charge != ChargeState.Charging)
-                knockback += hitDirection.normalized * knockbackForce * (1f - Data.knockbackResist);
+            if (hitDirection.sqrMagnitude > 0.0001f && bossState != BossState.Charging && !fusing)
+                knockback = Vector3.ClampMagnitude(knockback + hitDirection.normalized * knockbackForce * (1f - Data.knockbackResist), MaxKnockback);
 
             bool burn = kind == DamageNumbers.Kind.Burn;
             if (bodyRenderer && flashMaterial && !burn)
@@ -779,6 +1366,8 @@ namespace Survivor
                 nextCoin = Time.time + 0.18f;
                 Loot.Instance.DropCoins(transform.position + Vector3.up * 0.6f, 1, 1);
             }
+
+            if (IsBoss && !enraged && health > 0f && health <= maxHealth * 0.5f) Enrage();
 
             if (health <= 0f) Die(crit);
             else if (!burn && GameFX.Instance)
@@ -810,11 +1399,13 @@ namespace Survivor
                     fx.Blood(pos + Vector3.up * 0.8f, Mathf.RoundToInt(Data.bloodAmount * (IsElite ? 2f : 1f)), bloodA, bloodB);
                     fx.Splat(pos, size * 2f, splatColor);
                 }
-                fx.Gibs(pos + Vector3.up * 0.8f, Mathf.Clamp(Mathf.RoundToInt(size * 10f), 3, 30) + (crit ? 3 : 0) + (prop ? 8 : 0), bodyColor, gibInnerColor);
+                // Humans fall, they don't burst into chunks (Univers 9.10).
+                if (!IsHuman)
+                    fx.Gibs(pos + Vector3.up * 0.8f, Mathf.Clamp(Mathf.RoundToInt(size * 10f), 3, 30) + (crit ? 3 : 0) + (prop ? 8 : 0), bodyColor, gibInnerColor);
 
                 if (IsBoss || IsElite)
                 {
-                    fx.Explosion(pos, size * 3f, new Color(2f, 0.25f, 0.1f));
+                    fx.Explosion(pos, size * 3f, Amber * 2f);
                     if (CameraFollow.Instance) CameraFollow.Instance.Shake(IsBoss ? 0.7f : 0.3f);
                     GameManager.Instance.HitStop(IsBoss ? 0.25f : 0.06f);
                 }
@@ -836,9 +1427,11 @@ namespace Survivor
 
             if (Data.deathExplosionRadius > 0f)
             {
-                float radius = Data.deathExplosionRadius * (IsElite ? 1.4f : 1f);
+                float radius = Data.deathExplosionRadius * (IsElite ? EliteScale : 1f);
                 float playerDamage = selfDestruct ? Data.damage * damageMult : 0f;
-                Combat.QueueExplosion(pos, radius, Data.deathExplosionDamage * spawnHealthMult, Data.explosionColor,
+                // A fusing Kyste blows up exactly on its telegraph.
+                Vector3 blast = fusing ? fuseCenter : pos;
+                Combat.QueueExplosion(blast, radius, Data.deathExplosionDamage * spawnHealthMult, Data.explosionColor,
                     prop ? 0.1f : 0.05f, playerDamage);
             }
 
