@@ -1,4 +1,79 @@
-# Guide de test — soir du 6 novembre 2026 : difficulté qui monte + se dépasser
+# Guide de test — nuit du 7 au 8 novembre 2026 : le grand peaufinage
+
+## Tester sur ton iPhone (Mac + Xcode)
+
+1. **PC** : GitHub Desktop → *Push origin* (mon travail de la nuit est commité en local, pas encore poussé).
+2. **Mac** : GitHub Desktop → *Fetch* puis *Pull*. Ouvre le projet dans Unity 6000.6.8f1 et laisse l'import finir.
+3. Unity : *File > Build Profiles > iOS* → *Switch Platform* si besoin → *Build* (choisis un dossier, par ex. `Builds/iOS`).
+4. Ouvre `Unity-iPhone.xcodeproj` dans Xcode → cible *Unity-iPhone* → *Signing & Capabilities* → coche *Automatically manage
+   signing*, choisis ton équipe (ton Apple ID). L'identifiant est déjà réglé sur `com.mwn.cordon` (celui du modèle Unity aurait
+   été refusé par Apple).
+5. Branche l'iPhone, sélectionne-le en haut d'Xcode, ▶ *Run*. La 1re fois, sur l'iPhone : *Réglages > Général > VPN et gestion de
+   l'appareil* → faire confiance à ton compte. Avec un Apple ID gratuit, l'app expire au bout de 7 jours (il suffit de relancer ▶).
+6. L'app a maintenant sa propre icône (un éclat d'ambre). Son nom sur l'écran d'accueil reste « Survivor.ioKILLER » : le changer
+   aurait déplacé tes sauvegardes dans l'éditeur ; on le fera proprement plus tard.
+
+## Ce qui change
+
+**Interface (tout le jeu)**
+- Vraies polices (Roboto pour les titres, Inter pour le texte, libres de droits), palette de la bible DA.
+- Panneaux à coins coupés avec liseré, boutons en relief qui s'enfoncent sous le doigt, ombres sous les cartes.
+- Accueil : logo CORDON + tampon « ZONE INTERDITE », barre d'onglets avec pictogrammes et repère cyan, règles sous les titres.
+- 50 pictogrammes dessinés (armes, évolutions, bonus, reliques, pactes, bâtiments du Relais) au lieu des carrés avec une lettre.
+- Cartes de niveau : bandeau de couleur, icône, étiquettes de famille, cadres de rareté, ombre.
+- HUD : barre d'XP ambre (les éclats de l'injecteur), joystick redessiné, barre de boss ambre, flashs d'écran limités aux bords
+  (la Frénésie ne repeint plus tout l'écran en rouge), chiffres de dégâts plus gras.
+- Carnet, Plaque, Contrats, Relais, Registre (lignes de cahier), écran de fin (panneau héros), pubs, boutique : même style.
+- La Plaque montre maintenant les **vraies tenues 3D** du Passeur (photographiées depuis le modèle) au lieu de pilules.
+
+**Ennemis : plus intelligents, plus lisibles**
+- Ils arrivent en arc et de biais (fini la file indienne), certains visent où tu vas, chacun a sa vitesse.
+- Ils ne restent plus bloqués derrière les voitures et les murs : ils contournent. On ne peut plus se cacher derrière une voiture.
+- Ils se tournent naturellement (plus de demi-tour instantané) et accélèrent au lieu de démarrer à fond.
+- **Coups visibles** : un petit élan avant chaque coup ; si tu t'écartes à temps, il rate.
+- **Masse** : s'arrête, un cercle ambre se remplit devant elle, puis elle frappe le sol et reste plantée 0,6 s (ta fenêtre).
+- **Cracheur** : garde ses distances en se décalant de côté, s'arrête et s'illumine 0,5 s avant de cracher, vise un peu devant
+  toi, ne tire jamais hors écran. Jamais plus de 6 en même temps.
+- **Kyste** : s'arrête net et sa zone d'explosion se remplit au sol ; l'explosion tombe exactement dans le cercle.
+- **Boucher (boss)** : s'arrête et brille avant chaque salve, sa ligne de charge s'affiche au sol avant qu'il fonce, il reste
+  essoufflé 0,7 s après (le moment pour le punir). Sous 50 % de vie : « LE BOUCHER S'ENRAGE ! », salves plus fournies, renforts.
+- **Cristallisé** (le doré) : il ne te fonce plus dessus, il garde ses distances et s'enfuit : c'est toi qui le chasses.
+- Les **crues** (hordes) sont annoncées 1,2 s avant par des lueurs ambre au bord de l'écran ; les anneaux ont 2 brèches ;
+  les formations changent (anneau, colonne, tenaille après 5:00, parfois de côté ou par derrière) et l'heure exacte varie.
+
+**Collisions**
+- Plus de friction : toi et les hordes glissez le long des voitures et des murs au lieu d'y coller.
+- Le recul des tirs est plafonné : les ennemis ne traversent plus les murs quand on les tire à bout portant.
+- La foule ne te pousse plus, le boss ne t'entraîne plus dans sa charge.
+- Aucun ennemi, baril, caisse ou autel n'apparaît dans une voiture ou un mur ; rien n'apparaît hors de la carte.
+- Le bord de la carte est une rangée de barrières du Cordon (et tu glisses le long, sans trembler), le sol ne finit plus dans le vide.
+- Les balles testent toute leur trajectoire : plus de balles qui « traversent » un ennemi quand le téléphone rame une image.
+
+**Effets visuels**
+- Explosions : un flash doux + un anneau fin + de la fumée, au lieu d'un gros disque jaune/violet plein.
+- Gaz : un vrai nuage toxique qui tourne lentement, avec un liseré fin. Feu au sol et lance-flammes : flammes + fumée.
+- Débris : éclats de croûte d'ambre (plus de cubes). Le Pilleur (humain) ne se démembre jamais : juste une bouffée rouge.
+- Sang : gouttes et traînées douces, flaques qui disparaissent en 2-3 s.
+- Éclats d'XP : cristaux d'ambre debout avec un halo, couleur ambre (plus de « triangles jaunes »).
+- Éclairs : cœur blanc + halo bleu électrique. Tir du Cordon : cercle de visée blanc, obus, poussière grise (plus de lave).
+- Les effets d'armes n'utilisent plus le violet (réservé aux Fervents par la bible) : évolutions en or pâle, Tesla en bleu
+  électrique, gaz évolué vert-noir.
+
+## À regarder en priorité sur le téléphone
+1. La lisibilité en pleine horde (est-ce que tu vois les télégraphes de la Masse, du Kyste, du Cracheur ?).
+2. La fluidité quand il y a beaucoup d'ennemis (fumée, éclats) : dis-moi si ça saccade.
+3. La difficulté : le plafond de 6 Cracheurs rend la fin de partie un peu moins dure à distance ; le boss en phase 2 plus dur.
+4. Les écrans du menu : tout est-il lisible, rien ne déborde ?
+
+## Pas vérifié / à savoir
+- Rien n'a tourné sur un vrai iPhone : uniquement l'éditeur (qualité « Mobile » simulée, 60 i/s, 0 erreur sur plusieurs parties
+  de test). Le code compile aussi en mode build iOS.
+- Mes parties de test ont été retirées de tes sauvegardes (classement, record, or, campagne, missions du jour remis comme avant).
+  Seules les statistiques cumulées de la Plaque (« STATS » : parties, ennemis tués…) gardent quelques parties du bot.
+- Nouveaux outils dans le menu Unity : *Survivor > Bake Skin Thumbnails* (rephotographie les tenues), et `Tools/Blender/assets/app_icon.py`
+  (régénère l'icône).
+
+# (Avant) Guide de test — soir du 6 novembre 2026 : difficulté qui monte + se dépasser
 
 ## Nouveau
 
