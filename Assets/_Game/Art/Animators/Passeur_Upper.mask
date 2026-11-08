@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Passeur_Upper
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
+  m_Elements:
+  - m_Path: 
+    m_Weight: 0
+  - m_Path: Passeur
+    m_Weight: 0
+  - m_Path: Passeur_Angel
+    m_Weight: 0
+  - m_Path: Passeur_Camo
+    m_Weight: 0
+  - m_Path: Passeur_Demon
+    m_Weight: 0
+  - m_Path: Passeur_Founder
+    m_Weight: 0
+  - m_Path: Passeur_Hazmat
+    m_Weight: 0
+  - m_Path: Passeur_King
+    m_Weight: 0
+  - m_Path: Passeur_Medic
+    m_Weight: 0
+  - m_Path: Passeur_Neon
+    m_Weight: 0
+  - m_Path: Passeur_Punk
+    m_Weight: 0
+  - m_Path: Passeur_Sherif
+    m_Weight: 0
+  - m_Path: Passeur_Viking
+    m_Weight: 0
+  - m_Path: Rig
+    m_Weight: 0
+  - m_Path: Rig/Root
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/Spine
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Cape
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Lantern
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Neck
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Neck/Head
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Neck/Head/Halo
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.L
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Hand.L
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.L/UpperArm.L/LowerArm.L/Vial
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.R
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Hand.R
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Spine/Chest/Shoulder.R/UpperArm.R/LowerArm.R/Hand.R/Muzzle
+    m_Weight: 1
+  - m_Path: Rig/Root/Hips/Tail
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.L
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.L/LowerLeg.L
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.L/LowerLeg.L/Foot.L
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.R
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.R/LowerLeg.R
+    m_Weight: 0
+  - m_Path: Rig/Root/Hips/UpperLeg.R/LowerLeg.R/Foot.R
+    m_Weight: 0
