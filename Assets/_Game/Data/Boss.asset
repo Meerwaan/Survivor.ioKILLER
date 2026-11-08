@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951d701778a9b5743a169772cb280c95, type: 3}
+  m_Name: Boss
+  m_EditorClassIdentifier: Assembly-CSharp::Survivor.EnemyData
+  displayName: Boucher
+  prefab: {fileID: 1002188664790259141, guid: 2b58d3d307aa5164aa69633798acb019, type: 3}
+  behaviour: 2
+  maxHealth: 900
+  moveSpeed: 2
+  damage: 22
+  attackInterval: 1
+  hitRadius: 1
+  knockbackResist: 1
+  canBeElite: 1
+  projectilePrefab: {fileID: 870801474350520686, guid: 2a16052b0109d924eb8a9aa77b88f0d3, type: 3}
+  projectileDamage: 12
+  projectileSpeed: 6.5
+  fireInterval: 2.8
+  preferredRange: 7
+  ringCount: 16
+  fuseRange: 2.2
+  fuseTime: 0.7
+  deathExplosionRadius: 0
+  deathExplosionDamage: 0
+  explosionColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  splitInto: {fileID: 0}
+  splitCount: 0
+  escapeTime: 12
+  xp: 60
+  score: 500
+  loot: 0
+  bloodAmount: 120
+  bleeds: 1
+  hitSound: 7
+  deathSound: 8
