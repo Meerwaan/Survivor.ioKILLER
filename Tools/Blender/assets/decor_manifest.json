@@ -1,0 +1,942 @@
+{
+ "about": "CORDON decor kit (Tools/Blender/assets). Units meters, Unity axes: size/collider = [x width, y height, z depth]. collider_center / bounds_center are relative to the object origin. Origin of every object = bottom center at (0,0,0) (tall props: the base of the pole/trunk; cars: the center of the body). Blender -Y = Unity forward (+Z).",
+ "objects": [
+  {
+   "name": "Car_A",
+   "size": [
+    2.56,
+    1.35,
+    4.28
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 3,
+   "cluster": "street",
+   "tris": 783,
+   "bounds_center": [
+    -0.41,
+    0.7,
+    0.01
+   ],
+   "collider": [
+    1.54,
+    1.08,
+    3.96
+   ],
+   "collider_center": [
+    -0.0,
+    0.82,
+    -0.0
+   ],
+   "note": "driver door open on the car's left (Unity -X), outside the collider; origin = body center"
+  },
+  {
+   "name": "Car_B",
+   "size": [
+    1.73,
+    1.83,
+    4.28
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 2,
+   "cluster": "evacuation",
+   "tris": 714,
+   "bounds_center": [
+    0.02,
+    0.91,
+    0.01
+   ],
+   "collider": [
+    1.56,
+    1.14,
+    3.96
+   ],
+   "collider_center": [
+    -0.0,
+    0.82,
+    -0.0
+   ]
+  },
+  {
+   "name": "Car_C",
+   "size": [
+    2.79,
+    1.61,
+    5.04
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "flood",
+   "tris": 906,
+   "bounds_center": [
+    0.16,
+    0.8,
+    0.34
+   ],
+   "collider": [
+    1.99,
+    1.52,
+    4.08
+   ],
+   "collider_center": [
+    -0.0,
+    0.85,
+    -0.0
+   ],
+   "note": "pushed nose-up onto a debris heap by the Crue"
+  },
+  {
+   "name": "Car_Burnt",
+   "size": [
+    5.89,
+    1.09,
+    8.03
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.0,
+   "cluster": "strike",
+   "tris": 484,
+   "bounds_center": [
+    0.01,
+    0.54,
+    -0.24
+   ],
+   "collider": [
+    1.54,
+    0.95,
+    3.96
+   ],
+   "collider_center": [
+    -0.0,
+    0.61,
+    -0.0
+   ],
+   "note": "scorch mark on the ground is part of the mesh (6 x 7.4 m)"
+  },
+  {
+   "name": "Barrier_Jersey",
+   "size": [
+    2.0,
+    0.89,
+    0.61
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 4,
+   "cluster": "checkpoint",
+   "tris": 124,
+   "bounds_center": [
+    -0.0,
+    0.45,
+    -0.0
+   ],
+   "collider": [
+    2.0,
+    0.81,
+    0.61
+   ],
+   "collider_center": [
+    -0.0,
+    0.41,
+    -0.0
+   ]
+  },
+  {
+   "name": "Sandbags",
+   "size": [
+    3.7,
+    0.75,
+    1.79
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 2,
+   "cluster": "checkpoint",
+   "tris": 705,
+   "bounds_center": [
+    -0.0,
+    0.38,
+    -0.0
+   ],
+   "collider": [
+    3.15,
+    0.75,
+    1.52
+   ],
+   "collider_center": [
+    -0.0,
+    0.38,
+    -0.0
+   ],
+   "note": "curved Cordon firing position, convex side = forward (+Z), concave side behind"
+  },
+  {
+   "name": "Barrier_Checkpoint",
+   "size": [
+    4.87,
+    1.13,
+    1.26
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1,
+   "cluster": "checkpoint",
+   "tris": 336,
+   "bounds_center": [
+    -0.0,
+    0.56,
+    -0.0
+   ],
+   "collider": [
+    4.9,
+    1.15,
+    0.5
+   ],
+   "collider_center": [
+    -0.0,
+    0.57,
+    -0.0
+   ],
+   "note": "lowered red/white pole, 4 m: thin line obstacle"
+  },
+  {
+   "name": "Lamp",
+   "size": [
+    0.42,
+    5.17,
+    1.93
+   ],
+   "blocks": true,
+   "kind": "tall",
+   "weight": 3,
+   "cluster": "street",
+   "tris": 166,
+   "bounds_center": [
+    -0.0,
+    2.59,
+    0.8
+   ],
+   "collider": [
+    0.36,
+    4.6,
+    0.36
+   ],
+   "collider_center": [
+    -0.0,
+    2.3,
+    -0.0
+   ],
+   "note": "origin = pole base; arm + cold-white emissive head 1.5 m forward (+Z)"
+  },
+  {
+   "name": "BusShelter",
+   "size": [
+    4.08,
+    2.47,
+    1.75
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 0.6,
+   "cluster": "street",
+   "tris": 566,
+   "bounds_center": [
+    -0.0,
+    1.24,
+    -0.0
+   ],
+   "collider": [
+    3.3,
+    2.45,
+    1.45
+   ],
+   "collider_center": [
+    -0.0,
+    1.23,
+    -0.05
+   ],
+   "note": "open side = forward (+Z), abstract mosaic on the back wall"
+  },
+  {
+   "name": "Kiosk",
+   "size": [
+    2.46,
+    2.45,
+    2.52
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 0.6,
+   "cluster": "street",
+   "tris": 329,
+   "bounds_center": [
+    -0.0,
+    1.23,
+    -0.0
+   ],
+   "collider": [
+    2.3,
+    2.35,
+    1.7
+   ],
+   "collider_center": [
+    -0.0,
+    1.17,
+    -0.0
+   ],
+   "note": "newspaper kiosk, service window = forward (+Z)"
+  },
+  {
+   "name": "Wall_Ruin_A",
+   "size": [
+    4.2,
+    2.1,
+    1.23
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "flood",
+   "tris": 432,
+   "bounds_center": [
+    -0.0,
+    1.05,
+    -0.0
+   ],
+   "collider": [
+    4.2,
+    2.15,
+    0.4
+   ],
+   "collider_center": [
+    -0.0,
+    1.08,
+    -0.0
+   ],
+   "note": "4.2 m brick wall 0.9-2.1 m, plaster on the front (+Z) face, rubble behind (not in the collider)"
+  },
+  {
+   "name": "Wall_Ruin_B",
+   "size": [
+    4.52,
+    2.05,
+    1.28
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "flood",
+   "tris": 636,
+   "bounds_center": [
+    -0.0,
+    1.02,
+    -0.0
+   ],
+   "collider": [
+    4.5,
+    2.05,
+    0.4
+   ],
+   "collider_center": [
+    -0.0,
+    1.02,
+    -0.0
+   ],
+   "note": "prefab concrete fence, diamond relief on the front (+Z), one panel broken"
+  },
+  {
+   "name": "Container_Regen",
+   "size": [
+    8.59,
+    2.4,
+    4.35
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 0.4,
+   "cluster": "checkpoint",
+   "tris": 2242,
+   "bounds_center": [
+    -0.0,
+    1.2,
+    -0.0
+   ],
+   "collider": [
+    6.1,
+    2.2,
+    2.5
+   ],
+   "collider_center": [
+    -0.0,
+    1.1,
+    -0.0
+   ],
+   "note": "REGEN 20 ft container sunk in flood mud, 2.2 m visible; cyan band + roof stripe"
+  },
+  {
+   "name": "Fence_Chain",
+   "size": [
+    3.06,
+    2.02,
+    0.42
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 2,
+   "cluster": "checkpoint",
+   "tris": 510,
+   "bounds_center": [
+    -0.0,
+    1.01,
+    -0.0
+   ],
+   "collider": [
+    3.1,
+    2.0,
+    0.2
+   ],
+   "collider_center": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "note": "3 m chain-link segment, bottom pushed backward (-Z) by the Crue, debris caught behind"
+  },
+  {
+   "name": "Sign_Road",
+   "size": [
+    0.7,
+    2.53,
+    0.4
+   ],
+   "blocks": true,
+   "kind": "tall",
+   "weight": 1.5,
+   "cluster": "street",
+   "tris": 124,
+   "bounds_center": [
+    -0.0,
+    1.27,
+    0.17
+   ],
+   "collider": [
+    0.16,
+    2.6,
+    0.16
+   ],
+   "collider_center": [
+    -0.0,
+    1.3,
+    -0.0
+   ],
+   "note": "warning triangle '!' + blank blue plate facing forward (+Z), pole bent by the flood"
+  },
+  {
+   "name": "Tree_Dead",
+   "size": [
+    3.29,
+    5.29,
+    4.02
+   ],
+   "blocks": true,
+   "kind": "tall",
+   "weight": 2,
+   "cluster": "street",
+   "tris": 222,
+   "bounds_center": [
+    -0.4,
+    2.64,
+    -0.21
+   ],
+   "collider": [
+    0.45,
+    2.5,
+    0.45
+   ],
+   "collider_center": [
+    -0.0,
+    1.25,
+    -0.0
+   ],
+   "note": "origin = trunk base"
+  },
+  {
+   "name": "Planter",
+   "size": [
+    1.24,
+    0.86,
+    1.07
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "street",
+   "tris": 174,
+   "bounds_center": [
+    -0.0,
+    0.43,
+    -0.0
+   ],
+   "collider": [
+    1.12,
+    0.86,
+    0.97
+   ],
+   "collider_center": [
+    -0.0,
+    0.43,
+    -0.0
+   ]
+  },
+  {
+   "name": "Bench",
+   "size": [
+    2.03,
+    0.88,
+    0.57
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1,
+   "cluster": "street",
+   "tris": 132,
+   "bounds_center": [
+    -0.0,
+    0.44,
+    -0.0
+   ],
+   "collider": [
+    1.93,
+    0.88,
+    0.54
+   ],
+   "collider_center": [
+    -0.0,
+    0.44,
+    -0.0
+   ],
+   "note": "concrete park bench, a seat slat missing"
+  },
+  {
+   "name": "Barrels",
+   "size": [
+    1.94,
+    0.89,
+    1.24
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "street",
+   "tris": 270,
+   "bounds_center": [
+    -0.0,
+    0.44,
+    -0.0
+   ],
+   "collider": [
+    1.65,
+    0.89,
+    1.06
+   ],
+   "collider_center": [
+    -0.0,
+    0.44,
+    -0.0
+   ],
+   "note": "200 L drums, one tipped over leaking"
+  },
+  {
+   "name": "Pallets",
+   "size": [
+    1.39,
+    0.46,
+    1.19
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 1.5,
+   "cluster": "street",
+   "tris": 288,
+   "bounds_center": [
+    -0.0,
+    0.24,
+    -0.0
+   ],
+   "collider": [
+    1.32,
+    0.46,
+    1.13
+   ],
+   "collider_center": [
+    -0.0,
+    0.24,
+    -0.0
+   ]
+  },
+  {
+   "name": "TrashBags",
+   "size": [
+    1.42,
+    0.81,
+    1.44
+   ],
+   "blocks": false,
+   "kind": "small",
+   "weight": 4,
+   "cluster": "street",
+   "tris": 296,
+   "bounds_center": [
+    -0.0,
+    0.41,
+    -0.0
+   ]
+  },
+  {
+   "name": "Tires",
+   "size": [
+    1.24,
+    0.63,
+    0.85
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 2,
+   "cluster": "flood",
+   "tris": 284,
+   "bounds_center": [
+    -0.0,
+    0.32,
+    -0.0
+   ],
+   "collider": [
+    0.99,
+    0.63,
+    0.68
+   ],
+   "collider_center": [
+    -0.0,
+    0.32,
+    -0.0
+   ],
+   "note": "stack of 3 tires (water inside) + one leaning"
+  },
+  {
+   "name": "Debris_A",
+   "size": [
+    2.13,
+    0.77,
+    1.77
+   ],
+   "blocks": true,
+   "kind": "obstacle",
+   "weight": 2,
+   "cluster": "strike",
+   "tris": 314,
+   "bounds_center": [
+    -0.0,
+    0.38,
+    -0.0
+   ],
+   "collider": [
+    1.28,
+    0.77,
+    1.06
+   ],
+   "collider_center": [
+    -0.0,
+    0.38,
+    -0.0
+   ],
+   "note": "concrete rubble with rebar, collider = the core of the heap"
+  },
+  {
+   "name": "Debris_B",
+   "size": [
+    2.27,
+    0.5,
+    1.56
+   ],
+   "blocks": false,
+   "kind": "small",
+   "weight": 2,
+   "cluster": "flood",
+   "tris": 335,
+   "bounds_center": [
+    -0.0,
+    0.25,
+    -0.0
+   ],
+   "note": "bricks, planks, a broken chair and a tarp: walkable clutter"
+  },
+  {
+   "name": "Suitcase",
+   "size": [
+    1.2,
+    0.26,
+    0.92
+   ],
+   "blocks": false,
+   "kind": "small",
+   "weight": 2,
+   "cluster": "evacuation",
+   "tris": 152,
+   "bounds_center": [
+    -0.0,
+    0.13,
+    -0.0
+   ],
+   "note": "abandoned in the evacuation, with a canvas duffel and a sweater"
+  },
+  {
+   "name": "Stroller",
+   "size": [
+    0.82,
+    1.13,
+    1.21
+   ],
+   "blocks": false,
+   "kind": "small",
+   "weight": 0.5,
+   "cluster": "evacuation",
+   "tris": 180,
+   "bounds_center": [
+    -0.0,
+    0.56,
+    -0.0
+   ],
+   "note": "EMPTY pram left in the evacuation"
+  },
+  {
+   "name": "Decal_Crust_A",
+   "size": [
+    2.63,
+    0.03,
+    2.23
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 5,
+   "cluster": "flood",
+   "tris": 227,
+   "bounds_center": [
+    -0.0,
+    0.01,
+    -0.0
+   ],
+   "note": "dried flood mud (la Croute), cracked plates, matte, never glowing"
+  },
+  {
+   "name": "Decal_Crust_B",
+   "size": [
+    3.9,
+    0.03,
+    1.35
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 4,
+   "cluster": "flood",
+   "tris": 239,
+   "bounds_center": [
+    -0.0,
+    0.01,
+    -0.0
+   ],
+   "note": "elongated streak of Croute (a gutter, a flow line)"
+  },
+  {
+   "name": "Decal_Puddle_A",
+   "size": [
+    2.43,
+    0.01,
+    1.57
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 6,
+   "cluster": "street",
+   "tris": 52,
+   "bounds_center": [
+    -0.0,
+    0.0,
+    -0.0
+   ],
+   "note": "dark water + wet mud rim: give it a glossy material"
+  },
+  {
+   "name": "Decal_Puddle_B",
+   "size": [
+    3.93,
+    0.01,
+    2.11
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 4,
+   "cluster": "street",
+   "tris": 88,
+   "bounds_center": [
+    -0.0,
+    0.0,
+    -0.0
+   ],
+   "note": "dark water + wet mud rim: give it a glossy material"
+  },
+  {
+   "name": "Decal_Manhole",
+   "size": [
+    1.26,
+    0.03,
+    1.21
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 2,
+   "cluster": "street",
+   "tris": 226,
+   "bounds_center": [
+    -0.0,
+    0.02,
+    -0.0
+   ],
+   "note": "cast-iron cover, rust stain, mud seeping out on one side"
+  },
+  {
+   "name": "Decal_RoadLine",
+   "size": [
+    0.15,
+    0.0,
+    3.02
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 3,
+   "cluster": "street",
+   "tris": 21,
+   "bounds_center": [
+    -0.0,
+    0.0,
+    -0.0
+   ],
+   "note": "one worn 3 m dash along Z (forward), place every 6 m"
+  },
+  {
+   "name": "Decal_Zebra",
+   "size": [
+    4.5,
+    0.0,
+    3.0
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 0.8,
+   "cluster": "street",
+   "tris": 38,
+   "bounds_center": [
+    -0.0,
+    0.0,
+    -0.0
+   ],
+   "note": "worn pedestrian crossing, 5 stripes"
+  },
+  {
+   "name": "Decal_Papers",
+   "size": [
+    3.33,
+    0.03,
+    2.36
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 3,
+   "cluster": "evacuation",
+   "tris": 78,
+   "bounds_center": [
+    -0.0,
+    0.02,
+    -0.0
+   ],
+   "note": "tracts of the Cordon (white, red header) + soaked newspaper"
+  },
+  {
+   "name": "Resurgence_Small",
+   "size": [
+    2.53,
+    0.05,
+    2.17
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 0.3,
+   "cluster": "flood",
+   "tris": 286,
+   "bounds_center": [
+    -0.0,
+    0.03,
+    -0.0
+   ],
+   "note": "RARE: the Seve welling up, emissive amber center (palette alpha)"
+  },
+  {
+   "name": "Decal_Crater",
+   "size": [
+    2.89,
+    0.19,
+    2.98
+   ],
+   "blocks": false,
+   "kind": "decal",
+   "weight": 0.8,
+   "cluster": "strike",
+   "tris": 234,
+   "bounds_center": [
+    -0.0,
+    0.09,
+    -0.0
+   ],
+   "note": "Cordon strike: scorched star + lifted asphalt chunks (<= 12 cm)"
+  },
+  {
+   "name": "SixTowers",
+   "size": [
+    75.2,
+    60.0,
+    46.6
+   ],
+   "blocks": false,
+   "kind": "backdrop",
+   "weight": 1,
+   "cluster": "backdrop",
+   "tris": 1546,
+   "bounds_center": [
+    -0.0,
+    30.0,
+    -0.0
+   ],
+   "note": "six REGEN bioreactors, 60 m, footprint ~73 x 46 m; place 150-300 m away in the fog"
+  },
+  {
+   "name": "Skyline",
+   "size": [
+    273.7,
+    75.0,
+    34.95
+   ],
+   "blocks": false,
+   "kind": "backdrop",
+   "weight": 1,
+   "cluster": "backdrop",
+   "tris": 576,
+   "bounds_center": [
+    -0.0,
+    37.5,
+    -0.0
+   ],
+   "note": "260 m strip of silhouettes; detailed side +Y"
+  }
+ ]
+}

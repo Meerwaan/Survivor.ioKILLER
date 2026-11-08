@@ -57,3 +57,13 @@ Desktop.ini
 
 # --- Claude Code : réglages perso (le .mcp.json du projet, lui, est versionné) ---
 .claude/settings.local.json
+
+# --- Antigravity ---
+.gemini/
+
+# --- Roadmap interne ---
+ROADMAP.md
+
+# Blender kit: generated previews and Python cache (rebuild with the scripts)
+Tools/Blender/previews/
+Tools/Blender/**/__pycache__/
