@@ -97,7 +97,7 @@ namespace Survivor
                 if (GameFX.Instance)
                 {
                     GameFX.Instance.Sparks(e.transform.position + Vector3.up, new Color(2.5f, 2.2f, 1.6f), 3);
-                    GameFX.Instance.Blood(e.transform.position + Vector3.up, 4);
+                    if (e.Data && e.Data.bleeds) GameFX.Instance.Blood(e.transform.position + Vector3.up, 4, e.bloodA, e.bloodB);
                 }
             }
         }

@@ -129,6 +129,7 @@ MonoBehaviour:
   minSpeed: 0.35
   maxSpeed: 2.6
   idleBelow: 0.3
+  moveAbove: 0.45
 --- !u!1 &6656579888741608245
 GameObject:
   m_ObjectHideFlags: 0

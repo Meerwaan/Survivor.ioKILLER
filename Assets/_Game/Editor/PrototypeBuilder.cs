@@ -63,17 +63,22 @@ namespace Survivor.EditorTools
             {
                 Stats(d, hp: 9, speed: 2.3f, damage: 6, xp: 1, score: 10, radius: 0.4f, blood: 18);
                 d.displayName = "Ambré";
+                Approach(d, flank: 0.25f, lead: 0f, swing: 0.15f);
             });
             var runner = EnemyAsset("Runner", p.runner, d =>
             {
                 Stats(d, hp: 7, speed: 4.4f, damage: 5, xp: 1, score: 12, radius: 0.32f, blood: 14);
                 d.displayName = "Fiévreux";
+                Approach(d, flank: 0.7f, lead: 0.5f, swing: 0.12f);
             });
             var brute = EnemyAsset("Brute", p.brute, d =>
             {
                 Stats(d, hp: 70, speed: 1.7f, damage: 15, xp: 6, score: 40, radius: 0.65f, blood: 40);
                 d.displayName = "Masse";
                 d.knockbackResist = 0.8f;
+                // A telegraphed ground slam (circle in front, 0.55 s), then rooted: see Enemy.StartSwing.
+                Approach(d, flank: 0f, lead: 0f, swing: 0.55f);
+                d.slamRadius = 1.6f;
             });
             var spitter = EnemyAsset("Spitter", p.spitter, d =>
             {
@@ -84,6 +89,7 @@ namespace Survivor.EditorTools
                 d.projectileSpeed = 7f;
                 d.fireInterval = 3f;
                 d.preferredRange = 5f; // close enough to stay on a narrow portrait screen
+                Approach(d, flank: 0.3f, lead: 0f, swing: 0.15f);
             });
             var boss = EnemyAsset("Boss", p.boss, d =>
             {
@@ -96,6 +102,7 @@ namespace Survivor.EditorTools
                 d.projectileSpeed = 6.5f;
                 d.fireInterval = 2.8f;
                 d.ringCount = 16;
+                Approach(d, flank: 0f, lead: 0f, swing: 0.2f);
             });
             // Shooters always point at the current projectile prefab.
             spitter.projectilePrefab = p.spit ? p.spit : p.enemyBullet;
@@ -189,6 +196,7 @@ namespace Survivor.EditorTools
                 d.displayName = "Nuée";
                 d.attackInterval = 0.6f;
                 d.canBeElite = false;
+                Approach(d, flank: 0.5f, lead: 0.3f, swing: 0.05f);
             });
             r.bloater = EnemyAsset("Bloater", p.bloater, d =>
             {
@@ -199,15 +207,17 @@ namespace Survivor.EditorTools
                 d.fuseTime = 0.75f;
                 d.deathExplosionRadius = 3.2f;
                 d.deathExplosionDamage = 45f;
-                d.explosionColor = new Color(0.7f, 1f, 0.2f);
+                d.explosionColor = new Color(0.9f, 0.56f, 0.17f); // amber #E58E2B: "explosion d'ambre" (Univers 9.9)
                 d.knockbackResist = 0.3f;
                 d.deathSound = SfxId.Gore;
+                Approach(d, flank: 0.3f, lead: 0f, swing: 0.15f);
             });
             r.splitterSmall = EnemyAsset("SplitterSmall", p.splitterSmall, d =>
             {
                 Stats(d, hp: 6, speed: 3.4f, damage: 4, xp: 0.5f, score: 5, radius: 0.28f, blood: 10);
                 d.displayName = "Rejeton";
                 d.canBeElite = false;
+                Approach(d, flank: 1f, lead: 0f, swing: 0.08f);
             });
             r.splitter = EnemyAsset("Splitter", p.splitter, d =>
             {
@@ -216,6 +226,7 @@ namespace Survivor.EditorTools
                 d.splitInto = r.splitterSmall;
                 d.splitCount = 3;
                 d.deathSound = SfxId.Gore;
+                Approach(d, flank: 0.35f, lead: 0f, swing: 0.15f);
             });
             r.thief = EnemyAsset("Thief", p.thief, d =>
             {
@@ -229,10 +240,13 @@ namespace Survivor.EditorTools
             });
             r.golden = EnemyAsset("Golden", p.golden, d =>
             {
-                Stats(d, hp: 12, speed: 3.6f, damage: 5, xp: 4, score: 30, radius: 0.4f, blood: 18);
+                // Slow and evasive: the player hunts it (Bestiaire 3.1), it doesn't come for him (was 3.6 m/s, chasing).
+                Stats(d, hp: 12, speed: 2.2f, damage: 5, xp: 4, score: 30, radius: 0.4f, blood: 18);
                 d.displayName = "Cristallisé";
                 d.loot = LootTable.Golden;
                 d.canBeElite = false;
+                d.evasive = true;
+                Approach(d, flank: 0f, lead: 0f, swing: 0.15f);
             });
             r.barrel = EnemyAsset("Barrel", p.barrel, d =>
             {
@@ -272,6 +286,20 @@ namespace Survivor.EditorTools
             d.score = score;
             d.hitRadius = radius;
             d.bloodAmount = blood;
+            // Approach / melee defaults (EnemyData tooltips); each enemy overrides what it needs with Approach().
+            d.flank = 0.3f;
+            d.lead = 0f;
+            d.swingTime = 0.15f;
+            d.slamRadius = 0f;
+            d.evasive = false;
+        }
+
+        /// <summary>How it closes in (arc width, intercept) and how long its swing winds up before the hit lands.</summary>
+        static void Approach(EnemyData d, float flank, float lead, float swing)
+        {
+            d.flank = flank;
+            d.lead = lead;
+            d.swingTime = swing;
         }
 
         // ---------- Folders ----------
@@ -340,6 +368,7 @@ namespace Survivor.EditorTools
             m.ground.SetTexture("_BaseMap", CreateGroundTexture());
             m.ground.SetTextureScale("_BaseMap", new Vector2(100f, 100f));
             EditorUtility.SetDirty(m.ground);
+            CreateFXMaterials(m); // soft FX look (PrototypeBuilder.FX.cs), re-applied every build
             return m;
         }
 
@@ -535,8 +564,9 @@ namespace Survivor.EditorTools
             p.enemyBullet = Save(enemyBullet, "EnemyBullet");
 
             // Player weapons
-            p.bullet = ProjectilePrefab("Bullet", new Vector3(0.16f, 0.16f, 0.55f), m.bullet, 0.3f, m.fxLine, 0.07f, 0.14f);
-            p.pellet = ProjectilePrefab("Pellet", new Vector3(0.12f, 0.12f, 0.3f), m.bullet, 0.25f, m.fxLine, 0.05f, 0.09f);
+            // Tracers: slim bright HDR core + soft beam trail.
+            p.bullet = ProjectilePrefab("Bullet", new Vector3(0.12f, 0.12f, 0.6f), m.bullet, 0.3f, m.fxLine, 0.09f, 0.2f);
+            p.pellet = ProjectilePrefab("Pellet", new Vector3(0.1f, 0.1f, 0.34f), m.bullet, 0.25f, m.fxLine, 0.06f, 0.13f);
 
             var blade = new GameObject("Machete");
             Part(PrimitiveType.Cube, "Blade", blade.transform, new Vector3(0f, 0f, 0.1f), new Vector3(0.12f, 0.06f, 1.1f), m.blade, Quaternion.identity, true);
@@ -573,9 +603,7 @@ namespace Survivor.EditorTools
             bottle.AddComponent<MolotovBottle>();
             p.bottle = Save(bottle, "MolotovBottle");
 
-            p.fire = FlatDisc("FirePool", m.fire);
-            p.fire.AddComponent<FirePool>();
-            p.fire = Save(p.fire, "FirePool");
+            p.fire = FirePoolPrefab(m);
 
             // Gore
             p.splat = Save(FlatDisc("BloodSplat", m.splat), "BloodSplat");
@@ -724,12 +752,15 @@ namespace Survivor.EditorTools
             return Save(root, name);
         }
 
-        static GameObject ProjectilePrefab(string name, Vector3 scale, Material mat, float radius, Material trailMat, float trailTime, float trailWidth)
+        static GameObject ProjectilePrefab(string name, Vector3 scale, Material mat, float radius, Material trailMat, float trailTime, float trailWidth,
+            Color? trailColor = null, Color? sparkColor = null)
         {
             var go = new GameObject(name);
             Part(PrimitiveType.Sphere, "Mesh", go.transform, Vector3.zero, scale, mat, Quaternion.identity, false);
-            go.AddComponent<Projectile>().radius = radius;
-            AddTrail(go, trailMat, trailTime, trailWidth, new Color(1f, 0.8f, 0.4f, 0.8f));
+            var projectile = go.AddComponent<Projectile>();
+            projectile.radius = radius;
+            if (sparkColor.HasValue) projectile.sparkColor = sparkColor.Value;
+            AddTrail(go, trailMat, trailTime, trailWidth, trailColor ?? new Color(1f, 0.78f, 0.38f, 0.75f));
             return Save(go, name);
         }
 
@@ -870,7 +901,8 @@ namespace Survivor.EditorTools
             var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.name = "Ground";
             Object.DestroyImmediate(ground.GetComponent<Collider>());
-            ground.transform.localScale = new Vector3(40f, 1f, 40f);
+            // 480 m: the player is clamped at ±190 m and the camera sees ~25 m ahead, so the ground never runs out.
+            ground.transform.localScale = new Vector3(48f, 1f, 48f);
             ground.GetComponent<MeshRenderer>().sharedMaterial = CordonGround() ?? m.ground;
 
             var player = BuildPlayer(m, p);
@@ -905,6 +937,7 @@ namespace Survivor.EditorTools
             fx.ringMaterial = m.fxRing;
             fx.glowMaterial = m.fxGlow;
             fx.lineMaterial = m.fxLine;
+            WireFX(fx);
 
             // Stream mix: a new type shows up every half minute or so, so the first minutes keep surprising,
             // and the mix gets nastier over time (zombies fade, runners / brutes / spitters grow). See Docs/Pacing.md.
@@ -975,7 +1008,7 @@ namespace Survivor.EditorTools
                 Part(PrimitiveType.Cube, "Gun", visual, new Vector3(0.38f, 1.1f, 0.45f), new Vector3(0.14f, 0.16f, 0.6f), m.gun, Quaternion.identity, true);
             }
 
-            var gas = FlatDisc("Gas Cloud", m.gas);
+            var gas = GasCloudVisual(m);
             gas.transform.SetParent(player.transform, false);
             gas.SetActive(false); // shown once the weapon is picked
 

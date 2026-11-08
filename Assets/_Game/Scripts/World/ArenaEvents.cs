@@ -186,7 +186,7 @@ namespace Survivor
             var box = RunDirector.Instance.SpawnAt(crate, at);
             if (!box) return;
             box.DropIn(dropHeight);
-            if (GameFX.Instance) GameFX.Instance.Ring(at, 1.8f, new Color(1.2f, 1.1f, 0.8f), 0.8f);
+            if (GameFX.Instance) GameFX.Instance.Ring(box.transform.position, 1.8f, new Color(1.2f, 1.1f, 0.8f), 0.8f); // SpawnAt may have moved it out of the decor
             GameHUD.Instance.ShowBanner("RAVITAILLEMENT !", new Color(0.6f, 0.9f, 1f), 1.3f);
             SFX.Play(SfxId.Throw, 1f, 0.6f);
         }
@@ -232,8 +232,8 @@ namespace Survivor
             if (GameFX.Instance)
             {
                 Vector3 p = player.Position;
-                GameFX.Instance.Ring(p, 6f, FrenzyColor * 3f, 0.5f);
-                GameFX.Instance.Sparks(p + Vector3.up, FrenzyColor * 2.5f, 40, 2f);
+                GameFX.Instance.Ring(p, 3.5f, FrenzyColor * 1.5f, 0.5f);
+                GameFX.Instance.Sparks(p + Vector3.up, FrenzyColor * 2.5f, 28, 1.8f);
             }
             if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.2f);
         }

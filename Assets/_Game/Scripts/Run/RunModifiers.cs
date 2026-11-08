@@ -281,9 +281,9 @@ namespace Survivor
             var fx = GameFX.Instance;
             if (fx)
             {
-                fx.Ring(at, 7f, new Color(2.5f, 0.2f, 0.4f), 0.8f);
-                fx.Sparks(at + Vector3.up, new Color(2.5f, 0.3f, 0.4f), 50, 2f);
-                fx.Embers(at, 1.5f, 14, new Color(2f, 0.2f, 0.3f));
+                fx.Ring(at, 3.8f, new Color(1.4f, 0.2f, 0.28f), 0.7f);
+                fx.Sparks(at + Vector3.up, new Color(2.5f, 0.3f, 0.4f), 30, 1.8f);
+                fx.Embers(at, 1.5f, 10, new Color(2f, 0.2f, 0.3f));
             }
         }
 

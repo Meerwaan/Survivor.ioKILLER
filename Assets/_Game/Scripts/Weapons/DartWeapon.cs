@@ -53,7 +53,7 @@ namespace Survivor
         public override string EvolutionText => "10 aiguilles en cercle qui explosent et répandent le poison partout.";
         public override ItemTag Tags => ItemTag.Poison | ItemTag.Balle;
 
-        static readonly Color DartFlash = new(0.8f, 2.2f, 0.6f);
+        static readonly Color DartFlash = new(0.91f, 1.15f, 0.33f); // toxic #A6D23C
 
         float timer, ringAngle;
 

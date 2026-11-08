@@ -88,7 +88,7 @@ namespace Survivor
         void Boom(Vector3 at, float damage, float radius, bool main)
         {
             Synergies.Explosion(at, radius, damage, main ? knockback : knockback * 0.5f, Combat.ExplosionColor, ItemTag.Explosif);
-            if (GameFX.Instance) GameFX.Instance.Splat(at, radius * 0.5f);
+            if (GameFX.Instance) GameFX.Instance.Scorch(at, radius * 0.9f); // soot, not blood
             if (!main || !Evolved) return;
 
             for (int i = 0; i < evoBomblets; i++)

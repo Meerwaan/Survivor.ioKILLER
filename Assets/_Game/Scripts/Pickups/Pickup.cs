@@ -113,13 +113,14 @@ namespace Survivor
                     float amount = PlayerHealth.Instance.Max * healFraction;
                     PlayerHealth.Instance.Heal(amount);
                     GameHUD.Instance.ShowBanner($"+{amount:0} PV", new Color(0.5f, 0.95f, 0.4f), 0.8f);
-                    if (fx) fx.Ring(p, 2f, new Color(0.6f, 2f, 0.5f), 0.4f);
+                    if (fx) fx.Ring(p, 2f, GameFX.Heal * 1.4f, 0.4f);
                     SFX.Play(SfxId.Heal);
                     break;
                 case PickupType.Magnet:
                     XPGem.AttractAll();
                     GameHUD.Instance.ShowBanner("COLLECTEUR !", new Color(0.4f, 0.75f, 1f), 0.8f);
-                    if (fx) fx.Ring(p, 8f, new Color(0.6f, 1.2f, 3f), 0.6f);
+                    // The REGEN collector: a thin cyan wave sweeping the map (drawn dim by GameFX past 4 m).
+                    if (fx) fx.Ring(p, 6f, GameFX.RegenCyan * 1.4f, 0.6f);
                     SFX.Play(SfxId.Magnet);
                     break;
                 case PickupType.Coin:
@@ -136,8 +137,8 @@ namespace Survivor
                     SFX.Play(SfxId.Chest);
                     if (fx)
                     {
-                        fx.Ring(p, 7f, new Color(3f, 2.4f, 0.8f), 0.7f);
-                        fx.Sparks(p, new Color(3f, 2.4f, 0.8f), 60, 2f);
+                        fx.Ring(p, 3.5f, UIKit.Gold * 1.4f, 0.6f);
+                        fx.Sparks(p, new Color(3f, 2.4f, 0.8f), 36, 1.8f);
                     }
                     break;
             }

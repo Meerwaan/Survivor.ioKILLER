@@ -97,7 +97,12 @@ namespace Survivor
         public float bountyTime = 35f;
         public float bountyHealthMult = 1.5f;
 
-        public static readonly Color MeteorColor = new(1f, 0.4f, 0.1f);
+        /// <summary>Tir du Cordon: white aim circles (#F2F2EE), never orange (Univers 9.9: no lava).</summary>
+        public static readonly Color MeteorColor = new(0.949f, 0.949f, 0.933f);
+        static readonly Color ShellColor = new(1.6f, 1.55f, 1.45f);
+        static readonly Color ShellSmoke = new(0.45f, 0.44f, 0.42f, 0.35f);
+        /// <summary>Where a shell comes from, relative to its impact point (steep, slightly from the side).</summary>
+        static readonly Vector3 ShellFall = new(2f, 13f, 0f);
         public static readonly Color ZoneColor = new(0.7f, 0.25f, 1f);
         public static readonly Color AltarColor = new(1f, 0.15f, 0.3f);
         public static readonly Color FireColor = new(1f, 0.35f, 0.05f);
@@ -424,11 +429,11 @@ namespace Survivor
             float ahead = Mathf.Min(2.6f, r.height * 0.15f);
             Vector3 c = player.Position + new Vector3(0f, 0f, ahead);
             altars.Clear();
-            if (pacts.Count == 1) altars.Add(PactAltar.Create(pacts[0], ClampToMap(c + new Vector3(0f, 0f, 1.5f), 1f), AltarColor));
+            if (pacts.Count == 1) altars.Add(PactAltar.Create(pacts[0], SpawnSafety.FreePoint(ClampToMap(c + new Vector3(0f, 0f, 1.5f), 1f), 1.2f), AltarColor));
             else
             {
-                altars.Add(PactAltar.Create(pacts[0], ClampToMap(c + new Vector3(-side, 0f, 0f), 1f), AltarColor));
-                altars.Add(PactAltar.Create(pacts[1], ClampToMap(c + new Vector3(side, 0f, 0f), 1f), new Color(0.75f, 0.2f, 1f)));
+                altars.Add(PactAltar.Create(pacts[0], SpawnSafety.FreePoint(ClampToMap(c + new Vector3(-side, 0f, 0f), 1f), 1.2f), AltarColor));
+                altars.Add(PactAltar.Create(pacts[1], SpawnSafety.FreePoint(ClampToMap(c + new Vector3(side, 0f, 0f), 1f), 1.2f), new Color(0.75f, 0.2f, 1f)));
             }
             eventEnd = Now + altarLifetime;
 
@@ -575,7 +580,8 @@ namespace Survivor
             SetStatus(Mathf.FloorToInt(zoneProgress * 100f), Mathf.CeilToInt(left), "CERCLE DES FERVENTS  {0}%   {1} s", new Color(0.85f, 0.6f, 1f), left < 8f);
         }
 
-        /// <summary>A ring of zombies (runners mixed in after 4 min) crawling out around a point.</summary>
+        /// <summary>A ring of zombies (runners mixed in after 4 min) crawling out around a point, each one telegraphed
+        /// by a violet ground circle a moment before (Bestiaire rule 1: nothing pops out of thin air).</summary>
         static void SummonAround(Vector3 center, float radius)
         {
             var director = RunDirector.Instance;
@@ -589,7 +595,7 @@ namespace Survivor
                 if (!data) continue;
                 Vector3 dir = Quaternion.Euler(0f, offset + 360f * i / count, 0f) * Vector3.forward;
                 Vector3 p = center + dir * radius;
-                director.SpawnAt(data, p);
+                director.SpawnWarned(data, p, Enemy.SummonWarn, ZoneColor * 2f);
                 if (GameFX.Instance && i % 2 == 0) GameFX.Instance.Sparks(p + Vector3.up * 0.5f, ZoneColor * 2f, 4, 0.6f);
             }
         }
@@ -692,9 +698,11 @@ namespace Survivor
             visualBusy = new bool[MeteorVisuals];
             for (int i = 0; i < MeteorVisuals; i++)
             {
-                var r = RunProps.Primitive(PrimitiveType.Sphere, "Meteor", transform, RunProps.GlowMaterial);
-                r.transform.localScale = Vector3.one * 0.9f;
-                RunProps.Tint(r, MeteorColor * 3f);
+                // A falling shell: a thin bright streak along its path.
+                var r = RunProps.Primitive(PrimitiveType.Cylinder, "Shell", transform, RunProps.GlowMaterial);
+                r.transform.localScale = new Vector3(0.12f, 0.9f, 0.12f);
+                r.transform.rotation = Quaternion.FromToRotation(Vector3.up, ShellFall.normalized);
+                RunProps.Tint(r, ShellColor);
                 r.gameObject.SetActive(false);
                 meteorRenderers[i] = r;
             }
@@ -767,7 +775,7 @@ namespace Survivor
             at.y = 0f;
             float radius = meteorRadius * Random.Range(0.85f, 1.2f);
             meteors.Add(new Meteor { position = at, impactAt = Time.time + meteorTelegraph, radius = radius, visual = -1 });
-            if (GameFX.Instance) GameFX.Instance.Telegraph(at, radius, MeteorColor * 2.2f, meteorTelegraph);
+            if (GameFX.Instance) GameFX.Instance.Telegraph(at, radius, MeteorColor * 1.3f, meteorTelegraph);
         }
 
         /// <summary>Runs even after the shower ends, so every telegraphed meteor lands.</summary>
@@ -790,11 +798,11 @@ namespace Survivor
                 if (m.visual >= 0)
                 {
                     float k = Mathf.Clamp01(1f - until / FallTime);
-                    Vector3 p = m.position + new Vector3(3f * (1f - k), FallHeight * (1f - k * k), 0f);
+                    // Accelerates down a straight line; the streak's lower tip is the shell.
+                    Vector3 p = m.position + ShellFall * (FallHeight / ShellFall.y) * (1f - k * k);
                     var t = meteorRenderers[m.visual].transform;
-                    t.position = p;
-                    t.localScale = Vector3.one * (0.6f + m.radius * 0.35f);
-                    if (fx && dt > 0f) fx.Embers(p, 0.3f, 1, MeteorColor * 2.5f);
+                    t.position = p + ShellFall.normalized * 0.9f;
+                    if (fx && dt > 0f && Random.value < 0.4f) fx.Smoke(p + ShellFall.normalized * 1.4f, 0.05f, 1, 0.45f, ShellSmoke, 0.2f);
                 }
 
                 if (until > 0f)
@@ -828,8 +836,7 @@ namespace Survivor
             var fx = GameFX.Instance;
             if (fx)
             {
-                fx.Explosion(at, radius, MeteorColor);
-                fx.Embers(at, radius * 0.7f, 6, new Color(1.5f, 0.5f, 0.1f));
+                fx.DustBurst(at, radius); // grey dust, white pop, soot: no lava
             }
             if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.12f);
             // Meteors wreck enemies too: lure them into the circles.
@@ -952,6 +959,14 @@ namespace Survivor
                 float flicker = 1.6f + Mathf.Sin(now * 13f + p.radius * 7f) * 0.4f;
                 p.ring.SetColor(FireColor * flicker);
                 if (fx && Random.value < 0.35f) fx.Embers(p.position, p.radius * 0.8f, 1, FireColor * 2.2f);
+                // Fire is always animated and always smokes (Univers 9.4).
+                if (fx && Random.value < 0.35f)
+                {
+                    Vector2 c = Random.insideUnitCircle * p.radius * 0.75f;
+                    fx.Flame(p.position + new Vector3(c.x, 0.15f, c.y), new Vector3(0f, Random.Range(1.2f, 2.2f), 0f),
+                        Random.Range(0.35f, 0.55f), Random.Range(0.5f, 0.9f));
+                }
+                if (fx && Random.value < 0.05f) fx.Smoke(p.position, p.radius * 0.6f, 1, 1f + p.radius * 0.2f);
                 if (!doTick) continue;
                 if (!hurt && PlayerWithin(p.position, p.radius * 0.9f))
                 {

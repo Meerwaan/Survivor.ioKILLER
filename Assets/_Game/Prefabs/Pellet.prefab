@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.12, y: 0.12, z: 0.3}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.34}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8430081582167583486}
@@ -187,11 +187,11 @@ TrailRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Time: 0.05
+  m_Time: 0.06
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.09
+    widthMultiplier: 0.13
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -218,8 +218,8 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.8, b: 0.4, a: 0.8}
-      key1: {r: 1, g: 0.8, b: 0.4, a: 0}
+      key0: {r: 1, g: 0.78039217, b: 0.38039216, a: 0.7490196}
+      key1: {r: 1, g: 0.78039217, b: 0.38039216, a: 0}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

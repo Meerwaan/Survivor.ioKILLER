@@ -22,6 +22,11 @@ MonoBehaviour:
   hitRadius: 0.6
   knockbackResist: 0.3
   canBeElite: 1
+  flank: 0.3
+  lead: 0
+  swingTime: 0.15
+  slamRadius: 0
+  evasive: 0
   projectilePrefab: {fileID: 0}
   projectileDamage: 8
   projectileSpeed: 7
@@ -32,7 +37,7 @@ MonoBehaviour:
   fuseTime: 0.75
   deathExplosionRadius: 3.2
   deathExplosionDamage: 45
-  explosionColor: {r: 0.7, g: 1, b: 0.2, a: 1}
+  explosionColor: {r: 0.9, g: 0.56, b: 0.17, a: 1}
   splitInto: {fileID: 0}
   splitCount: 0
   escapeTime: 12

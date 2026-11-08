@@ -68,15 +68,15 @@ namespace Survivor.EditorTools
                     m.SetColor("_FlashColor", new Color(0.95f, 0.12f, 0.1f));
                 }),
                 // Éclats (XP) tiers: dark amber, amber, bright amber (Univers 9.4: amber never brighter than #E58E2B).
-                gem1 = ArtMat("M_Eclat1", palette, m => m.SetFloat("_EmissionStrength", 1.6f)),
+                gem1 = ArtMat("M_Eclat1", palette, m => m.SetFloat("_EmissionStrength", 0.85f)), // lower: the facets stay readable, no pale-yellow wash
                 gem2 = ArtMat("M_Eclat2", palette, m =>
                 {
-                    m.SetFloat("_EmissionStrength", 2.4f);
+                    m.SetFloat("_EmissionStrength", 1.3f);
                     m.SetColor("_Glow", new Color(0.35f, 0.14f, 0.02f));
                 }),
                 gem3 = ArtMat("M_Eclat3", palette, m =>
                 {
-                    m.SetFloat("_EmissionStrength", 3.4f);
+                    m.SetFloat("_EmissionStrength", 2.0f);
                     m.SetColor("_Glow", new Color(0.9f, 0.4f, 0.06f));
                     m.SetFloat("_GlowRim", 0.3f);
                 }),

@@ -20,7 +20,7 @@ namespace Survivor
             public float tick;
         }
 
-        [Tooltip("Flat disc showing the cloud's area.")]
+        [Tooltip("Root of the cloud visual: soft cloud layers (\"Cloud*\", slowly counter-rotating) and a thin \"Edge\" ring.")]
         public Transform visual;
         public float slowFactor = 0.75f;
 
@@ -51,24 +51,56 @@ namespace Survivor
         public override string EvolutionText => "Nuage géant qui englue les ennemis et te soigne un peu pour chaque ennemi dedans.";
         public override ItemTag Tags => ItemTag.Poison;
 
-        float timer, pulse;
-        static readonly Color GasColor = new(0.6f, 2f, 0.3f);
-        static readonly Color PlagueColor = new(1.4f, 0.4f, 2f);
+        float timer, pulse, spin;
+
+        // Toxic #A6D23C fading into dark olive; the Peste noire is darker, almost black-green (never violet).
+        static readonly Color CloudColor = new(0.5f, 0.62f, 0.17f, 0.3f);
+        static readonly Color CloudColorB = new(0.36f, 0.45f, 0.12f, 0.24f);
+        static readonly Color PlagueCloud = new(0.17f, 0.23f, 0.07f, 0.42f);
+        static readonly Color PlagueCloudB = new(0.12f, 0.16f, 0.05f, 0.34f);
+        static readonly Color EdgeColor = new(0.65f, 0.82f, 0.24f, 0.32f);
+        static readonly Color PlagueEdge = new(0.42f, 0.55f, 0.14f, 0.3f);
+        static readonly Color PuffColor = new(0.42f, 0.52f, 0.15f, 0.2f);
+        static readonly Color PlaguePuff = new(0.13f, 0.17f, 0.06f, 0.3f);
+        static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
+        Renderer[] layers;
+        Transform[] spinners;
+        MaterialPropertyBlock block;
 
         protected override void Awake()
         {
             base.Awake();
-            if (visual) visual.gameObject.SetActive(false);
+            if (!visual) return;
+            visual.gameObject.SetActive(false);
+            block = new MaterialPropertyBlock();
+            layers = visual.GetComponentsInChildren<Renderer>(true);
+            int n = 0;
+            foreach (var r in layers) if (r.transform != visual && r.name.StartsWith("Cloud")) n++;
+            spinners = new Transform[n];
+            n = 0;
+            foreach (var r in layers) if (r.transform != visual && r.name.StartsWith("Cloud")) spinners[n++] = r.transform;
         }
 
         protected override void OnLevelChanged()
         {
             if (!visual) return;
             visual.gameObject.SetActive(true);
-            if (Evolved && visual.TryGetComponent<Renderer>(out var r))
+        }
+
+        /// <summary>Tints every layer (old single-disc visual included), a little denser right after a tick.</summary>
+        void PaintCloud()
+        {
+            if (layers == null) return;
+            float boost = 1f + pulse * 0.25f;
+            foreach (var r in layers)
             {
-                var block = new MaterialPropertyBlock();
-                block.SetColor("_BaseColor", new Color(0.5f, 0.15f, 0.7f, 0.3f));
+                if (!r) continue;
+                Color c = r.name.StartsWith("Edge") ? (Evolved ? PlagueEdge : EdgeColor)
+                    : r.name.EndsWith("B") ? (Evolved ? PlagueCloudB : CloudColorB)
+                    : (Evolved ? PlagueCloud : CloudColor);
+                c.a = Mathf.Clamp01(c.a * boost);
+                block.SetColor(BaseColorId, c);
                 r.SetPropertyBlock(block);
             }
         }
@@ -83,9 +115,14 @@ namespace Survivor
             pulse = Mathf.MoveTowards(pulse, 0f, Time.deltaTime * 4f);
             if (visual)
             {
-                float breathe = 1f + Mathf.Sin(Time.time * 3f) * 0.03f + pulse * 0.08f;
+                float breathe = 1f + Mathf.Sin(Time.time * 3f) * 0.03f + pulse * 0.05f;
                 visual.SetPositionAndRotation(new Vector3(transform.position.x, 0.05f, transform.position.z), Quaternion.identity);
                 visual.localScale = new Vector3(radius * 2f * breathe, 0.01f, radius * 2f * breathe);
+                // Two cloud layers turning slowly in opposite directions: the gas swirls instead of sitting still.
+                spin += Time.deltaTime * 14f;
+                for (int i = 0; i < spinners.Length; i++)
+                    if (spinners[i]) spinners[i].localRotation = Quaternion.Euler(90f, (i % 2 == 0 ? spin : -spin * 0.7f) + i * 67f, 0f);
+                PaintCloud();
             }
 
             timer -= Time.deltaTime;
@@ -115,7 +152,9 @@ namespace Survivor
             }
 
             if (Evolved && hits > 0) PlayerHealth.Instance.Heal(Mathf.Min(evoHealCap, hits * evoHealPerEnemy));
-            if (GameFX.Instance) GameFX.Instance.Embers(center, radius * 0.8f, Evolved ? 5 : 3, Evolved ? PlagueColor : GasColor);
+            // A few soft puffs drifting low over the cloud.
+            if (GameFX.Instance)
+                GameFX.Instance.Smoke(center, radius * 0.75f, Evolved ? 3 : 2, 1.1f + radius * 0.15f, Evolved ? PlaguePuff : PuffColor, 0.12f);
         }
     }
 }

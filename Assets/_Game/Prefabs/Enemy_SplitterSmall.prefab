@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5130141060865201040}
   - component: {fileID: 5786860154828451023}
   - component: {fileID: 6768958048325381062}
-  - component: {fileID: 408072911421073453}
+  - component: {fileID: 237013192823775117}
   m_Layer: 0
   m_Name: Enemy_SplitterSmall
   m_TagString: Untagged
@@ -98,17 +98,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 446732ea36f0ccd4ebcb01728b3a8ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Survivor.Enemy
-  bodyRenderer: {fileID: 1402688986393964618}
+  bodyRenderer: {fileID: 582937249796344980}
   flashMaterial: {fileID: 2100000, guid: e06e8b7f2492cd3489a8161d59235795, type: 2}
   eliteMaterial: {fileID: 2100000, guid: ea0b27d7535daa8468779aca58edfc6b, type: 2}
   visual: {fileID: 7764487134040216524}
-  anim: {fileID: 408072911421073453}
+  anim: {fileID: 237013192823775117}
   bloodA: {r: 0.13, g: 0.06, b: 0.02, a: 1}
   bloodB: {r: 0.55, g: 0.27, b: 0.06, a: 1}
   splatColor: {r: 0.3, g: 0.13, b: 0.035, a: 0.72}
   gibColor: {r: 0.52, g: 0.28, b: 0.09, a: 1}
   gibInnerColor: {r: 0.12, g: 0.05, b: 0.02, a: 1}
---- !u!114 &408072911421073453
+--- !u!114 &237013192823775117
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -120,13 +120,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed62ff54b0d9a004d9aa0c2cd70ee79f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Survivor.CharacterAnimator
-  animator: {fileID: 2083368279721935565}
+  animator: {fileID: 543180790474587667}
   variants:
-  - {fileID: 1402688986393964618}
+  - {fileID: 582937249796344980}
   naturalSpeed: 3.4
   minSpeed: 0.35
   maxSpeed: 2.6
   idleBelow: 0.3
+  moveAbove: 0.45
 --- !u!1 &7594941853300400535
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,10 +157,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5334989559599552695}
+  - {fileID: 5866476010822722665}
   m_Father: {fileID: 3678285976766563195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &5585318685035478876
+--- !u!1001 &6260937675730912130
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -240,18 +241,18 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a5fdb24b966689e42ac2721717b263d4, type: 3}
---- !u!137 &1402688986393964618 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -2381185995556434154, guid: a5fdb24b966689e42ac2721717b263d4, type: 3}
-  m_PrefabInstance: {fileID: 5585318685035478876}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &2083368279721935565 stripped
+--- !u!95 &543180790474587667 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: a5fdb24b966689e42ac2721717b263d4, type: 3}
-  m_PrefabInstance: {fileID: 5585318685035478876}
+  m_PrefabInstance: {fileID: 6260937675730912130}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &5334989559599552695 stripped
+--- !u!137 &582937249796344980 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2381185995556434154, guid: a5fdb24b966689e42ac2721717b263d4, type: 3}
+  m_PrefabInstance: {fileID: 6260937675730912130}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5866476010822722665 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a5fdb24b966689e42ac2721717b263d4, type: 3}
-  m_PrefabInstance: {fileID: 5585318685035478876}
+  m_PrefabInstance: {fileID: 6260937675730912130}
   m_PrefabAsset: {fileID: 0}

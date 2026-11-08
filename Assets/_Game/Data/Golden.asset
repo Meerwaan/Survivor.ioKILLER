@@ -16,12 +16,17 @@ MonoBehaviour:
   prefab: {fileID: 1926516880807019863, guid: e16aef4a5436316429b9c400978798d3, type: 3}
   behaviour: 0
   maxHealth: 12
-  moveSpeed: 3.6
+  moveSpeed: 2.2
   damage: 5
   attackInterval: 0.8
   hitRadius: 0.4
   knockbackResist: 0
   canBeElite: 0
+  flank: 0
+  lead: 0
+  swingTime: 0.15
+  slamRadius: 0
+  evasive: 1
   projectilePrefab: {fileID: 0}
   projectileDamage: 8
   projectileSpeed: 7

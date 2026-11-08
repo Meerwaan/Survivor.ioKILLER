@@ -78,7 +78,8 @@ namespace Survivor
         [Tooltip("Weapons left out of the card pool each run (never the starting weapon, never the weekly element's).")]
         public int absentWeapons = 3;
 
-        public static readonly Color EvolutionColor = new(0.85f, 0.45f, 1f);
+        /// <summary>Pale gold-white (violet belongs to the cult only, Univers 9.4).</summary>
+        public static readonly Color EvolutionColor = new(1f, 0.84f, 0.55f);
         public static readonly Color RareColor = new(0.3f, 0.7f, 1f);
         public static readonly Color EpicColor = new(1f, 0.55f, 0.1f);
         static readonly Color HealColor = new(0.4f, 0.9f, 0.4f);

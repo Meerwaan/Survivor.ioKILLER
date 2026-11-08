@@ -5,7 +5,8 @@ namespace Survivor
 {
     /// <summary>
     /// Dropped by enemies. Flies to the player once inside the pickup radius.
-    /// Color shows its value: blue (1+), green (5+), red (20+).
+    /// Size and glow show its value: small éclat (1+), cluster (5+), big crystal (20+).
+    /// Leans back and spins slowly so the shard faces the camera; GameFX draws a steady amber glow under each one.
     /// </summary>
     public class XPGem : MonoBehaviour
     {
@@ -20,7 +21,16 @@ namespace Survivor
         [Tooltip("Optional mesh per tier (CORDON éclats). Empty = the same mesh, only bigger.")]
         public Mesh[] tierMeshes;
 
-        float value;
+        /// <summary>0 small éclat, 1 cluster, 2 big crystal (read by GameFX for the glow).</summary>
+        public int Tier { get; private set; }
+
+        /// <summary>The modeled éclats read as thin slivers from the camera at their real size: oversized per tier.</summary>
+        static readonly float[] ModeledScale = { 1.8f, 1.6f, 1.4f };
+        const float SpinSpeed = 70f;
+        /// <summary>Top leans away from the camera (~60° above, behind): the shard's long side faces it.</summary>
+        static readonly Quaternion Lean = Quaternion.AngleAxis(14f, Vector3.right); // nearly upright: reads as a crystal, lying flat it read as a paper triangle
+
+        float value, spin;
         bool attracted;
         float speed;
         Vector3 popVelocity;
@@ -56,6 +66,7 @@ namespace Survivor
             value = xp;
             attracted = false;
             speed = -7f; // backs off a little before whooshing in
+            spin = Random.Range(0f, 360f);
             Refresh();
 
             // Little jump out of the corpse.
@@ -74,6 +85,7 @@ namespace Survivor
         void Refresh()
         {
             int tier = value >= 20f ? 2 : value >= 5f ? 1 : 0;
+            Tier = tier;
             if (crystal && tierMaterials != null && tier < tierMaterials.Length && tierMaterials[tier])
                 crystal.sharedMaterial = tierMaterials[tier];
             if (crystal && tierMeshes != null && tier < tierMeshes.Length && tierMeshes[tier] &&
@@ -81,7 +93,7 @@ namespace Survivor
                 mf.sharedMesh = tierMeshes[tier];
             // CORDON éclats are modeled at their real size per tier; the greybox cube just grows.
             bool modeled = tierMeshes != null && tier < tierMeshes.Length && tierMeshes[tier];
-            transform.localScale = Vector3.one * (modeled ? 1f : 0.4f + 0.15f * tier);
+            transform.localScale = Vector3.one * (modeled ? ModeledScale[tier] : 0.4f + 0.15f * tier);
         }
 
         void Update()
@@ -90,7 +102,8 @@ namespace Survivor
             if (!player) return;
 
             float dt = Time.deltaTime;
-            transform.Rotate(0f, 180f * dt, 0f, Space.World);
+            spin += SpinSpeed * dt;
+            transform.rotation = Lean * Quaternion.Euler(0f, spin, 0f);
 
             if (popTime > 0f && !attracted)
             {

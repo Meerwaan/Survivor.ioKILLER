@@ -140,11 +140,11 @@ namespace Survivor
         const float CalmDelay = 4f;
         /// <summary>Increvable II: HP healed per enemy hit by the riposte, and the cap per riposte.</summary>
         const float RiposteHealPerHit = 0.5f, RiposteHealMax = 4f;
-        public static readonly Color PlasmaColor = new(1.6f, 0.6f, 2.6f);
+        public static readonly Color PlasmaColor = new(1.5f, 1.95f, 2.4f); // electric white-blue (#9ADCFF), not violet
 
         public static readonly Color FireColor = new(1f, 0.45f, 0.1f);
         public static readonly Color ToxicColor = new(0.45f, 1f, 0.2f);
-        public static readonly Color ArcColor = new(0.7f, 1.3f, 3f);
+        public static readonly Color ArcColor = new(1.2f, 1.72f, 2.4f); // #9ADCFF
         public static readonly Color FusionColor = new(1f, 0.3f, 0.05f);
         public static readonly Color PistoleroColor = new(1f, 0.85f, 0.3f);
 
@@ -288,8 +288,8 @@ namespace Survivor
             var pc = PlayerController.Instance;
             if (!pc || !GameFX.Instance) return;
             Vector3 p = pc.Position;
-            GameFX.Instance.Ring(p, 5f, color * 2.5f, 0.6f);
-            GameFX.Instance.Sparks(p + Vector3.up, color * 2f, 40, 1.6f);
+            GameFX.Instance.Ring(p, 3.2f, color * 1.5f, 0.55f);
+            GameFX.Instance.Sparks(p + Vector3.up, color * 2f, 24, 1.5f);
         }
 
         /// <summary>Set bonuses currently active (for the HUD / pause screen).</summary>
@@ -451,7 +451,7 @@ namespace Survivor
             {
                 damage += st.bleedDps * (st.bleedUntil - now) * ElectrocutionMult;
                 st.bleedUntil = now;
-                if (GameFX.Instance) GameFX.Instance.Blood(e.transform.position + Vector3.up, 6);
+                if (GameFX.Instance) GameFX.Instance.Blood(e.transform.position + Vector3.up, 6, e.bloodA, e.bloodB);
             }
 
             bool crit = forcedCrit || Random.value < s.critChance;

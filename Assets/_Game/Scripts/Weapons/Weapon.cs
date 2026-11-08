@@ -56,9 +56,11 @@ namespace Survivor
             if (GameFX.Instance)
             {
                 Vector3 p = transform.position;
-                GameFX.Instance.Ring(p, 6f, color * 3f, 0.6f);
-                GameFX.Instance.Ring(p, 3.5f, Color.white * 2f, 0.4f);
-                GameFX.Instance.Sparks(p + Vector3.up, color * 2f, 60, 2f);
+                // Readable but never screen-covering: two thin rings, a short pop, sparks.
+                GameFX.Instance.Ring(p, 3.5f, color * 1.5f, 0.55f);
+                GameFX.Instance.Ring(p, 2f, UpgradeManager.EvolutionColor * 1.3f, 0.35f);
+                GameFX.Instance.Flash(p + Vector3.up, 0.9f, UpgradeManager.EvolutionColor * 1.5f, 0.15f);
+                GameFX.Instance.Sparks(p + Vector3.up, color * 2f, 30, 1.6f);
             }
         }
 

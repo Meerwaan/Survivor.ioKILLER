@@ -154,9 +154,10 @@ namespace Survivor
             center.y = 0f;
             if (GameFX.Instance)
             {
-                GameFX.Instance.Ring(center, radius, UIKit.Gold * 2.5f, 0.45f);
-                GameFX.Instance.Ring(center, radius * 0.6f, Color.white * 2f, 0.3f);
-                GameFX.Instance.Sparks(center + Vector3.up, UIKit.Gold * 2f, 40, 2f);
+                // Level-up: a thin amber wave on the ground (Univers 9.9), not a gold disc.
+                GameFX.Instance.Ring(center, radius, GameFX.AmberBright * 1.4f, 0.5f);
+                GameFX.Instance.Ring(center, radius * 0.4f, GameFX.AmberBright * 1.2f, 0.3f);
+                GameFX.Instance.Sparks(center + Vector3.up, GameFX.AmberBright * 2f, 18, 1.6f);
             }
             if (CameraFollow.Instance) CameraFollow.Instance.Shake(0.15f);
             SFX.Play(SfxId.Thud, 0.8f, 0.8f);
@@ -233,7 +234,7 @@ namespace Survivor
                 // Explosif set bonuses and reactions (Artificier, Fusion, Dispersion) like grenades do.
                 if (p.corpse) Synergies.Explosion(p.position, p.radius, p.damage, 7f, p.color, ItemTag.Explosif);
                 else Explosion(p.position, p.radius, p.damage, 7f, p.color);
-                if (p.corpse && GameFX.Instance) GameFX.Instance.Blood(p.position + Vector3.up * 0.5f, 12);
+                if (p.corpse && GameFX.Instance) GameFX.Instance.Ichor(p.position + Vector3.up * 0.5f, 12);
                 if (p.playerDamage > 0f) HurtPlayer(p.position, p.radius, p.playerDamage);
             }
 

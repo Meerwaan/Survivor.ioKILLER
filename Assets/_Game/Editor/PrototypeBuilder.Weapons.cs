@@ -40,7 +40,7 @@ namespace Survivor.EditorTools
             var darts = player.AddComponent<DartWeapon>();
             darts.displayName = "Fléchettes";
             darts.color = new Color(0.55f, 1f, 0.6f);
-            darts.bulletPrefab = p.bullet;
+            darts.bulletPrefab = DartPrefab(m); // toxic-green tracer, its own pool
             darts.unlockCost = 0;
 
             var flamer = player.AddComponent<FlamethrowerWeapon>();

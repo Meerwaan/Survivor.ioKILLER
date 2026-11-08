@@ -165,12 +165,28 @@ namespace Survivor
                 GameFX.Instance.Embers(me + aim * range * 0.7f, range * 0.25f, 2, EmberColor);
         }
 
+        static readonly Color JetSmoke = new(0.227f, 0.227f, 0.227f, 0.42f);
+
         void SpawnPuffs(Vector3 me, float range, float angle)
         {
-            if (!puffPrefab) return;
             Vector3 nozzle = me + Vector3.up * 0.9f;
             float speed = range / PuffLife * 0.95f;
             float size = 0.55f + range * 0.12f;
+            var fx = GameFX.Instance;
+            if (fx && fx.HasFlames)
+            {
+                // Soft additive tongues (white-hot, #FFC43D, #FF6A2A) with #3A3A3A smoke at the far end.
+                for (int j = 0; j < aimCount; j++)
+                {
+                    Vector3 dir = Quaternion.Euler(0f, Random.Range(-angle, angle) * 0.4f, 0f) * aims[j];
+                    fx.Flame(nozzle + aims[j] * 0.5f, dir * speed, PuffLife * Random.Range(0.85f, 1.1f), size * Random.Range(1f, 1.45f));
+                    if (Random.value < 0.3f)
+                        fx.Smoke(me + dir * range * 0.85f, 0.3f, 1, size * 1.1f, JetSmoke, 0.9f);
+                }
+                if (Random.value < 0.3f) fx.Flash(nozzle + aims[0] * 0.6f, 0.3f, NozzleColor, 0.06f);
+                return;
+            }
+            if (!puffPrefab) return;
             for (int j = 0; j < aimCount; j++)
             {
                 Vector3 dir = Quaternion.Euler(0f, Random.Range(-angle, angle) * 0.4f, 0f) * aims[j];

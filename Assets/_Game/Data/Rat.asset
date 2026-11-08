@@ -22,6 +22,11 @@ MonoBehaviour:
   hitRadius: 0.25
   knockbackResist: 0
   canBeElite: 0
+  flank: 0.5
+  lead: 0.3
+  swingTime: 0.05
+  slamRadius: 0
+  evasive: 0
   projectilePrefab: {fileID: 0}
   projectileDamage: 8
   projectileSpeed: 7

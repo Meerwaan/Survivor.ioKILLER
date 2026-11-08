@@ -195,8 +195,9 @@ namespace Survivor
                 Combat.Nova(p, radius, levelBurstDamage * RunModifiers.WorldScale * s.damageMult);
                 if (GameFX.Instance)
                 {
-                    GameFX.Instance.Ring(p, radius * 1.15f, UpgradeManager.EvolutionColor * 2.5f, 0.55f);
-                    GameFX.Instance.Flash(p + Vector3.up * 0.5f, radius * 0.45f, UIKit.Gold * 2f, 0.15f);
+                    // A second, slower amber wave behind the nova, and a short pop on the injector.
+                    GameFX.Instance.Ring(p, radius * 1.1f, GameFX.AmberBright * 1.3f, 0.75f);
+                    GameFX.Instance.Flash(p + Vector3.up * 0.9f, 0.8f, GameFX.AmberBright * 1.5f, 0.14f);
                 }
             }
             if (PlayerHealth.Instance) PlayerHealth.Instance.Heal(PlayerHealth.Instance.Max * Mathf.Min(0.3f, levelBurstHeal * count));

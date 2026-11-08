@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Ambient: 1
-    - _EmissionStrength: 1.6
+    - _EmissionStrength: 0.85
     - _Flash: 0
     - _GlowRim: 0.6
     - _RimPower: 3.5

@@ -49,8 +49,9 @@ namespace Survivor
         public override string EvolutionText => "3 éclairs géants en chaîne et la foudre qui tombe du ciel.";
         public override ItemTag Tags => ItemTag.Electrique;
 
-        static readonly Color BoltColor = new(0.7f, 1.4f, 3f);
-        static readonly Color StormColor = new(1.6f, 1f, 3f);
+        // Electric #9ADCFF (the storm a little whiter): never violet, never REGEN cyan.
+        static readonly Color BoltColor = new(1.2f, 1.72f, 2.4f);
+        static readonly Color StormColor = new(1.7f, 2.1f, 2.5f);
 
         float timer;
         readonly List<Enemy> hit = new(32);

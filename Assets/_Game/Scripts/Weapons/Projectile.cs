@@ -50,10 +50,16 @@ namespace Survivor
             if (trail) trail.Clear();
         }
 
+        /// <summary>Enemies touched by this frame's segment, sorted by distance along it. Shared scratch (Update never nests).</summary>
+        static Enemy[] sweptHits = new Enemy[32];
+        static float[] sweptT = new float[32];
+
         void Update()
         {
             float dt = Time.deltaTime;
-            transform.position += direction * speed * dt;
+            Vector3 from = transform.position;
+            Vector3 step = direction * speed * dt;
+            transform.position = from + step;
             life -= dt;
             if (life <= 0f)
             {
@@ -61,19 +67,13 @@ namespace Survivor
                 return;
             }
 
-            Vector3 p = transform.position;
             var stats = PlayerController.Instance ? PlayerController.Instance.Stats : null;
-            // Only the enemies around us (snapshot of this frame, same order as walking Enemy.Active backwards).
-            var list = Candidates;
-            EnemyGrid.Query(p, radius, list);
-            for (int i = 0; i < list.Count; i++)
+            int hitCount = Sweep(from, step);
+            for (int h = 0; h < hitCount; h++)
             {
-                var enemy = list[i];
-                if (!EnemyGrid.IsLive(enemy)) continue; // died or got recycled earlier this frame
-                Vector3 d = enemy.transform.position - p;
-                d.y = 0f;
-                float r = enemy.Radius + radius;
-                if (d.sqrMagnitude > r * r || alreadyHit.Contains(enemy)) continue; // distance first: cheaper
+                var enemy = sweptHits[h];
+                sweptHits[h] = null;
+                if (!EnemyGrid.IsLive(enemy)) continue; // died or got recycled by an earlier hit of this segment
 
                 alreadyHit.Add(enemy);
                 Vector3 hitPoint = enemy.transform.position + Vector3.up;
@@ -103,7 +103,14 @@ namespace Survivor
                     Synergies.QueueExplosion(hitPoint, 1.4f * area, damage * 0.7f, 4f, PowderColor, tags);
                 }
 
-                if (ricochetLeft > 0 && Bounce(hitPoint)) return;
+                if (ricochetLeft > 0)
+                {
+                    // Ricochet from where the segment touched this enemy, not from the end of a long (hitch) step.
+                    Vector3 end = transform.position;
+                    transform.position = from + step * sweptT[h];
+                    if (Bounce(hitPoint)) return;
+                    transform.position = end;
+                }
 
                 if (pierceLeft-- <= 0)
                 {
@@ -111,6 +118,48 @@ namespace Survivor
                     return;
                 }
             }
+        }
+
+        /// <summary>
+        /// Swept hit test: every live, not-yet-hit enemy whose circle touches this frame's segment
+        /// [from, from + step] on the ground plane, sorted along it (a frame hitch can't tunnel through a crowd).
+        /// </summary>
+        int Sweep(Vector3 from, Vector3 step)
+        {
+            float sx = step.x, sz = step.z, len2 = sx * sx + sz * sz;
+            // Only the enemies around the segment (snapshot of this frame, same order as walking Enemy.Active backwards).
+            var list = Candidates;
+            EnemyGrid.Query(from + step * 0.5f, Mathf.Sqrt(len2) * 0.5f + radius, list);
+            int n = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                var enemy = list[i];
+                if (!EnemyGrid.IsLive(enemy)) continue; // died or got recycled earlier this frame
+                Vector3 c = enemy.transform.position;
+                float cx = c.x - from.x, cz = c.z - from.z;
+                float t = len2 > 1e-8f ? Mathf.Clamp01((cx * sx + cz * sz) / len2) : 1f;
+                float dx = cx - sx * t, dz = cz - sz * t;
+                float r = enemy.Radius + radius;
+                if (dx * dx + dz * dz > r * r || alreadyHit.Contains(enemy)) continue; // distance first: cheaper
+
+                if (n == sweptHits.Length)
+                {
+                    System.Array.Resize(ref sweptHits, n * 2);
+                    System.Array.Resize(ref sweptT, n * 2);
+                }
+                // Insertion by distance along the segment (ties keep snapshot order).
+                int j = n - 1;
+                while (j >= 0 && sweptT[j] > t)
+                {
+                    sweptT[j + 1] = sweptT[j];
+                    sweptHits[j + 1] = sweptHits[j];
+                    j--;
+                }
+                sweptT[j + 1] = t;
+                sweptHits[j + 1] = enemy;
+                n++;
+            }
+            return n;
         }
 
         bool Bounce(Vector3 from)
