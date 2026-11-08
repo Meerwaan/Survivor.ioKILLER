@@ -164,7 +164,7 @@ namespace Survivor
             int d = rec >= 0 ? score - rec : score - prog.paceFinal;
             string amount = Medals.FormatScore(Mathf.Abs(d));
             if (rec < 0)
-                return d >= 0 ? $"\n<color=#FFD94D>RECORD BATTU  +{amount}</color>" : $"\n<color=#FF9A70>Encore {amount} pour le record</color>";
+                return d >= 0 ? $"\n<color=#F4C84A>RECORD BATTU  +{amount}</color>" : $"\n<color=#FF9A70>Encore {amount} pour le record</color>";
             return d >= 0 ? $"\n<color=#8CFF7A>+{amount} vs record</color>" : $"\n<color=#FF7070>-{amount} vs record</color>";
         }
 
@@ -248,7 +248,7 @@ namespace Survivor
                 r.pivot = new Vector2(0f, 0.5f);
                 r.anchoredPosition = new Vector2(i * (seg + gap), 0f);
                 r.sizeDelta = new Vector2(seg, height);
-                var img = UIKit.Image(r, i < colors.Count ? colors[i] : new Color(1f, 1f, 1f, 0.12f));
+                var img = UIKit.Image(r, i < colors.Count ? colors[i] : new Color(1f, 1f, 1f, 0.12f), UIKit.BarSprite);
                 img.raycastTarget = false;
             }
         }
@@ -276,7 +276,9 @@ namespace Survivor
                 var chip = UIKit.Rect("Tag " + name, card);
                 chip.anchorMin = chip.anchorMax = new Vector2(1f, 1f);
                 chip.pivot = new Vector2(1f, 0.5f);
-                UIKit.Image(chip, color).raycastTarget = false;
+                var chipImg = UIKit.Image(chip, color, UIKit.ChipSprite);
+                chipImg.type = Image.Type.Sliced;
+                chipImg.raycastTarget = false;
                 var label = UIKit.Label(chip, name, 24, new Color(0.06f, 0.06f, 0.07f), TextAnchor.MiddleCenter, FontStyle.Bold);
                 UIKit.Stretch(label.rectTransform);
                 var shadow = label.GetComponent<Shadow>();
@@ -354,7 +356,7 @@ namespace Survivor
             int room = um.BuildRoom;
             levelUpSub.text = banishMode ? "Touche la carte à bannir pour toute la partie"
                 : room <= 0 ? "Stuff complet : l'évolution est gratuite !"
-                : room == 1 ? "<color=#FFD94D>Dernier niveau de stuff : choisis bien !</color>"
+                : room == 1 ? "<color=#F4C84A>Dernier niveau de stuff : choisis bien !</color>"
                 : "Choisis une amélioration";
             levelUpSub.color = banishMode ? UIKit.Blood : UIKit.Muted;
         }
@@ -386,8 +388,8 @@ namespace Survivor
                 $"Meilleur combo   x{Combat.BestCombo}\n" +
                 $"Niveau   {PlayerXP.Instance.Level}\n\n" +
                 $"<size=80><b>{gm.Score}</b></size>\n" +
-                (newBest ? "<color=#FFD94D>NOUVEAU RECORD !</color>" : $"Record   {GameManager.BestScore}") +
-                $"\n\n<color=#FFD94D>+{gm.GoldEarned} or</color>   <size=36>(total {Progression.Gold})</size>";
+                (newBest ? "<color=#F4C84A>NOUVEAU RECORD !</color>" : $"Record   {GameManager.BestScore}") +
+                $"\n\n<color=#F4C84A>+{gm.GoldEarned} or</color>   <size=36>(total {Progression.Gold})</size>";
             gameOverRank.text = "";
             gameOverTitle.text = gm.Won ? "VICTOIRE !" : "TU ES MORT";
             gameOverTitle.color = gm.Won ? UIKit.Gold : UIKit.Blood;
@@ -434,7 +436,8 @@ namespace Survivor
         public void ScreenFlash(Color color, float strength = 0.6f)
         {
             flashColor = color;
-            flashAlpha = Mathf.Max(flashAlpha, Mathf.Clamp01(strength));
+            // Edge-only flash (vignette sprite), capped: the fight in the middle must stay readable.
+            flashAlpha = Mathf.Max(flashAlpha, Mathf.Clamp(strength, 0f, 0.65f));
             flashOverlay.gameObject.SetActive(true);
         }
 
@@ -463,10 +466,11 @@ namespace Survivor
                 shownBuild = build;
                 bool full = um && um.BuildComplete;
                 levelText.text = !um ? $"Nv {shownLevel}"
-                    : full ? $"Nv {shownLevel}   ·   <color=#FFD94D>STUFF COMPLET</color>"
+                    : full ? $"Nv {shownLevel}   ·   <color=#F4C84A>STUFF COMPLET</color>"
                     : $"Nv {shownLevel}   ·   Stuff {build}/{um.BuildCap}";
                 // Gold XP bar once the stuff is full: from now on every level is a burst.
-                xpFill.color = full ? UIKit.Gold : new Color(0.2f, 0.75f, 1f);
+                // Amber like the éclats the injector burns; gold once the stuff is full.
+                xpFill.color = full ? UIKit.Gold : UIKit.Amber;
             }
             xpPunch = Mathf.MoveTowards(xpPunch, 0f, dt * 3f);
             xpBar.localScale = new Vector3(1f, 1f + xpPunch * 0.5f, 1f);
@@ -562,7 +566,7 @@ namespace Survivor
                 calloutText.gameObject.SetActive(false);
                 return;
             }
-            float pop = calloutAge < 0.12f ? Mathf.Lerp(2.4f, 1f, calloutAge / 0.12f) : 1f + (calloutAge - 0.12f) * 0.1f;
+            float pop = calloutAge < 0.12f ? Mathf.Lerp(1.55f, 1f, calloutAge / 0.12f) : 1f + (calloutAge - 0.12f) * 0.1f;
             calloutText.rectTransform.localScale = Vector3.one * pop;
             var c = calloutText.color;
             c.a = Mathf.Clamp01((life - calloutAge) / 0.3f);
@@ -595,7 +599,7 @@ namespace Survivor
             var events = ArenaEvents.Instance;
             bool on = events && events.FrenzyActive;
             var c = ArenaEvents.FrenzyColor;
-            c.a = on ? (0.3f + 0.15f * Mathf.Sin(Time.unscaledTime * 10f)) * Mathf.Clamp01(events.FrenzyLeft / 0.5f) : 0f;
+            c.a = on ? (0.22f + 0.06f * Mathf.Sin(Time.unscaledTime * 4f)) * Mathf.Clamp01(events.FrenzyLeft / 0.5f) : 0f;
             frenzyVignette.color = c;
 
             if (frenzyText.gameObject.activeSelf != on) frenzyText.gameObject.SetActive(on);
@@ -691,8 +695,8 @@ namespace Survivor
             var sb = new System.Text.StringBuilder();
             int used = um.BuildLevels, cap = um.BuildCap;
             sb.Append(um.BuildComplete
-                ? $"<color=#FFD94D><b>STUFF COMPLET {Mathf.Min(used, cap)}/{cap}</b></color>\n"
-                : $"<color=#FFD94D><b>STUFF {used}/{cap}</b></color>  <size=30>({cap - used} libre{(cap - used > 1 ? "s" : "")})</size>\n");
+                ? $"<color=#F4C84A><b>STUFF COMPLET {Mathf.Min(used, cap)}/{cap}</b></color>\n"
+                : $"<color=#F4C84A><b>STUFF {used}/{cap}</b></color>  <size=30>({cap - used} libre{(cap - used > 1 ? "s" : "")})</size>\n");
             foreach (var w in um.Weapons)
             {
                 if (w.Level == 0) continue;
@@ -752,27 +756,37 @@ namespace Survivor
 
             var fl = UIKit.Rect("Screen Flash", canvasRect);
             UIKit.Stretch(fl);
-            flashOverlay = UIKit.Image(fl, new Color(1f, 1f, 1f, 0f));
+            flashOverlay = UIKit.Image(fl, new Color(1f, 1f, 1f, 0f), UIKit.Vignette);
             flashOverlay.raycastTarget = false;
             fl.gameObject.SetActive(false);
 
             // Widgets that follow world/screen positions sit directly on the canvas.
             hpBar = UIKit.Rect("HP Bar", canvasRect);
-            hpBar.sizeDelta = new Vector2(130, 18);
-            UIKit.Image(hpBar, new Color(0f, 0f, 0f, 0.7f)).raycastTarget = false;
+            hpBar.sizeDelta = new Vector2(136, 20);
+            var hpBg = UIKit.Image(hpBar, new Color(0.02f, 0.02f, 0.03f, 0.8f), UIKit.ChipSprite);
+            hpBg.type = Image.Type.Sliced;
+            hpBg.pixelsPerUnitMultiplier = 2f;
+            hpBg.raycastTarget = false;
             hpFill = UIKit.Fill(hpBar, new Color(0.85f, 0.1f, 0.1f), 3f);
 
+            // Joystick: thin light ring + dark disc, solid knob with a rim.
             joyBase = UIKit.Rect("Joystick", canvasRect);
             joyBase.sizeDelta = new Vector2(260, 260);
-            UIKit.Image(joyBase, new Color(1f, 1f, 1f, 0.12f), UIKit.Circle).raycastTarget = false;
+            UIKit.Image(joyBase, new Color(1f, 1f, 1f, 0.22f), UIKit.Circle).raycastTarget = false;
+            var joyInner = UIKit.Rect("Disc", joyBase);
+            UIKit.Stretch(joyInner, 5f);
+            UIKit.Image(joyInner, new Color(0.02f, 0.03f, 0.04f, 0.32f), UIKit.Circle).raycastTarget = false;
             joyKnob = UIKit.Rect("Knob", joyBase);
-            joyKnob.sizeDelta = new Vector2(110, 110);
-            UIKit.Image(joyKnob, new Color(1f, 1f, 1f, 0.45f), UIKit.Circle).raycastTarget = false;
+            joyKnob.sizeDelta = new Vector2(116, 116);
+            UIKit.Image(joyKnob, new Color(1f, 1f, 1f, 0.35f), UIKit.Circle).raycastTarget = false;
+            var knobCore = UIKit.Rect("Core", joyKnob);
+            UIKit.Stretch(knobCore, 8f);
+            UIKit.Image(knobCore, new Color(UIKit.Ink.r, UIKit.Ink.g, UIKit.Ink.b, 0.6f), UIKit.Circle).raycastTarget = false;
             joyBase.gameObject.SetActive(false);
 
             bossArrow = UIKit.Rect("Boss Arrow", canvasRect);
             bossArrow.sizeDelta = new Vector2(70, 70);
-            UIKit.Image(bossArrow, UIKit.Gold, UIKit.Triangle).raycastTarget = false;
+            UIKit.Image(bossArrow, UIKit.Amber, UIKit.Triangle).raycastTarget = false;
             bossArrow.gameObject.SetActive(false);
 
             // Everything else respects the phone's notch / rounded corners.
@@ -804,13 +818,17 @@ namespace Survivor
             xpBar.anchorMax = new Vector2(1, 1);
             xpBar.pivot = new Vector2(0.5f, 1);
             xpBar.anchoredPosition = new Vector2(0, -16);
-            xpBar.sizeDelta = new Vector2(-32, 34);
-            UIKit.Image(xpBar, new Color(0f, 0f, 0f, 0.65f)).raycastTarget = false;
-            xpFill = UIKit.Fill(xpBar, new Color(0.2f, 0.75f, 1f), 4f);
+            xpBar.sizeDelta = new Vector2(-32, 36);
+            var xpBg = UIKit.Image(xpBar, new Color(0.02f, 0.025f, 0.03f, 0.75f), UIKit.ChipSprite);
+            xpBg.type = Image.Type.Sliced;
+            xpBg.raycastTarget = false;
+            UIKit.Outline(xpBar, new Color(1f, 1f, 1f, 0.12f), true);
+            xpFill = UIKit.Fill(xpBar, UIKit.Amber, 5f);
+            xpFill.fillAmount = 0f; // an Image starts full: don't flash a full bar before the first update
             levelText = UIKit.Label(xpBar, "Nv 1", 26, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Stretch(levelText.rectTransform);
 
-            UIKit.Button(hudRoot, "II", new Color(0f, 0f, 0f, 0.55f), UIKit.TopLeft, new Vector2(24, -66), new Vector2(110, 110),
+            UIKit.Button(hudRoot, "II", new Color(0.08f, 0.09f, 0.11f, 0.7f), UIKit.TopLeft, new Vector2(24, -66), new Vector2(110, 110),
                 () => GameManager.Instance.Pause(), 52);
 
             comboText = UIKit.Label(hudRoot, "", 40, Color.white, TextAnchor.UpperLeft, FontStyle.Bold);
@@ -834,9 +852,12 @@ namespace Survivor
 
             bossBar = UIKit.Rect("Boss Bar", hudRoot);
             UIKit.Place(bossBar, UIKit.Top, new Vector2(0, -170), new Vector2(560, 36));
-            UIKit.Image(bossBar, new Color(0f, 0f, 0f, 0.7f)).raycastTarget = false;
-            bossFill = UIKit.Fill(bossBar, UIKit.Gold, 4f);
-            var bossLabel = UIKit.Label(bossBar, "SOUCHE", 26, Color.black, TextAnchor.MiddleCenter, FontStyle.Bold);
+            var bossBg = UIKit.Image(bossBar, new Color(0.02f, 0.02f, 0.03f, 0.8f), UIKit.ChipSprite);
+            bossBg.type = Image.Type.Sliced;
+            bossBg.raycastTarget = false;
+            UIKit.Outline(bossBar, new Color(UIKit.Amber.r, UIKit.Amber.g, UIKit.Amber.b, 0.6f), true);
+            bossFill = UIKit.Fill(bossBar, UIKit.Amber, 5f);
+            var bossLabel = UIKit.Label(bossBar, "SOUCHE", 26, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Stretch(bossLabel.rectTransform);
             bossBar.gameObject.SetActive(false);
 
@@ -955,12 +976,19 @@ namespace Survivor
             var card = UIKit.Rect("Card", cardList);
             UIKit.Place(card, UIKit.Top, new Vector2(0, -index * (compact ? 232 : 290)), new Vector2(920, compact ? 214 : 260));
 
+            var shadowRect = UIKit.Rect("Shadow", card);
+            UIKit.Stretch(shadowRect, -16f);
+            shadowRect.anchoredPosition = new Vector2(0f, -10f);
+            var shadowImg = UIKit.Image(shadowRect, new Color(0f, 0f, 0f, 0.55f), UIKit.GlowSprite);
+            shadowImg.type = Image.Type.Sliced;
+            shadowImg.raycastTarget = false;
+
             if (evo)
             {
                 // Glowing frame behind the card.
                 var glow = UIKit.Rect("Glow", card);
                 UIKit.Stretch(glow, -10f);
-                UIKit.Image(glow, option.color).raycastTarget = false;
+                UIKit.Panel(glow, option.color, false).raycastTarget = false;
                 UIAnim.Pulse(glow, 6f, 0.02f);
             }
             else if (option.rarity != UpgradeRarity.Commun)
@@ -968,24 +996,34 @@ namespace Survivor
                 // Rare / epic: thick frame in the rarity color (the level label says how many levels).
                 var frame = UIKit.Rect("Rarity", card);
                 UIKit.Stretch(frame, option.rarity == UpgradeRarity.Epique ? -9f : -6f);
-                UIKit.Image(frame, option.RarityColor).raycastTarget = false;
+                UIKit.Panel(frame, option.RarityColor, false).raycastTarget = false;
                 if (option.rarity == UpgradeRarity.Epique) UIAnim.Pulse(frame, 5f, 0.015f);
             }
             else if (isNew)
             {
                 var frame = UIKit.Rect("Frame", card);
                 UIKit.Stretch(frame, -4f);
-                UIKit.Image(frame, new Color(option.color.r, option.color.g, option.color.b, 0.6f)).raycastTarget = false;
+                UIKit.Panel(frame, new Color(option.color.r, option.color.g, option.color.b, 0.75f), false).raycastTarget = false;
             }
 
             var bgRect = UIKit.Rect("Background", card);
             UIKit.Stretch(bgRect);
-            var bg = UIKit.Image(bgRect, evo ? EvoCard : UIKit.Card);
+            var bg = UIKit.Panel(bgRect, evo ? EvoCard : UIKit.Card);
+            // Color stripe on the left edge: the item's color, so the hand reads at a glance.
+            var accent = UIKit.Rect("Accent", bgRect);
+            accent.anchorMin = new Vector2(0f, 0f);
+            accent.anchorMax = new Vector2(0f, 1f);
+            accent.pivot = new Vector2(0f, 0.5f);
+            accent.anchoredPosition = new Vector2(5f, 0f);
+            accent.sizeDelta = new Vector2(7f, -44f);
+            UIKit.Image(accent, option.color).raycastTarget = false;
             var button = card.gameObject.AddComponent<Button>();
             button.targetGraphic = bg;
             var colors = button.colors;
             colors.pressedColor = new Color(0.7f, 0.7f, 0.7f);
+            colors.fadeDuration = 0.06f;
             button.colors = colors;
+            card.gameObject.AddComponent<UIPress>();
             button.onClick.AddListener(() =>
             {
                 if (Time.unscaledTime < cardsReadyAt) return;

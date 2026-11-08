@@ -12,6 +12,8 @@ namespace Survivor
 
             // Storage + harvest
             var card = MetaUI.Card(page, "Storage", UIKit.Center, new Vector2(0, 530), new Vector2(980, 250), UIKit.Card);
+            UIKit.DropShadow(card, 16f, 0.45f, -8f);
+            MetaUI.Strip(card, UIKit.Gold);
             MetaUI.Text(card, "RÉSERVE", 38, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(30, -18), new Vector2(600, 50), FontStyle.Bold);
             var stock = MetaUI.Text(card, "", 34, Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(30, -74), new Vector2(630, 50));
             var fill = MetaUI.Bar(card, UIKit.TopLeft, new Vector2(30, -134), new Vector2(620, 34), UIKit.Gold, 0f);
@@ -70,28 +72,34 @@ namespace Survivor
             int next = level + 1;
 
             var row = MetaUI.Card(content, b.name, UIKit.Top, new Vector2(0, -y), new Vector2(960, 240), level > 0 ? UIKit.Card : MetaUI.Locked);
+            if (level > 0) MetaUI.Strip(row, b.color);
+            if (maxed) PanelRim(row, new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.6f));
             Color c = level > 0 ? b.color : new Color(b.color.r * 0.45f, b.color.g * 0.45f, b.color.b * 0.45f);
             var icon = UIKit.Icon(row, b.name, c, false, 110, level > 0 ? level.ToString() : "");
             UIKit.Place(icon, UIKit.Left, new Vector2(18, 0), new Vector2(110, 110));
 
-            MetaUI.Text(row, $"{b.name}  <size=30><color=#BBBBBB>Nv {level}/{b.maxLevel}</color></size>", 40, Color.white,
-                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -14), new Vector2(550, 52), FontStyle.Bold);
-            MetaUI.Text(row, b.description, 26, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -64), new Vector2(550, 36));
-            MetaUI.Text(row, level > 0 ? "Actuel : " + b.effect(level) : "Pas encore construit", 26, Color.white,
-                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -102), new Vector2(550, 60));
+            // Fixed boxes in a fixed-height row: long effect texts shrink instead of running into the next line.
+            FitText(MetaUI.Text(row, $"{b.name}  <size=30><color=#8C949C>Nv {level}/{b.maxLevel}</color></size>", 40, Color.white,
+                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -14), new Vector2(550, 52), FontStyle.Bold), 28);
+            FitText(MetaUI.Text(row, b.description, 26, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -64), new Vector2(550, 36)), 18);
+            FitText(MetaUI.Text(row, level > 0 ? "Actuel : " + b.effect(level) : "Pas encore construit", 26, Color.white,
+                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -102), new Vector2(550, 60)), 18);
             if (!maxed)
-                MetaUI.Text(row, $"Niv. {next} : {b.effect(next)}", 26, MetaUI.LightGreen,
-                    TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -164), new Vector2(550, 64));
+                FitText(MetaUI.Text(row, $"Niv. {next} : {b.effect(next)}", 26, MetaUI.LightGreen,
+                    TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(148, -164), new Vector2(550, 64)), 18);
 
             string blocker = Camp.UpgradeBlocker(b);
             if (maxed)
             {
-                MetaUI.Button(row, "MAX", UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(240, 150), () => { }, 44, false);
+                var max = MetaUI.Button(row, "MAX", UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(240, 150), () => { }, 44, false);
+                var maxLabel = max.GetComponentInChildren<Text>();
+                if (maxLabel) maxLabel.color = UIKit.Gold;
             }
             else if (blocker != null)
             {
                 var lockBox = MetaUI.Card(row, "Locked", UIKit.Right, new Vector2(-18, 0), new Vector2(240, 150), new Color(0f, 0f, 0f, 0.35f));
-                MetaUI.Text(lockBox, blocker, 28, MetaUI.Red, TextAnchor.MiddleCenter, UIKit.Center, Vector2.zero, new Vector2(220, 140));
+                PanelRim(lockBox, new Color(MetaUI.Red.r, MetaUI.Red.g, MetaUI.Red.b, 0.45f));
+                FitText(MetaUI.Text(lockBox, blocker, 28, MetaUI.Red, TextAnchor.MiddleCenter, UIKit.Center, Vector2.zero, new Vector2(220, 140)), 20);
             }
             else
             {

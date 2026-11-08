@@ -24,6 +24,9 @@ namespace Survivor
         Text goldText, starsText;
         readonly Button[] navButtons = new Button[5];
         readonly RectTransform[] navBadges = new RectTransform[5];
+        readonly RectTransform[] navMarks = new RectTransform[5];
+        readonly Image[] navGlyphs = new Image[5];
+        readonly Text[] navLabels = new Text[5];
 
         Page current = Page.Home;
         ScrollRect pageScroll;
@@ -156,7 +159,13 @@ namespace Survivor
         {
             int tab = TabOf(current);
             for (int i = 0; i < navButtons.Length; i++)
-                navButtons[i].targetGraphic.color = i == tab ? UIKit.Blood : UIKit.Dark;
+            {
+                bool on = i == tab;
+                navButtons[i].targetGraphic.color = on ? new Color(0.2f, 0.24f, 0.28f) : new Color(0.1f, 0.115f, 0.135f);
+                if (navMarks[i]) navMarks[i].gameObject.SetActive(on);
+                if (navGlyphs[i]) navGlyphs[i].color = on ? UIKit.Accent : UIKit.Muted;
+                if (navLabels[i]) navLabels[i].color = on ? UIKit.Ink : UIKit.Muted;
+            }
         }
 
         void RefreshTopBar()
@@ -190,17 +199,45 @@ namespace Survivor
             UIKit.Stretch(page);
 
             // Top bar: resources
-            var bar = MetaUI.Card(root, "Top Bar", UIKit.Center, new Vector2(0, 895), new Vector2(1080, 120), new Color(0f, 0f, 0f, 0.55f));
+            var bar = UIKit.Rect("Top Bar", root);
+            UIKit.Place(bar, UIKit.Center, new Vector2(0, 895), new Vector2(1080, 120));
+            UIKit.Image(bar, new Color(UIKit.Bg.r, UIKit.Bg.g, UIKit.Bg.b, 0.82f)).raycastTarget = false;
+            var barLine = UIKit.Rect("Line", bar);
+            UIKit.Place(barLine, UIKit.Bottom, Vector2.zero, new Vector2(1080, 2));
+            UIKit.Image(barLine, UIKit.Line).raycastTarget = false;
             goldChip = Chip(bar, -230, 520, UIKit.Gold, UIKit.Circle, out goldText);
             Chip(bar, 330, 300, UIKit.Gold, MetaUI.Star, out starsText);
 
-            // Bottom tabs
-            var nav = MetaUI.Card(root, "Nav", UIKit.Center, new Vector2(0, -880), new Vector2(1080, 160), new Color(0.05f, 0.05f, 0.06f, 0.97f));
+            // Bottom tabs: pictogram + label, the active one gets a cyan mark (REGEN hardware look).
+            var nav = UIKit.Rect("Nav", root);
+            UIKit.Place(nav, UIKit.Center, new Vector2(0, -880), new Vector2(1080, 160));
+            UIKit.Image(nav, new Color(UIKit.Bg.r, UIKit.Bg.g, UIKit.Bg.b, 0.97f));
+            var navLine = UIKit.Rect("Line", nav);
+            UIKit.Place(navLine, UIKit.Top, Vector2.zero, new Vector2(1080, 2));
+            UIKit.Image(navLine, UIKit.Line).raycastTarget = false;
             for (int i = 0; i < TabNames.Length; i++)
             {
                 int tab = i;
-                navButtons[i] = UIKit.Button(nav, TabNames[i], UIKit.Dark, UIKit.Center, new Vector2(-432 + i * 216, 0), new Vector2(208, 144), () => OnTab(tab), 32);
-                navBadges[i] = MetaUI.Badge(navButtons[i].transform, new Vector2(-4, -4), "!");
+                var b = UIKit.Button(nav, TabNames[i], UIKit.Dark, UIKit.Center, new Vector2(-432 + i * 216, -4), new Vector2(208, 140), () => OnTab(tab), 26);
+                navButtons[i] = b;
+                var label = b.GetComponentInChildren<Text>();
+                label.alignment = TextAnchor.LowerCenter;
+                label.rectTransform.offsetMin = new Vector2(4f, 16f);
+                navLabels[i] = label;
+                var glyph = IconPainter.For(TabNames[i]);
+                if (glyph)
+                {
+                    var g = UIKit.Rect("Glyph", b.transform);
+                    UIKit.Place(g, UIKit.Top, new Vector2(0, -16), new Vector2(66, 66));
+                    navGlyphs[i] = UIKit.Image(g, UIKit.Muted, glyph);
+                    navGlyphs[i].raycastTarget = false;
+                    navGlyphs[i].preserveAspect = true;
+                }
+                var mark = UIKit.Rect("Mark", b.transform);
+                UIKit.Place(mark, UIKit.Bottom, new Vector2(0, 6), new Vector2(120, 6));
+                UIKit.Image(mark, UIKit.Accent).raycastTarget = false;
+                navMarks[i] = mark;
+                navBadges[i] = MetaUI.Badge(b.transform, new Vector2(-4, -4), "!");
                 navBadges[i].gameObject.SetActive(false);
             }
 
@@ -225,8 +262,15 @@ namespace Survivor
         /// <summary>Big page title + subtitle under the top bar. Returns the subtitle.</summary>
         Text Header(string title, string subtitle)
         {
-            MetaUI.Text(page, title, 74, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 780), new Vector2(640, 100), FontStyle.Bold);
-            return MetaUI.Text(page, subtitle, 32, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 708), new Vector2(1040, 50));
+            var t = MetaUI.Text(page, title, 74, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 780), new Vector2(640, 100), FontStyle.Bold);
+            t.resizeTextForBestFit = true;
+            t.resizeTextMaxSize = t.fontSize;
+            t.resizeTextMinSize = 40;
+            t.verticalOverflow = VerticalWrapMode.Truncate;
+            var line = UIKit.Rect("Underline", page);
+            UIKit.Place(line, UIKit.Center, new Vector2(0, 734), new Vector2(160, 4));
+            UIKit.Image(line, UIKit.Blood).raycastTarget = false;
+            return MetaUI.Text(page, subtitle, 32, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 700), new Vector2(1040, 50));
         }
 
         void BackButton(Page target)
@@ -236,7 +280,20 @@ namespace Survivor
 
         static Text SectionTitle(RectTransform content, string text, float y)
         {
-            return MetaUI.Text(content, text, 40, UIKit.Gold, TextAnchor.LowerLeft, UIKit.Top, new Vector2(0, -y), new Vector2(960, 60), FontStyle.Bold);
+            var t = MetaUI.Text(content, text, 40, UIKit.Gold, TextAnchor.LowerLeft, UIKit.Top, new Vector2(0, -y), new Vector2(960, 60), FontStyle.Bold);
+            SectionRule(content, y + 64f, 960f);
+            return t;
+        }
+
+        /// <summary>Thin rule under a section title, with a short red tick at its start.</summary>
+        static void SectionRule(RectTransform content, float y, float width)
+        {
+            var line = UIKit.Rect("Rule", content);
+            UIKit.Place(line, UIKit.Top, new Vector2(0, -y), new Vector2(width, 2));
+            UIKit.Image(line, UIKit.Line).raycastTarget = false;
+            var tick = UIKit.Rect("Tick", line);
+            UIKit.Place(tick, UIKit.Left, new Vector2(0, 0), new Vector2(70, 4));
+            UIKit.Image(tick, UIKit.Blood).raycastTarget = false;
         }
 
         static string FormatDuration(float seconds)
@@ -263,9 +320,18 @@ namespace Survivor
             var content = MetaUI.Scroll(page, new Vector2(0, 15), new Vector2(1080, 1610), out pageScroll);
             float y = 6f;
 
-            var title = MetaUI.Text(content, "CORDON", 100, UIKit.Blood, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -y), new Vector2(1060, 220), FontStyle.Bold);
-            title.lineSpacing = 0.85f;
-            UIAnim.Pulse(title.rectTransform, 1.5f, 0.02f);
+            // Logo: the name, a red rule, the place, and a tilted stamp.
+            var title = MetaUI.Text(content, "CORDON", 136, UIKit.Ink, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -y - 8), new Vector2(1060, 150), FontStyle.Bold);
+            title.GetComponent<Shadow>().effectDistance = new Vector2(4f, -6f);
+            UIAnim.Pulse(title.rectTransform, 1.2f, 0.012f);
+            var rule = UIKit.Rect("Rule", content);
+            UIKit.Place(rule, UIKit.Top, new Vector2(0, -y - 160), new Vector2(560, 5));
+            UIKit.Image(rule, UIKit.Blood).raycastTarget = false;
+            MetaUI.Text(content, "OSTROV  ·  ZONE D'EXCLUSION  ·  KM 17", 26, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top,
+                new Vector2(0, -y - 174), new Vector2(1000, 40), FontStyle.Bold);
+            var stamp = UIKit.Stamp(content, "ZONE INTERDITE", new Color(0.86f, 0.25f, 0.2f, 0.9f), 24, 9f);
+            stamp.anchorMin = stamp.anchorMax = stamp.pivot = UIKit.Top;
+            stamp.anchoredPosition = new Vector2(398, -y - 34);
             y += 222f;
 
             MetaUI.Text(content, "Pseudo", 30, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -y), new Vector2(600, 40));
@@ -280,8 +346,7 @@ namespace Survivor
             var s = Campaign.Stages[stage];
             var card = MetaUI.Card(content, "Campaign", UIKit.Top, new Vector2(0, -y), new Vector2(980, 380), UIKit.Card);
             y += 410f;
-            var stripe = MetaUI.Card(card, "Stripe", UIKit.Left, Vector2.zero, new Vector2(12, 380), Campaign.ChapterColors[s.chapter]);
-            stripe.SetAsFirstSibling();
+            MetaUI.Strip(card, Campaign.ChapterColors[s.chapter]);
             MetaUI.Text(card, "CARTE D'OSTROV", 40, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(36, -20), new Vector2(500, 50), FontStyle.Bold);
             MetaUI.Stars(card, UIKit.TopRight, new Vector2(-30, -20), 54, Campaign.StarMask(stage));
             MetaUI.Text(card, Campaign.ChapterTitle(s.chapter), 32, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(36, -72), new Vector2(900, 44));
@@ -396,14 +461,16 @@ namespace Survivor
             var row = MetaUI.Card(content, "Stage " + Campaign.Code(i), UIKit.Top, new Vector2(0, -y), new Vector2(960, 196), unlocked ? UIKit.Card : MetaUI.Locked);
 
             Color c = Campaign.ChapterColors[s.chapter];
+            if (unlocked && !cleared) PanelRim(row, new Color(0.8f, 0.3f, 0.26f, 0.75f)); // the stage to play next
             var code = MetaUI.Card(row, "Code", UIKit.Left, new Vector2(18, 0), new Vector2(150, 150), unlocked ? new Color(c.r * 0.7f, c.g * 0.7f, c.b * 0.7f) : UIKit.Dark);
             MetaUI.Text(code, Campaign.Code(i), 54, unlocked ? Color.white : UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, Vector2.zero, new Vector2(150, 150), FontStyle.Bold);
 
-            MetaUI.Text(row, s.name, 40, unlocked ? Color.white : UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -16), new Vector2(560, 54), FontStyle.Bold);
-            MetaUI.Text(row, $"{UIKit.FormatTime(Mathf.RoundToInt(s.duration))}  ·  Ennemis x{s.health:0.0#}  ·  Dégâts x{s.damage:0.0#}", 27, UIKit.Muted,
-                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -72), new Vector2(560, 40));
+            // Fixed 560-wide boxes: long names / reward lines shrink instead of spilling.
+            FitText(MetaUI.Text(row, s.name, 40, unlocked ? Color.white : UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -16), new Vector2(560, 54), FontStyle.Bold), 28);
+            FitText(MetaUI.Text(row, $"{UIKit.FormatTime(Mathf.RoundToInt(s.duration))}  ·  Ennemis x{s.health:0.0#}  ·  Dégâts x{s.damage:0.0#}", 27, UIKit.Muted,
+                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -72), new Vector2(560, 40)), 20);
             string reward = cleared ? $"<color=#{MetaUI.GreenHex}>Terminée</color>  ·  rejouable pour les étoiles" : "1er passage : " + Campaign.RewardText(s);
-            MetaUI.Text(row, reward, 26, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -116), new Vector2(560, 70));
+            FitText(MetaUI.Text(row, reward, 26, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(190, -116), new Vector2(560, 70)), 20);
 
             MetaUI.Stars(row, UIKit.TopRight, new Vector2(-22, -18), 46, Campaign.StarMask(i));
             if (unlocked)

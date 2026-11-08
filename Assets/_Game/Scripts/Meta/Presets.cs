@@ -233,7 +233,16 @@ namespace Survivor
             float width = height * 3.6f;
             var pill = UIKit.Rect("Preset Badge", parent);
             UIKit.Place(pill, anchor, position, new Vector2(width, height));
-            UIKit.Image(pill, Tint).raycastTarget = false;
+            // Chamfered chip (same family as the other tags), with a darker lip so it reads on light cards.
+            var lip = UIKit.Image(pill, new Color(Tint.r * 0.5f, Tint.g * 0.5f, Tint.b * 0.5f), UIKit.ChipSprite);
+            lip.type = Image.Type.Sliced;
+            lip.raycastTarget = false;
+            var face = UIKit.Rect("Face", pill);
+            UIKit.Stretch(face, 2f);
+            face.offsetMin = new Vector2(2f, 4f);
+            var f = UIKit.Image(face, Tint, UIKit.ChipSprite);
+            f.type = Image.Type.Sliced;
+            f.raycastTarget = false;
 
             var icon = UIKit.Rect("Heart", pill);
             UIKit.Place(icon, UIKit.Left, new Vector2(height * 0.18f, 0f), new Vector2(height * 0.72f, height * 0.72f));

@@ -7,13 +7,13 @@ namespace Survivor
     /// <summary>Extra UI helpers for the meta screens, on top of UIKit (scroll lists, cards, bars, stars).</summary>
     public static class MetaUI
     {
-        public static readonly Color Green = new(0.25f, 0.6f, 0.25f);
-        public static readonly Color LightGreen = new(0.5f, 1f, 0.5f);
-        public static readonly Color Brown = new(0.55f, 0.4f, 0.1f);
-        public static readonly Color Locked = new(0.06f, 0.06f, 0.07f, 0.95f);
-        public static readonly Color Red = new(0.95f, 0.4f, 0.35f);
-        public const string GoldHex = "FFD94D";
-        public const string GreenHex = "7CFF7C";
+        public static readonly Color Green = new(0.2f, 0.5f, 0.3f);
+        public static readonly Color LightGreen = new(0.45f, 0.86f, 0.58f);
+        public static readonly Color Brown = new(0.5f, 0.36f, 0.14f);
+        public static readonly Color Locked = new(0.06f, 0.065f, 0.075f, 0.95f);
+        public static readonly Color Red = new(0.92f, 0.42f, 0.36f);
+        public const string GoldHex = "F4C84A";
+        public const string GreenHex = "6FDC95";
 
         static Sprite star;
 
@@ -27,12 +27,30 @@ namespace Survivor
             return t;
         }
 
+        /// <summary>
+        /// A panel (cut corners + thin outline). Thin strips (stripes, separators) stay plain rectangles,
+        /// and fully transparent cards stay invisible.
+        /// </summary>
         public static RectTransform Card(Transform parent, string name, Vector2 anchor, Vector2 position, Vector2 size, Color color)
         {
             var r = UIKit.Rect(name, parent);
             UIKit.Place(r, anchor, position, size);
-            UIKit.Image(r, color).raycastTarget = false;
+            if (Mathf.Min(size.x, size.y) < 24f || color.a < 0.05f) UIKit.Image(r, color).raycastTarget = false;
+            else UIKit.Panel(r, color, true, Mathf.Min(size.x, size.y) < 100f ? 0.7f : 1f).raycastTarget = false;
             return r;
+        }
+
+        /// <summary>Colored accent strip glued to the left edge of a card (chapter / mode color).</summary>
+        public static RectTransform Strip(RectTransform card, Color color, float width = 8f)
+        {
+            var s = UIKit.Rect("Strip", card);
+            s.anchorMin = new Vector2(0f, 0f);
+            s.anchorMax = new Vector2(0f, 1f);
+            s.pivot = new Vector2(0f, 0.5f);
+            s.anchoredPosition = new Vector2(6f, 0f);
+            s.sizeDelta = new Vector2(width, -40f);
+            UIKit.Image(s, color).raycastTarget = false;
+            return s;
         }
 
         /// <summary>Small button that can be disabled (greyed).</summary>
@@ -53,8 +71,10 @@ namespace Survivor
         {
             var bar = UIKit.Rect("Bar", parent);
             UIKit.Place(bar, anchor, position, size);
-            UIKit.Image(bar, new Color(0f, 0f, 0f, 0.6f)).raycastTarget = false;
-            var fill = UIKit.Fill(bar, color, 4f);
+            var bg = UIKit.Image(bar, new Color(0f, 0f, 0f, 0.6f), UIKit.ChipSprite);
+            bg.type = Image.Type.Sliced;
+            bg.raycastTarget = false;
+            var fill = UIKit.Fill(bar, color, 5f);
             fill.fillAmount = Mathf.Clamp01(value);
             return fill;
         }
@@ -86,8 +106,11 @@ namespace Survivor
         {
             var b = UIKit.Rect("Badge", parent);
             UIKit.Place(b, UIKit.TopRight, position, new Vector2(56, 56));
-            UIKit.Image(b, new Color(0.9f, 0.15f, 0.1f), UIKit.Circle).raycastTarget = false;
-            var t = UIKit.Label(b, text, 32, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+            UIKit.Image(b, new Color(0.05f, 0.05f, 0.06f, 0.9f), UIKit.Circle).raycastTarget = false;
+            var dot = UIKit.Rect("Dot", b);
+            UIKit.Stretch(dot, 4f);
+            UIKit.Image(dot, new Color(0.86f, 0.2f, 0.16f), UIKit.Circle).raycastTarget = false;
+            var t = UIKit.Label(b, text, 30, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Stretch(t.rectTransform);
             return b;
         }

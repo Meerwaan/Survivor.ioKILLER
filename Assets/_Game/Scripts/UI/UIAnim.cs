@@ -55,6 +55,12 @@ namespace Survivor
 
         public bool Done => !sliding;
 
+        /// <summary>True while this component writes localScale every frame (UIPress then lets it apply the press).</summary>
+        public bool DrivesScale => sliding || pulseAmount > 0f;
+
+        UIPress press;
+        float PressFactor => press || TryGetComponent(out press) ? press.Factor : 1f;
+
         void Update()
         {
             float dt = Time.unscaledDeltaTime;
@@ -67,7 +73,7 @@ namespace Survivor
             }
             else if (pulseAmount > 0f)
             {
-                rect.localScale = baseScale * (1f + Mathf.Sin(Time.unscaledTime * pulseSpeed) * pulseAmount);
+                rect.localScale = baseScale * ((1f + Mathf.Sin(Time.unscaledTime * pulseSpeed) * pulseAmount) * PressFactor);
             }
         }
 
@@ -75,7 +81,7 @@ namespace Survivor
         {
             float e = EaseOutBack(k);
             rect.anchoredPosition = Vector2.LerpUnclamped(from, target, e);
-            rect.localScale = baseScale * Mathf.LerpUnclamped(startScale, 1f, e);
+            rect.localScale = baseScale * (Mathf.LerpUnclamped(startScale, 1f, e) * PressFactor);
             if (group) group.alpha = Mathf.Clamp01(k * 3f);
         }
 

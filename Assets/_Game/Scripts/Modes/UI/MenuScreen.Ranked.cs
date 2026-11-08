@@ -10,8 +10,11 @@ namespace Survivor
     /// </summary>
     public partial class MenuScreen
     {
-        static readonly Color DailyColor = new(0.3f, 0.7f, 1f);
-        static readonly Color MenacesColor = new(0.65f, 0.3f, 1f);
+        /// <summary>The daily "call" comes over the REGEN radio: interface cyan.</summary>
+        static readonly Color DailyColor = UIKit.Accent;
+        static readonly Color MenacesColor = UIKit.Hex(0x9A5CE6);
+        /// <summary>Selected condition row: a dark blood tint.</summary>
+        static readonly Color ThreatOnCard = UIKit.Hex(0x3A1A1C, 0.97f);
 
         /// <summary>Mode shown by the rules page.</summary>
         GameMode infoMode = GameMode.Classic;
@@ -51,7 +54,8 @@ namespace Survivor
         {
             MetaUI.Text(content, "LE REGISTRE", 46, UIKit.Gold, TextAnchor.LowerLeft, UIKit.Top, new Vector2(0, -y), new Vector2(980, 60), FontStyle.Bold);
             MetaUI.Text(content, "Mêmes règles pour tous", 28, UIKit.Muted, TextAnchor.LowerRight, UIKit.Top, new Vector2(0, -y - 4), new Vector2(980, 50));
-            y += 72f;
+            SectionRule(content, y + 66f, 980f);
+            y += 84f;
 
             const float w = 480f, h = 340f;
             ModeTile(content, GameMode.Classic, new Vector2(-250, -y), new Vector2(w, h));
@@ -74,8 +78,10 @@ namespace Survivor
         {
             bool locked = mode == GameMode.Menaces && !GameModes.MenacesUnlocked;
             var tile = MetaUI.Card(content, "Mode " + mode, UIKit.Top, position, size, locked ? MetaUI.Locked : UIKit.Card);
-            var stripe = MetaUI.Card(tile, "Stripe", UIKit.Top, Vector2.zero, new Vector2(size.x, 8), ModeColor(mode));
-            stripe.SetAsFirstSibling();
+            // Mode color as a strip along the top edge, starting after the cut corner.
+            var stripe = UIKit.Rect("Stripe", tile);
+            UIKit.Place(stripe, UIKit.TopRight, new Vector2(-2, -2), new Vector2(size.x - 22, 6));
+            UIKit.Image(stripe, ModeColor(mode)).raycastTarget = false;
 
             string title = mode switch
             {
@@ -148,7 +154,7 @@ namespace Survivor
                 return;
             }
             string playLabel = mode == GameMode.Daily && GameModes.DailyRankedUsed ? "S'ENTRAÎNER" : "JOUER";
-            var play = UIKit.Button(tile, playLabel, mode == GameMode.Classic ? new Color(0.45f, 0.08f, 0.06f) : UIKit.Blood,
+            var play = UIKit.Button(tile, playLabel, UIKit.Blood,
                 new Vector2(0f, 0f), new Vector2(20, 18), new Vector2(290, 92), () => PlayMode(mode), playLabel.Length > 6 ? 36 : 44);
             if (mode == GameMode.Daily && !GameModes.DailyRankedUsed) UIAnim.Pulse((RectTransform)play.transform, 3f, 0.03f);
             string second = mode == GameMode.Menaces ? "CHOIX" : "INFOS";
@@ -229,7 +235,7 @@ namespace Survivor
             var um = UpgradeManager.Instance;
             if (!um) return;
             string names = um.AbsentNamesFor(startId, seed, boosted);
-            if (names.Length > 0) list.Add($"Armes absentes : <color=#BBBBBB>{names}</color>");
+            if (names.Length > 0) list.Add($"Armes absentes : <color=#8C949C>{names}</color>");
         }
 
         static List<string> RuleLines(GameMode mode)
@@ -289,11 +295,15 @@ namespace Survivor
             return list;
         }
 
+        /// <summary>One rule line with a small cyan square as the bullet (wrapped, sized to its real height).</summary>
         static float Bullet(RectTransform content, string text, float y)
         {
-            var t = MetaUI.Text(content, "•  " + text, 32, Color.white, TextAnchor.UpperLeft, UIKit.Top, new Vector2(0, -y), new Vector2(960, 90));
+            var t = MetaUI.Text(content, text, 32, Color.white, TextAnchor.UpperLeft, UIKit.Top, new Vector2(18, -y), new Vector2(924, 90));
             float h = Mathf.Max(46f, t.preferredHeight + 10f);
-            t.rectTransform.sizeDelta = new Vector2(960, h);
+            t.rectTransform.sizeDelta = new Vector2(924, h);
+            var mark = UIKit.Rect("Bullet", content);
+            UIKit.Place(mark, UIKit.Top, new Vector2(-470, -y - 13), new Vector2(10, 10));
+            UIKit.Image(mark, UIKit.Accent).raycastTarget = false;
             return y + h;
         }
 
@@ -302,7 +312,13 @@ namespace Survivor
         {
             int best = Leaderboard.PersonalBest(board);
             var m = Medals.For(board, best);
-            var card = MetaUI.Card(content, "Medal", UIKit.Top, new Vector2(0, -y), new Vector2(960, 200), new Color(1f, 1f, 1f, 0.05f));
+            var card = MetaUI.Card(content, "Medal", UIKit.Top, new Vector2(0, -y), new Vector2(960, 200), UIKit.Card);
+            if (m != Medal.None)
+            {
+                var mc = Medals.ColorOf(m);
+                MetaUI.Strip(card, mc);
+                PanelRim(card, new Color(mc.r, mc.g, mc.b, 0.5f));
+            }
             Medals.Icon(card, UIKit.Left, new Vector2(24, 0), 150, m);
             MetaUI.Text(card, m == Medal.None ? "Pas encore de médaille" : Medals.Name(m), 46, Medals.ColorOf(m), TextAnchor.UpperLeft,
                 UIKit.TopLeft, new Vector2(200, -20), new Vector2(740, 58), FontStyle.Bold);
@@ -322,7 +338,17 @@ namespace Survivor
             {
                 var m = (Medal)(i + 1);
                 bool got = best >= t[i];
-                var row = MetaUI.Card(content, "Tier", UIKit.Top, new Vector2(0, -y), new Vector2(960, 70), new Color(1f, 1f, 1f, got ? 0.08f : 0.03f));
+                // Ledger line: shaded when reached (with the medal color as a strip), thin rule under it.
+                var row = UIKit.Rect("Tier", content);
+                UIKit.Place(row, UIKit.Top, new Vector2(0, -y), new Vector2(960, 70));
+                UIKit.Image(row, new Color(1f, 1f, 1f, got ? 0.06f : 0.015f)).raycastTarget = false;
+                LedgerRule(row, 960f, -4f);
+                if (got)
+                {
+                    var strip = UIKit.Rect("Strip", row);
+                    UIKit.Place(strip, UIKit.Left, Vector2.zero, new Vector2(5, 70));
+                    UIKit.Image(strip, Medals.ColorOf(m)).raycastTarget = false;
+                }
                 Medals.Icon(row, UIKit.Left, new Vector2(16, 0), 54, got ? m : Medal.None);
                 MetaUI.Text(row, Medals.Name(m), 34, got ? Medals.ColorOf(m) : UIKit.Muted, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(90, 0), new Vector2(400, 60), FontStyle.Bold);
                 MetaUI.Text(row, Medals.FormatScore(t[i]) + (got ? $"  <color=#{MetaUI.GreenHex}>atteint</color>" : ""), 34, got ? Color.white : UIKit.Muted,
@@ -382,12 +408,16 @@ namespace Survivor
         void ThreatRow(RectTransform content, ThreatDef t, float y)
         {
             bool on = GameModes.IsSelected(t.id);
-            var row = MetaUI.Card(content, "Threat " + t.id, UIKit.Top, new Vector2(0, -y), new Vector2(960, 116),
-                on ? new Color(0.28f, 0.08f, 0.1f, 0.97f) : UIKit.Card);
-            string bonus = $"<color=#{(on ? MetaUI.GoldHex : "BFBFBF")}>+{t.Percent} %</color>";
-            MetaUI.Text(row, $"{t.name}   {bonus}" + (t.mutator ? "  <size=26><color=#9FD8FF>MUTATEUR</color></size>" : ""), 38, on ? Color.white : UIKit.Muted,
-                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(24, -14), new Vector2(710, 50), FontStyle.Bold);
-            MetaUI.Text(row, t.description, 27, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(24, -66), new Vector2(710, 44));
+            var row = MetaUI.Card(content, "Threat " + t.id, UIKit.Top, new Vector2(0, -y), new Vector2(960, 116), on ? ThreatOnCard : UIKit.Card);
+            if (on)
+            {
+                MetaUI.Strip(row, UIKit.Blood);
+                PanelRim(row, new Color(0.8f, 0.3f, 0.26f, 0.7f));
+            }
+            string bonus = $"<color=#{(on ? MetaUI.GoldHex : "8C949C")}>+{t.Percent} %</color>";
+            FitText(MetaUI.Text(row, $"{t.name}   {bonus}" + (t.mutator ? "  <size=26><color=#2CB1C4>MUTATEUR</color></size>" : ""), 38, on ? Color.white : UIKit.Muted,
+                TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(24, -14), new Vector2(710, 50), FontStyle.Bold), 28);
+            FitText(MetaUI.Text(row, t.description, 27, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(24, -66), new Vector2(710, 44)), 20);
             string id = t.id;
             UIKit.Button(row, on ? "ACTIVE" : "OFF", on ? UIKit.Blood : UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(190, 84), () =>
             {
@@ -442,7 +472,7 @@ namespace Survivor
             for (int i = 0; i < BoardTabs.Length; i++)
             {
                 var tabMode = BoardTabs[i];
-                UIKit.Button(page, BoardTabNames[i], tabMode == mode ? UIKit.Blood : UIKit.Dark, UIKit.Center,
+                PageTab(page, BoardTabNames[i], tabMode == mode,
                     new Vector2(-372 + i * 248, 625), new Vector2(236, 90), () =>
                     {
                         if (boardMode == tabMode) return;
@@ -455,13 +485,14 @@ namespace Survivor
             int best = Leaderboard.PersonalBest(board);
             var m = Medals.For(board, best);
             var info = MetaUI.Card(page, "Board Info", UIKit.Center, new Vector2(0, 495), new Vector2(980, 140), UIKit.Card);
+            MetaUI.Strip(info, ModeColor(mode));
             Medals.Icon(info, UIKit.Left, new Vector2(20, 0), 110, m);
-            MetaUI.Text(info, best > 0 ? $"Ton record : {Medals.FormatScore(best)}  ·  <color=#{Medals.Hex(m)}>{Medals.Name(m)}</color>" : "Pas encore de score ici",
-                36, Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(150, -20), new Vector2(810, 48), FontStyle.Bold);
-            MetaUI.Text(info, Medals.NextText(board, best), 30, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(150, -78), new Vector2(810, 44));
+            FitText(MetaUI.Text(info, best > 0 ? $"Ton record : {Medals.FormatScore(best)}  ·  <color=#{Medals.Hex(m)}>{Medals.Name(m)}</color>" : "Pas encore de score ici",
+                36, Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(150, -20), new Vector2(810, 48), FontStyle.Bold), 26);
+            FitText(MetaUI.Text(info, Medals.NextText(board, best), 30, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(150, -78), new Vector2(810, 44)), 22);
 
             bool multColumn = mode == GameMode.Menaces;
-            RankRow(page, UIKit.Center, new Vector2(0, 385), "#", "Pseudo", "", "Score", multColumn ? "Mult." : "Temps", UIKit.Muted, false);
+            RankRow(page, UIKit.Center, new Vector2(0, 385), "#", "Pseudo", "", "Score", multColumn ? "Mult." : "Temps", UIKit.Muted, false, true);
             boardRows = UIKit.Rect("Rows", page);
             UIKit.Place(boardRows, UIKit.Center, new Vector2(0, 345), new Vector2(980, 0));
             boardRows.pivot = new Vector2(0.5f, 1f);
@@ -500,19 +531,43 @@ namespace Survivor
             }
         }
 
-        /// <summary>One leaderboard line. Nickname and title are user text: rich text off.</summary>
-        static void RankRow(RectTransform parent, Vector2 anchor, Vector2 position, string rank, string name, string title, string score, string last, Color color, bool shaded)
+        /// <summary>
+        /// One leaderboard line, as a ledger page: alternate shading, a ruled line under each entry and a red margin line
+        /// after the rank (the header row gets the strong rule). Nickname and title are user text: rich text off.
+        /// </summary>
+        static void RankRow(RectTransform parent, Vector2 anchor, Vector2 position, string rank, string name, string title, string score, string last, Color color, bool shaded, bool header = false)
         {
             var row = UIKit.Rect("Row", parent);
             UIKit.Place(row, anchor, position, new Vector2(980, 70));
-            UIKit.Image(row, new Color(1f, 1f, 1f, shaded ? 0.06f : 0f)).raycastTarget = false;
+            if (!header)
+            {
+                bool first = color == UIKit.Gold;
+                var shade = first ? new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.08f) : new Color(1f, 1f, 1f, shaded ? 0.045f : 0.012f);
+                UIKit.Image(row, shade).raycastTarget = false;
+            }
+            LedgerRule(row, 980f, -3f, header);
+            var margin = UIKit.Rect("Margin", row);
+            UIKit.Place(margin, UIKit.Left, new Vector2(96, 0), new Vector2(2, 74));
+            UIKit.Image(margin, new Color(UIKit.Blood.r, UIKit.Blood.g, UIKit.Blood.b, 0.45f)).raycastTarget = false;
 
             bool hasTitle = !string.IsNullOrEmpty(title);
             RowCell(row, rank, 20, 90, 0f, 38, color, TextAnchor.MiddleLeft);
             RowCell(row, name, 110, 470, hasTitle ? 12f : 0f, hasTitle ? 34 : 38, color, TextAnchor.MiddleLeft);
-            if (hasTitle) RowCell(row, title, 112, 470, -20f, 22, new Color(1f, 0.8f, 0.45f), TextAnchor.MiddleLeft);
+            if (hasTitle) RowCell(row, title, 112, 470, -20f, 22, new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.85f), TextAnchor.MiddleLeft);
             RowCell(row, score, 580, 230, 0f, 38, color, TextAnchor.MiddleRight);
             RowCell(row, last, 830, 130, 0f, 34, color, TextAnchor.MiddleRight);
+        }
+
+        /// <summary>Thin ruled line under a ledger row; the strong one (header) is opaque with a red tick, like SectionRule.</summary>
+        static void LedgerRule(RectTransform row, float width, float y, bool strong = false)
+        {
+            var rule = UIKit.Rect("Rule", row);
+            UIKit.Place(rule, UIKit.Bottom, new Vector2(0, y), new Vector2(width, strong ? 3 : 2));
+            UIKit.Image(rule, strong ? UIKit.Line : new Color(UIKit.Line.r, UIKit.Line.g, UIKit.Line.b, 0.75f)).raycastTarget = false;
+            if (!strong) return;
+            var tick = UIKit.Rect("Tick", rule);
+            UIKit.Place(tick, UIKit.Left, Vector2.zero, new Vector2(70, 4));
+            UIKit.Image(tick, UIKit.Blood).raycastTarget = false;
         }
 
         static void RowCell(RectTransform row, string text, float x, float width, float yOffset, int size, Color color, TextAnchor alignment)

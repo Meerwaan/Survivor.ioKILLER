@@ -32,15 +32,26 @@ namespace Survivor
             fx.duration = 1.3f;
         }
 
-        /// <summary>A burst of small discs flying from one point to another (harvest, rewards).</summary>
+        /// <summary>Coin pictogram (outlined, so coins read over any panel), or a plain disc if it can't be drawn.</summary>
+        static Sprite Coin
+        {
+            get
+            {
+                var s = IconPainter.For("Bourse");
+                return s ? s : UIKit.Circle;
+            }
+        }
+
+        /// <summary>A burst of small coins flying from one point to another (harvest, rewards).</summary>
         public static void Burst(RectTransform layer, Vector3 fromWorld, Vector3 toWorld, Color color, int count, Sprite sprite = null)
         {
             float scale = layer.lossyScale.x;
+            var coin = sprite ? sprite : Coin;
             for (int i = 0; i < count; i++)
             {
                 var r = UIKit.Rect("Coin", layer);
-                r.sizeDelta = new Vector2(46, 46);
-                var img = UIKit.Image(r, color, sprite ? sprite : UIKit.Circle);
+                r.sizeDelta = new Vector2(52, 52);
+                var img = UIKit.Image(r, color, coin);
                 img.raycastTarget = false;
                 var fx = r.gameObject.AddComponent<MetaFX>();
                 fx.mode = Mode.Fly;

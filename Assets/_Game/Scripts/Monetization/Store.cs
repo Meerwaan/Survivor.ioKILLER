@@ -165,8 +165,15 @@ namespace Survivor
         {
             var canvas = MonetizationUI.NewCanvas("Mock Store", MonetizationUI.StoreOrder);
             var bg = UIKit.Overlay("Store", canvas, 0.8f);
-            var card = MetaUI.Card(bg, "Card", UIKit.Center, Vector2.zero, new Vector2(900, 760), UIKit.Card);
-            UIAnim.SlideIn(card, new Vector2(0, -60), 0f, 0.25f, 0.85f);
+            // "Le Guichet": a wrapper so the shadow slides in with the card, a purple (premium) strip on top.
+            var holder = UIKit.Rect("Holder", bg);
+            UIKit.Place(holder, UIKit.Center, Vector2.zero, new Vector2(900, 760));
+            var card = MetaUI.Card(holder, "Card", UIKit.Center, Vector2.zero, new Vector2(900, 760), UIKit.Card);
+            UIKit.DropShadow(card, 22f, 0.6f, -12f);
+            UIAnim.SlideIn(holder, new Vector2(0, -60), 0f, 0.25f, 0.85f);
+            var stripe = UIKit.Rect("Stripe", card);
+            UIKit.Place(stripe, UIKit.TopRight, new Vector2(-2, -2), new Vector2(878, 6));
+            UIKit.Image(stripe, MonetizationUI.Premium).raycastTarget = false;
 
             MetaUI.Text(card, "ACHAT (test)", 52, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -40), new Vector2(840, 70), FontStyle.Bold);
             MetaUI.Text(card, product.name, 60, Color.white, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -130), new Vector2(840, 80), FontStyle.Bold);

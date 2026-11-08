@@ -28,6 +28,18 @@ namespace Survivor
                 Shape(root, UIKit.Circle, new Color(0f, 0f, 0f, 0.35f), new Vector2(0, bottom), new Vector2(size * 0.55f, size * 0.12f));
             }
 
+            // The real outfit, photographed by Survivor > Bake Skin Thumbnails (falls back to the drawn shapes).
+            var photo = Thumb(s.id);
+            if (photo)
+            {
+                var r = UIKit.Rect("Photo", root);
+                UIKit.Place(r, UIKit.Center, new Vector2(0f, size * 0.02f), new Vector2(size * 0.8f, size));
+                var img = UIKit.Image(r, Color.white, photo);
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                return root;
+            }
+
             // Behind the body
             if (s.accessory == SkinAccessory.Cape)
                 Shape(root, UIKit.Square, s.accent, new Vector2(0, bottom + h * 0.42f), new Vector2(w * 1.35f, h * 0.7f));
@@ -92,6 +104,17 @@ namespace Survivor
                     break;
             }
             return root;
+        }
+
+        static readonly System.Collections.Generic.Dictionary<string, Sprite> thumbs = new();
+
+        static Sprite Thumb(string id)
+        {
+            string key = string.IsNullOrEmpty(id) ? "skin_default" : id;
+            if (thumbs.TryGetValue(key, out var s) && s) return s;
+            s = Resources.Load<Sprite>("SkinThumbs/" + key);
+            thumbs[key] = s;
+            return s;
         }
 
         static Image Shape(RectTransform root, Sprite sprite, Color color, Vector2 pos, Vector2 size)

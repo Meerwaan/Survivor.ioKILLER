@@ -196,10 +196,10 @@ namespace Survivor
                 holder.anchoredPosition = new Vector2(col * (IconSize + IconGap), -row * (IconSize + IconGap));
                 if (p.IsPact)
                 {
-                    // Pacts: blood-red frame, so the curse is never forgotten.
+                    // Pacts: blood-red chamfered frame (same cut as the icon tile), so the curse is never forgotten.
                     var frame = UIKit.Rect("Frame", holder);
-                    UIKit.Stretch(frame, -5f);
-                    UIKit.Image(frame, RunModifiers.PactColor).raycastTarget = false;
+                    UIKit.Stretch(frame, -4f);
+                    UIKit.Panel(frame, RunModifiers.PactColor, false, 0.95f).raycastTarget = false;
                 }
                 var icon = UIKit.Icon(holder, p.name, c, !p.IsPact, IconSize, "");
                 icon.anchorMin = icon.anchorMax = icon.pivot = UIKit.Center;

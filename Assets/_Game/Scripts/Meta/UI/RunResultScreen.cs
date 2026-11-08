@@ -68,6 +68,9 @@ namespace Survivor
             MetaUI.Text(panel, Campaign.ChapterTitle(Campaign.Stages[stage].chapter), 34, UIKit.Muted, TextAnchor.MiddleCenter,
                 UIKit.Center, new Vector2(0, 585), new Vector2(1000, 50));
 
+            // Hero panel behind the stars and their conditions.
+            HeroPanel(panel, new Vector2(0, 332), new Vector2(980, 425), r.won ? UIKit.Gold : UIKit.Blood, r.won && r.newStars != 0);
+
             // Big stars: what this run achieved; the new ones pop in.
             int saved = Campaign.StarMask(stage);
             for (int i = 0; i < 3; i++)
@@ -97,6 +100,7 @@ namespace Survivor
 
             // Rewards
             var rewards = MetaUI.Card(panel, "Rewards", UIKit.Center, new Vector2(0, -175), new Vector2(980, 400), UIKit.Card);
+            MetaUI.Strip(rewards, UIKit.Gold);
             MetaUI.Text(rewards, r.firstClear ? "RÉCOMPENSES  ·  1ER PASSAGE !" : "RÉCOMPENSES", 38, UIKit.Gold, TextAnchor.UpperCenter,
                 UIKit.Top, new Vector2(0, -18), new Vector2(940, 50), FontStyle.Bold);
             var lines = MetaUI.Text(rewards, RewardLines(r), 36, Color.white, TextAnchor.UpperCenter,
@@ -154,7 +158,34 @@ namespace Survivor
 
         // ---------- Ranked modes (Classique, Défi du jour, Défi de la semaine, Menaces) ----------
 
-        static readonly Color PracticeColor = new(1f, 0.55f, 0.45f);
+        /// <summary>Practice / off-Registre runs (same salmon as the menu's "essai utilisé" lines).</summary>
+        static readonly Color PracticeColor = UIKit.Hex(0xFFA070);
+
+        /// <summary>
+        /// Big framed panel behind the key result (stars, or score + record + rank): drop shadow, a color strip along
+        /// the top edge (after the cut corner), the rim in that color, and a pulsing halo when something new was won.
+        /// Created before the texts so it stays behind them.
+        /// </summary>
+        static RectTransform HeroPanel(RectTransform parent, Vector2 position, Vector2 size, Color color, bool glow)
+        {
+            var hero = MetaUI.Card(parent, "Hero", UIKit.Center, position, size, UIKit.Card);
+            UIKit.DropShadow(hero, 20f, 0.55f, -12f);
+            if (glow)
+            {
+                var halo = UIKit.DropShadow(hero, 30f, 0.3f, 0f);
+                if (halo)
+                {
+                    halo.color = new Color(color.r, color.g, color.b, 0.3f);
+                    UIAnim.Pulse(halo.rectTransform, 2.5f, 0.02f);
+                }
+            }
+            var line = hero.Find("Line");
+            if (line && line.TryGetComponent<Image>(out var rim)) rim.color = new Color(color.r, color.g, color.b, 0.75f);
+            var stripe = UIKit.Rect("Stripe", hero);
+            UIKit.Place(stripe, UIKit.TopRight, new Vector2(-2, -2), new Vector2(size.x - 22, 6));
+            UIKit.Image(stripe, color).raycastTarget = false;
+            return hero;
+        }
 
         /// <summary>
         /// Full score screen over GameHUD's game-over panel: mode, base score x multiplier, final score, record, rank on
@@ -184,6 +215,10 @@ namespace Survivor
             MetaUI.Text(panel, $"Temps {UIKit.FormatTime(Mathf.FloorToInt(gm.RunTime))}   ·   Tués {gm.Kills}   ·   Niveau {level}   ·   Souches {gm.BossKills}\n" + ProgressLine(res),
                 30, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 584), new Vector2(1040, 76));
 
+            // Hero panel: score, record and rank read as one block.
+            HeroPanel(panel, new Vector2(0, 376), new Vector2(980, 330),
+                res.newBest ? UIKit.Gold : res.submitted ? UIKit.Blood : PracticeColor, res.newBest);
+
             // Score: base x multiplier = final
             if (res.mult > 1.001f)
                 MetaUI.Text(panel, $"Score {Medals.FormatScore(res.baseScore)}   <color=#{MetaUI.GoldHex}>{Threats.FormatMult(res.mult)}</color>", 40, Color.white,
@@ -210,6 +245,7 @@ namespace Survivor
 
             // Run gold and missions (gold is banked by GameManager.EndRun).
             var rewards = MetaUI.Card(panel, "Rewards", UIKit.Center, new Vector2(0, -175), new Vector2(980, 150), UIKit.Card);
+            MetaUI.Strip(rewards, UIKit.Gold);
             MetaUI.Text(rewards, $"<color=#{MetaUI.GoldHex}>+{gm.GoldEarned} or</color>   <size=30>(total {Progression.Gold})</size>", 44, Color.white,
                 TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -16), new Vector2(940, 60), FontStyle.Bold);
             MetaUI.Text(rewards, MissionLine(r), 30, UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -84), new Vector2(940, 50));
@@ -287,6 +323,10 @@ namespace Survivor
         static void BuildMedalCard(RectTransform panel, RankedResult res)
         {
             var card = MetaUI.Card(panel, "Medal", UIKit.Center, new Vector2(0, 60), new Vector2(980, 230), UIKit.Card);
+            var mc = Medals.ColorOf(res.medal);
+            if (res.medal != Medal.None) MetaUI.Strip(card, mc);
+            var line = card.Find("Line");
+            if (res.NewMedal && line && line.TryGetComponent<Image>(out var rim)) rim.color = new Color(mc.r, mc.g, mc.b, 0.8f);
             var icon = Medals.Icon(card, UIKit.Left, new Vector2(30, 0), 170, res.medal);
             UIAnim.SlideIn(icon, new Vector2(-60, 0), 0.35f, 0.4f, 1.4f);
 

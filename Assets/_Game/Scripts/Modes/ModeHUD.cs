@@ -16,7 +16,7 @@ namespace Survivor
         Rect appliedSafeArea;
         bool introShown;
 
-        static readonly Color PracticeColor = new(1f, 0.55f, 0.45f);
+        static readonly Color PracticeColor = UIKit.Hex(0xFFA070);
 
         void Awake()
         {
@@ -26,7 +26,8 @@ namespace Survivor
 
             pill = UIKit.Rect("Mode Label", safeRoot);
             UIKit.Place(pill, UIKit.Top, new Vector2(0, -146), new Vector2(520, 38));
-            UIKit.Image(pill, new Color(0f, 0f, 0f, 0.45f)).raycastTarget = false;
+            // Small chamfered chip with a thin rim (sliced: it is resized to the label).
+            UIKit.Panel(pill, new Color(0.03f, 0.035f, 0.045f, 0.62f)).raycastTarget = false;
             label = UIKit.Label(pill, "", 26, UIKit.Gold, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Stretch(label.rectTransform);
             pill.gameObject.SetActive(false);

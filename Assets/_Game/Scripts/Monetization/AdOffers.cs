@@ -28,7 +28,9 @@ namespace Survivor
 
             if (MonetizationRuntime.DoubleGoldUsedThisRun)
             {
-                return MetaUI.Button(parent, $"OR DOUBLÉ\n<size=28>+{amount} or reçus</size>", UIKit.Dark, anchor, position, size, () => { }, 36, false);
+                var done = MetaUI.Button(parent, $"OR DOUBLÉ\n<size=28>+{amount} or reçus</size>", UIKit.Dark, anchor, position, size, () => { }, 36, false);
+                MarkReceived(done);
+                return done;
             }
             if (!Ads.IsRewardedReady(AdPlacement.DoubleGold)) return null;
 
@@ -47,6 +49,7 @@ namespace Survivor
                     if (!button) return;
                     MonetizationUI.SetLabel(button, $"OR DOUBLÉ\n<size=28>+{amount} or reçus</size>");
                     MonetizationUI.SetEnabled(button, false, MonetizationUI.AdButton);
+                    MarkReceived(button);
                     var tag = button.transform.Find("Ad Tag");
                     if (tag) tag.gameObject.SetActive(false);
                     var layer = button.transform.parent as RectTransform;
@@ -57,6 +60,13 @@ namespace Survivor
             button.targetGraphic.color = MetaUI.Green;
             UIAnim.Pulse((RectTransform)button.transform, 3f, 0.035f);
             return button;
+        }
+
+        /// <summary>A spent offer reads as a done state (green label), not as a greyed-out action.</summary>
+        static void MarkReceived(Button b)
+        {
+            var t = b ? b.GetComponentInChildren<Text>() : null;
+            if (t) t.color = MetaUI.LightGreen;
         }
     }
 }

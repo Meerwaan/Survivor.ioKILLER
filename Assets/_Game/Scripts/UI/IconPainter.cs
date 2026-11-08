@@ -22,7 +22,8 @@ namespace Survivor
         {
             string key = GlyphKey(name);
             if (key == null) return null;
-            if (cache.TryGetValue(key, out var s)) return s;
+            // "&& s": Unity may destroy the texture (editor play mode restarts) while the static cache survives.
+            if (cache.TryGetValue(key, out var s) && s) return s;
             var glyph = Glyph(key);
             if (glyph == null) return null;
             s = Render(glyph);
@@ -48,7 +49,8 @@ namespace Survivor
             ("revolver", "revolver"), ("gatling", "revolver"), ("fusil", "shotgun"), ("chevrotine", "shotgun"),
             ("machette", "machete"), ("molotov", "molotov"), ("gaz", "gas"), ("nuage", "gas"),
             ("flechette", "dart"), ("lance-flamme", "flame"), ("tesla", "bolt"), ("grenade", "grenade"),
-            ("scie", "saw"),
+            ("scie", "saw"), ("aiguille", "dart"), ("dragon", "flame"), ("peste", "gas"), ("sous-munition", "grenade"),
+            ("hachoir", "machete"), ("napalm", "molotov"), ("canon a viande", "shotgun"),
             // Bonuses
             ("rage", "claws"), ("adrenaline", "syringe"), ("gros calibre", "area"), ("sang froid", "heartplus"),
             ("bidon", "jerrycan"), ("chargeur", "bullets"), ("cadavre", "skullburst"), ("oeil", "crosshair"),
@@ -71,7 +73,9 @@ namespace Survivor
             // Camp and meta
             ("potager", "sprout"), ("entrepot", "crate"), ("radio", "radio"), ("feu de camp", "flame"),
             ("cuisine", "pot"), ("dortoir", "bed"), ("douche", "drop"), ("dispensaire", "medkit"),
-            ("palissade", "wall"), ("caisse", "crate"), ("coffre", "crate"), ("or", "coin"),
+            ("palissade", "wall"), ("caisse", "crate"), ("coffre", "crate"), ("bourse", "coin"), ("trousse", "medkit"),
+            // Menu tabs
+            ("jouer", "crosshair"), ("relais", "flame"), ("carnet", "book"), ("contrats", "radio"), ("plaque", "dogtag"),
         };
 
         static string Fold(string s)
@@ -231,14 +235,15 @@ namespace Survivor
                     };
                 case "molotov":
                     return p => U(
-                        Box(p, 0f, -0.35f, 0.3f, 0.45f, 0f, 0.14f),
-                        Box(p, 0f, 0.2f, 0.11f, 0.22f, 0f, 0.04f),
-                        Poly(p, 0f, 0.95f, 0.2f, 0.65f, 0.1f, 0.42f, -0.12f, 0.42f, -0.18f, 0.62f, -0.06f, 0.75f));
+                        Cut(Box(p, -0.1f, -0.38f, 0.32f, 0.5f, 0f, 0.15f), Box(p, -0.1f, -0.42f, 0.33f, 0.09f)),
+                        Box(p, -0.1f, 0.2f, 0.11f, 0.2f, 0f, 0.04f),
+                        Box(p, -0.1f, 0.38f, 0.14f, 0.05f, 0f, 0.02f),
+                        FlameAt(p, 0.18f, 0.55f, 0.42f));
                 case "gas":
                     return p => Cut(U(
                             Circle(p, -0.3f, -0.1f, 0.38f), Circle(p, 0.18f, 0.05f, 0.45f), Circle(p, 0.45f, -0.3f, 0.3f),
                             Box(p, 0.05f, -0.42f, 0.55f, 0.2f, 0f, 0.2f)),
-                        U(Circle(p, -0.05f, -0.05f, 0.08f), Circle(p, 0.26f, -0.05f, 0.08f), Box(p, 0.1f, -0.3f, 0.14f, 0.04f)));
+                        U(Ring(p, -0.22f, -0.12f, 0.13f, 0.035f), Ring(p, 0.2f, 0.08f, 0.18f, 0.035f), Ring(p, 0.42f, -0.32f, 0.09f, 0.03f)));
                 case "dart":
                     return p =>
                     {
@@ -254,7 +259,7 @@ namespace Survivor
                     return p => Poly(p, 0.15f, 0.92f, -0.5f, -0.05f, -0.05f, -0.05f, -0.2f, -0.92f, 0.5f, 0.15f, 0.05f, 0.15f);
                 case "grenade":
                     return p => U(
-                        Cut(Circle(p, 0f, -0.18f, 0.55f), U(Box(p, 0f, -0.18f, 0.6f, 0.025f), Box(p, 0f, -0.18f, 0.025f, 0.6f))),
+                        Cut(Box(p, 0f, -0.2f, 0.5f, 0.6f, 0f, 0.45f), U(Box(p, 0f, -0.02f, 0.6f, 0.03f), Box(p, 0f, -0.38f, 0.6f, 0.03f))),
                         Box(p, 0f, 0.43f, 0.18f, 0.12f, 0f, 0.03f),
                         Box(p, 0.25f, 0.22f, 0.07f, 0.32f, -20f, 0.03f),
                         Ring(p, -0.3f, 0.62f, 0.14f, 0.045f));
@@ -357,8 +362,9 @@ namespace Survivor
                         Poly(p, -0.45f, 0.45f, -0.25f, -0.2f, -0.38f, -0.72f, -0.62f, -0.55f, -0.65f, 0.0f),
                         Poly(p, 0.5f, 0.3f, 0.66f, -0.1f, 0.6f, -0.68f, 0.38f, -0.72f, 0.33f, -0.15f));
                 case "clover":
-                    return p => U(Circle(p, 0f, 0.38f, 0.3f), Circle(p, 0f, -0.18f, 0.3f), Circle(p, -0.28f, 0.1f, 0.3f), Circle(p, 0.28f, 0.1f, 0.3f),
-                        Seg(p, 0.05f, -0.2f, 0.3f, -0.85f, 0.06f));
+                    return p => U(Heart(Rot(p - new Vector2(0f, 0.36f), 0f), 0f, 0f, 0.42f), Heart(Rot(p - new Vector2(0f, -0.28f), 180f), 0f, 0f, 0.42f),
+                        Heart(Rot(p - new Vector2(-0.32f, 0.04f), 90f), 0f, 0f, 0.42f), Heart(Rot(p - new Vector2(0.32f, 0.04f), -90f), 0f, 0f, 0.42f),
+                        Seg(p, 0.05f, -0.1f, 0.35f, -0.9f, 0.055f));
                 case "snow":
                     return p => U(Spoke(p, 0f), Spoke(p, 60f), Spoke(p, 120f), Circle(p, 0f, 0f, 0.15f));
                 case "bell":
@@ -380,8 +386,8 @@ namespace Survivor
                     return p => U(Seg(p, 0f, -0.75f, 0f, 0.2f, 0.06f), Leaf(p, -0.32f, 0.3f, 35f), Leaf(p, 0.32f, 0.45f, -35f),
                         Box(p, 0f, -0.78f, 0.6f, 0.1f, 0f, 0.05f));
                 case "crate":
-                    return p => Cut(Box(p, 0f, 0f, 0.72f, 0.62f, 0f, 0.06f),
-                        U(Box(p, 0f, 0.3f, 0.6f, 0.025f), Box(p, 0f, -0.3f, 0.6f, 0.025f), Seg(p, -0.55f, -0.24f, 0.55f, 0.24f, 0.035f)));
+                    return p => U(Cut(Box(p, 0f, 0f, 0.72f, 0.62f, 0f, 0.06f), Box(p, 0f, 0f, 0.5f, 0.4f)),
+                        Seg(p, -0.48f, -0.38f, 0.48f, 0.38f, 0.09f), Box(p, 0f, 0f, 0.5f, 0.03f));
                 case "radio":
                     return p => Cut(U(Box(p, 0f, -0.25f, 0.75f, 0.45f, 0f, 0.1f), Seg(p, 0.35f, 0.2f, 0.65f, 0.9f, 0.04f)),
                         U(Circle(p, -0.3f, -0.25f, 0.22f), Box(p, 0.38f, -0.15f, 0.22f, 0.05f), Box(p, 0.38f, -0.35f, 0.22f, 0.05f)));
@@ -392,6 +398,14 @@ namespace Survivor
                 case "bed":
                     return p => U(Box(p, 0.1f, -0.15f, 0.8f, 0.14f, 0f, 0.04f), Box(p, -0.62f, 0.12f, 0.2f, 0.14f, 0f, 0.08f),
                         Box(p, 0.25f, 0.05f, 0.55f, 0.08f, 0f, 0.05f), Box(p, -0.8f, -0.1f, 0.05f, 0.5f), Box(p, 0.85f, -0.4f, 0.05f, 0.2f), Box(p, -0.8f, -0.4f, 0.05f, 0.2f));
+                case "book":
+                    return p => Cut(U(Box(p, -0.38f, 0f, 0.36f, 0.62f, 6f, 0.05f), Box(p, 0.38f, 0f, 0.36f, 0.62f, -6f, 0.05f)),
+                        U(Box(p, 0f, 0f, 0.035f, 0.7f), Box(p, -0.4f, 0.25f, 0.2f, 0.03f, 6f), Box(p, -0.4f, 0.05f, 0.2f, 0.03f, 6f),
+                            Box(p, 0.4f, 0.25f, 0.2f, 0.03f, -6f), Box(p, 0.4f, 0.05f, 0.2f, 0.03f, -6f)));
+                case "dogtag":
+                    return p => U(Cut(Box(p, 0.08f, -0.12f, 0.42f, 0.62f, -12f, 0.22f),
+                            U(Circle(p, 0.2f, 0.36f, 0.08f), Box(p, 0.05f, -0.15f, 0.22f, 0.035f, -12f), Box(p, 0.02f, -0.32f, 0.18f, 0.035f, -12f))),
+                        Cut(Ring(p, -0.12f, 0.55f, 0.32f, 0.03f), Box(p, 0.2f, 0.2f, 0.25f, 0.3f)));
                 case "wall":
                     return p => Cut(Box(p, 0f, -0.05f, 0.85f, 0.65f, 0f, 0.03f),
                         U(Box(p, 0f, 0.2f, 1f, 0.03f), Box(p, 0f, -0.25f, 1f, 0.03f),

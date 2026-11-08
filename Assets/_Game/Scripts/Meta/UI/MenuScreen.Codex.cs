@@ -15,12 +15,14 @@ namespace Survivor
     public partial class MenuScreen
     {
         static readonly string[] CodexTabs = { "ARMES", "BONUS", "SYNERGIES", "PRESETS" };
-        static readonly Color CodexSelected = new(0.2f, 0.17f, 0.07f, 0.97f);
-        static readonly Color CodexEvoBlock = new(0.85f, 0.45f, 1f, 0.12f);
-        static readonly Color CodexLine = new(0.86f, 0.86f, 0.86f);
+        static readonly Color CodexSelected = UIKit.Hex(0x2E2816, 0.97f);
+        static readonly Color CodexEvoBlock = new(0.85f, 0.45f, 1f, 0.1f);
+        /// <summary>Body text of the cards: between Ink and Muted.</summary>
+        static readonly Color CodexLine = UIKit.Hex(0xC9CED3);
         static readonly Color NoFrame = new(0f, 0f, 0f, 0f);
-        const string MutedHex = "BBBBBB";
-        const string DimHex = "8A8A8A";
+        /// <summary>Secondary text in rich text (palette muted), and a dimmer one for hints.</summary>
+        const string MutedHex = "8C949C";
+        const string DimHex = "767E86";
         const float CodexWidth = 960f;
         const float TileHeight = 120f, TileStep = 134f;
 
@@ -36,9 +38,10 @@ namespace Survivor
             bool animate = !codexQuiet;
             codexQuiet = false;
 
-            MetaUI.Text(page, "LE CARNET", 70, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 785), new Vector2(640, 90), FontStyle.Bold);
-            MetaUI.Text(page, "Tout le monde à armes égales : c'est le hasard qui fait ton stuff.", 28, UIKit.Muted,
-                TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 712), new Vector2(1040, 50));
+            var subtitle = Header("LE CARNET", "Tout le monde à armes égales : c'est le hasard qui fait ton stuff.");
+            UIKit.ApplyFont(subtitle, 28, FontStyle.Normal); // long line: keep the old size so it stays on one line
+            var stamp = UIKit.Stamp(page, "CONFIDENTIEL REGEN", new Color(0.86f, 0.25f, 0.2f, 0.85f), 20, 8f);
+            stamp.anchoredPosition = new Vector2(372, 792);
             for (int i = 0; i < CodexTabs.Length; i++) CodexTabButton(i);
 
             var content = MetaUI.Scroll(page, new Vector2(0, -118), new Vector2(1000, 1340), out pageScroll);
@@ -64,7 +67,7 @@ namespace Survivor
         void CodexTabButton(int tab)
         {
             bool on = codexTab == tab;
-            UIKit.Button(page, CodexTabs[tab], on ? UIKit.Blood : UIKit.Dark, UIKit.Center, new Vector2(-375 + tab * 250, 620), new Vector2(240, 100), () =>
+            PageTab(page, CodexTabs[tab], on, new Vector2(-375 + tab * 250, 620), new Vector2(240, 100), () =>
             {
                 if (codexTab == tab) return;
                 codexTab = tab;
@@ -122,8 +125,18 @@ namespace Survivor
 
             const float x = 164f, width = CodexWidth - x - 26f;
             float cy = 20f;
-            MetaUI.Text(card, selected ? "ARME DE DÉPART" : "CHOISIR", 26, selected ? UIKit.Gold : UIKit.Muted, TextAnchor.UpperRight,
-                UIKit.TopRight, new Vector2(-26, -32), new Vector2(270, 40), FontStyle.Bold);
+            if (selected)
+            {
+                // Rubber stamp, like a note in the Carnet.
+                var stamp = UIKit.Stamp(card, "ARME DE DÉPART", UIKit.Gold, 22, 5f);
+                stamp.anchorMin = stamp.anchorMax = stamp.pivot = UIKit.TopRight;
+                stamp.anchoredPosition = new Vector2(-30, -26);
+            }
+            else
+            {
+                MetaUI.Text(card, "CHOISIR", 26, UIKit.Muted, TextAnchor.UpperRight,
+                    UIKit.TopRight, new Vector2(-26, -32), new Vector2(270, 40), FontStyle.Bold);
+            }
             CodexFlow(card, w.displayName, 44, selected ? UIKit.Gold : Color.white, x, ref cy, width - 280f, FontStyle.Bold, 2f);
             CodexFlow(card, CodexTags(w.Tags), 28, Color.white, x, ref cy, width, FontStyle.Normal, 6f);
             CodexFlow(card, w.Summary, 30, UIKit.Muted, x, ref cy, width, FontStyle.Normal, 12f);
@@ -157,7 +170,10 @@ namespace Survivor
             CodexFlow(card, w.EvolutionText, 27, Color.white, x + 18f, ref cy, width - 36f, FontStyle.Normal, 0f);
             cy += 12f;
             UIKit.Place(block, UIKit.TopLeft, new Vector2(x, -top), new Vector2(width, cy - top));
-            UIKit.Image(block, CodexEvoBlock).raycastTarget = false;
+            UIKit.Panel(block, CodexEvoBlock, true, 0.6f).raycastTarget = false;
+            var evo = UpgradeManager.EvolutionColor;
+            PanelRim(block, new Color(evo.r, evo.g, evo.b, 0.45f));
+            MetaUI.Strip(block, evo, 5f);
             return cy;
         }
 
@@ -329,6 +345,7 @@ namespace Survivor
             PresetBadge.HeartIcon(row, UIKit.Left, new Vector2(26, 0), 58f, active ? PresetBadge.Tint : new Color(1f, 1f, 1f, 0.12f));
             nameText = MetaUI.Text(row, p.name, 38, editing ? UIKit.Gold : Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(104, -16), new Vector2(450, 50), FontStyle.Bold);
             nameText.supportRichText = false;
+            FitText(nameText, 26);
 
             string info = $"{p.weapons.Count}/{Presets.MaxWeapons} armes · {p.passives.Count}/{Presets.MaxPassives} bonus";
             string tiers = CodexTierSummary(p, um, 2);
@@ -345,7 +362,7 @@ namespace Survivor
             }, 34);
 
             bool confirm = codexDeleteConfirm == i;
-            UIKit.Button(row, confirm ? "SÛR ?" : "SUPPR.", confirm ? UIKit.Blood : new Color(0.3f, 0.3f, 0.33f), UIKit.Right, new Vector2(-16, 0), new Vector2(160, 100), () =>
+            UIKit.Button(row, confirm ? "SÛR ?" : "SUPPR.", confirm ? UIKit.Blood : UIKit.Line, UIKit.Right, new Vector2(-16, 0), new Vector2(160, 100), () =>
             {
                 if (codexDeleteConfirm != i)
                 {
@@ -420,20 +437,19 @@ namespace Survivor
 
             var tile = UIKit.Rect("Tile " + label, content);
             UIKit.Place(tile, UIKit.Top, new Vector2(-325 + col * 325, -(y0 + row * TileStep)), new Vector2(310, TileHeight));
-            if (on)
-            {
-                var frame = UIKit.Rect("Frame", tile);
-                UIKit.Stretch(frame, -5f);
-                UIKit.Image(frame, PresetBadge.Tint).raycastTarget = false;
-            }
+            Color tint = PresetBadge.Tint;
+            if (on) CardHalo(tile, new Color(tint.r, tint.g, tint.b, 0.45f), 10f);
             var bgRect = UIKit.Rect("Bg", tile);
             UIKit.Stretch(bgRect);
-            var bg = UIKit.Image(bgRect, on ? Color.Lerp(UIKit.Card, color, 0.22f) : UIKit.Card);
+            var bg = UIKit.Panel(bgRect, on ? Color.Lerp(UIKit.Card, color, 0.22f) : UIKit.Card, true, 0.7f);
+            if (on) PanelRim(bgRect, tint);
             var button = tile.gameObject.AddComponent<Button>();
             button.targetGraphic = bg;
             var colors = button.colors;
-            colors.pressedColor = new Color(0.7f, 0.7f, 0.7f);
+            colors.pressedColor = new Color(0.75f, 0.75f, 0.75f);
+            colors.fadeDuration = 0.06f;
             button.colors = colors;
+            tile.gameObject.AddComponent<UIPress>();
             button.onClick.AddListener(() =>
             {
                 codexDeleteConfirm = -1;
@@ -457,6 +473,7 @@ namespace Survivor
             nr.anchorMax = Vector2.one;
             nr.offsetMin = new Vector2(94, 34);
             nr.offsetMax = new Vector2(-10, -10);
+            FitText(name, 18);
 
             var tagText = UIKit.Label(tile, tags == ItemTag.None ? $"<color=#{DimHex}>Sans famille</color>" : Synergies.TagNames(tags), 20, Color.white, TextAnchor.LowerLeft);
             var tr = tagText.rectTransform;
@@ -465,6 +482,7 @@ namespace Survivor
             tr.pivot = new Vector2(0.5f, 0f);
             tr.offsetMin = new Vector2(94, 8);
             tr.offsetMax = new Vector2(-6, 34);
+            FitText(tagText, 14);
 
             if (on) PresetBadge.HeartIcon(tile, UIKit.TopRight, new Vector2(-8, -8), 30f, PresetBadge.Tint);
         }
@@ -556,40 +574,85 @@ namespace Survivor
         {
             var card = UIKit.Rect(name, content);
             UIKit.Place(card, UIKit.Top, new Vector2(0, -y), new Vector2(CodexWidth, 120));
-            if (frame.a > 0f)
-            {
-                var f = UIKit.Rect("Frame", card);
-                UIKit.Stretch(f, -6f);
-                UIKit.Image(f, frame).raycastTarget = false;
-            }
+            // Shadow and halo are children (drawn first): they follow the slide-in and the height set by CodexFinish.
+            bool framed = frame.a > 0f;
+            if (framed) CardHalo(card, new Color(frame.r, frame.g, frame.b, 0.42f), 16f);
+            CardHalo(card, new Color(0f, 0f, 0f, 0.42f), 14f, -8f); // ends up first: under the halo
             var bgRect = UIKit.Rect("Bg", card);
             UIKit.Stretch(bgRect);
-            var bg = UIKit.Image(bgRect, background);
+            var bg = UIKit.Panel(bgRect, background);
+            if (framed) PanelRim(bgRect, new Color(frame.r, frame.g, frame.b, 0.9f));
             if (onClick != null)
             {
                 var button = card.gameObject.AddComponent<Button>();
                 button.targetGraphic = bg;
                 var colors = button.colors;
-                colors.pressedColor = new Color(0.75f, 0.75f, 0.75f);
+                colors.pressedColor = new Color(0.8f, 0.8f, 0.8f);
+                colors.fadeDuration = 0.06f;
                 button.colors = colors;
                 button.onClick.AddListener(() => SFX.Play(SfxId.Click));
                 button.onClick.AddListener(onClick);
+                card.gameObject.AddComponent<UIPress>();
             }
             return card;
         }
 
         static void CodexFinish(RectTransform card, float height) => card.sizeDelta = new Vector2(card.sizeDelta.x, height);
 
-        /// <summary>Thin colored bar on the left edge, full height.</summary>
-        static void CodexStripe(RectTransform card, Color color)
+        /// <summary>Colored accent strip on the left edge (inset so it clears the cut corners).</summary>
+        static void CodexStripe(RectTransform card, Color color) => MetaUI.Strip(card, color);
+
+        // ---------- Shared page widgets (sub-tabs, rims, halos, text fit) ----------
+
+        static readonly Color TabOn = new(0.2f, 0.24f, 0.28f);
+        static readonly Color TabOff = new(0.1f, 0.115f, 0.135f);
+
+        /// <summary>Sub-page tab (Carnet, Plaque, Registre). Like the bottom nav: the active one is lighter, with a cyan mark.</summary>
+        static Button PageTab(Transform parent, string label, bool on, Vector2 position, Vector2 size, UnityAction onClick, int fontSize)
         {
-            var s = UIKit.Rect("Stripe", card);
-            s.anchorMin = Vector2.zero;
-            s.anchorMax = new Vector2(0f, 1f);
-            s.pivot = new Vector2(0f, 0.5f);
-            s.offsetMin = Vector2.zero;
-            s.offsetMax = new Vector2(10f, 0f);
-            UIKit.Image(s, color).raycastTarget = false;
+            var b = UIKit.Button(parent, label, on ? TabOn : TabOff, UIKit.Center, position, size, onClick, fontSize);
+            var text = b.GetComponentInChildren<Text>();
+            if (text) text.color = on ? UIKit.Ink : UIKit.Muted;
+            if (on)
+            {
+                var mark = UIKit.Rect("Mark", b.transform);
+                UIKit.Place(mark, UIKit.Bottom, new Vector2(0, 8), new Vector2(Mathf.Min(120f, size.x * 0.5f), 5));
+                UIKit.Image(mark, UIKit.Accent).raycastTarget = false;
+            }
+            return b;
+        }
+
+        /// <summary>Recolors the thin outline ("Line" child) of a UIKit.Panel / MetaUI.Card: selected, equipped, ready...</summary>
+        static void PanelRim(RectTransform panel, Color color)
+        {
+            var line = panel ? panel.Find("Line") : null;
+            if (line && line.TryGetComponent<Image>(out var img)) img.color = color;
+        }
+
+        /// <summary>
+        /// Soft shadow / colored halo as the FIRST child of a rect that has no image of its own
+        /// (so it draws behind the card's background child, and moves and resizes with it).
+        /// </summary>
+        static Image CardHalo(RectTransform card, Color color, float spread, float offsetY = 0f)
+        {
+            var g = UIKit.Rect("Halo", card);
+            UIKit.Stretch(g, -spread);
+            g.anchoredPosition = new Vector2(0f, offsetY);
+            g.SetAsFirstSibling();
+            var img = UIKit.Image(g, color, UIKit.GlowSprite);
+            img.type = Image.Type.Sliced;
+            img.raycastTarget = false;
+            return img;
+        }
+
+        /// <summary>Shrinks a label to fit its box instead of spilling over its neighbors.</summary>
+        static Text FitText(Text t, int minSize)
+        {
+            t.resizeTextForBestFit = true;
+            t.resizeTextMaxSize = t.fontSize;
+            t.resizeTextMinSize = Mathf.Min(minSize, t.fontSize);
+            t.verticalOverflow = VerticalWrapMode.Truncate;
+            return t;
         }
 
         /// <summary>Wrapped text block at the cursor; moves the cursor below it (sized to its real height, so long French lines never overflow).</summary>

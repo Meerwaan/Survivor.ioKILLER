@@ -31,8 +31,15 @@ namespace Survivor
         void Build()
         {
             var bg = UIKit.Overlay("Announce", canvas, 0.75f);
-            var card = MetaUI.Card(bg, "Card", UIKit.Center, Vector2.zero, new Vector2(900, 620), UIKit.Card);
-            UIAnim.SlideIn(card, new Vector2(0, -60), 0f, 0.25f, 0.85f);
+            // Wrapper so the shadow slides in with the card.
+            var holder = UIKit.Rect("Holder", bg);
+            UIKit.Place(holder, UIKit.Center, Vector2.zero, new Vector2(900, 620));
+            var card = MetaUI.Card(holder, "Card", UIKit.Center, Vector2.zero, new Vector2(900, 620), UIKit.Card);
+            UIKit.DropShadow(card, 22f, 0.6f, -12f);
+            UIAnim.SlideIn(holder, new Vector2(0, -60), 0f, 0.25f, 0.85f);
+            var stripe = UIKit.Rect("Stripe", card);
+            UIKit.Place(stripe, UIKit.TopRight, new Vector2(-2, -2), new Vector2(878, 6));
+            UIKit.Image(stripe, MonetizationUI.AdYellow).raycastTarget = false;
             MonetizationUI.AdTag(card, UIKit.TopLeft, new Vector2(30, -30), 50f);
 
             text = MetaUI.Text(card, "", 58, Color.white, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -110), new Vector2(840, 200), FontStyle.Bold);

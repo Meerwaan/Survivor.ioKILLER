@@ -16,9 +16,11 @@ namespace Survivor
         public const int AdOrder = 1000;
         public const int StoreOrder = 1010;
 
-        public static readonly Color AdYellow = new(1f, 0.82f, 0.2f);
-        public static readonly Color AdButton = new(0.16f, 0.45f, 0.75f);
-        public static readonly Color Premium = new(0.55f, 0.25f, 0.75f);
+        /// <summary>The "PUB" tag (reward gold, so an ad always reads as "you get something").</summary>
+        public static readonly Color AdYellow = UIKit.Gold;
+        /// <summary>Rewarded-ad buttons: deep REGEN teal (light text stays readable on it).</summary>
+        public static readonly Color AdButton = UIKit.Hex(0x1F8796);
+        public static readonly Color Premium = UIKit.Hex(0x7A43B4);
 
         /// <summary>Full-screen canvas for an overlay (destroy its GameObject when done).</summary>
         public static RectTransform NewCanvas(string name, int order)
@@ -33,8 +35,16 @@ namespace Survivor
         {
             var tag = UIKit.Rect("Ad Tag", parent);
             UIKit.Place(tag, anchor, position, new Vector2(height * 1.9f, height));
-            UIKit.Image(tag, AdYellow).raycastTarget = false;
-            var t = UIKit.Label(tag, "PUB", Mathf.RoundToInt(height * 0.62f), Color.black, TextAnchor.MiddleCenter, FontStyle.Bold);
+            // Small chamfered sticker with a dark rim, so it reads on any button color.
+            var rim = UIKit.Image(tag, UIKit.Bg, UIKit.ChipSprite);
+            rim.type = Image.Type.Sliced;
+            rim.raycastTarget = false;
+            var fill = UIKit.Rect("Fill", tag);
+            UIKit.Stretch(fill, Mathf.Max(2f, height * 0.06f));
+            var f = UIKit.Image(fill, AdYellow, UIKit.ChipSprite);
+            f.type = Image.Type.Sliced;
+            f.raycastTarget = false;
+            var t = UIKit.Label(tag, "PUB", Mathf.RoundToInt(height * 0.62f), UIKit.Bg, TextAnchor.MiddleCenter, FontStyle.Bold);
             t.GetComponent<Shadow>().enabled = false;
             UIKit.Stretch(t.rectTransform);
             return tag;
@@ -62,7 +72,7 @@ namespace Survivor
             b.interactable = enabled;
             if (b.targetGraphic) b.targetGraphic.color = enabled ? color : UIKit.Dark;
             var t = b.GetComponentInChildren<Text>();
-            if (t) t.color = enabled ? Color.white : new Color(0.6f, 0.6f, 0.6f);
+            if (t) t.color = enabled ? (UIKit.Luma(color) > 0.55f ? UIKit.Bg : UIKit.Ink) : new Color(0.6f, 0.6f, 0.6f);
         }
 
         /// <summary>"1 h 05" / "12 min" / "45 s".</summary>

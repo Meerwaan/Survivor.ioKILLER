@@ -66,7 +66,21 @@ namespace Survivor
         void Build()
         {
             var bg = UIKit.Overlay("Revive", canvas, 0.72f);
-            var title = MetaUI.Text(bg, "SECONDE CHANCE ?", 96, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 520), new Vector2(1060, 140), FontStyle.Bold);
+
+            // Modal card behind everything but the "Non merci" exit (gold strip: it's an offer).
+            var card = MetaUI.Card(bg, "Card", UIKit.Center, new Vector2(0, 138), new Vector2(980, 990), UIKit.Card);
+            UIKit.DropShadow(card, 24f, 0.6f, -14f);
+            var line = card.Find("Line");
+            if (line && line.TryGetComponent<Image>(out var rim)) rim.color = new Color(UIKit.Gold.r, UIKit.Gold.g, UIKit.Gold.b, 0.6f);
+            var stripe = UIKit.Rect("Stripe", card);
+            UIKit.Place(stripe, UIKit.TopRight, new Vector2(-2, -2), new Vector2(958, 6));
+            UIKit.Image(stripe, UIKit.Gold).raycastTarget = false;
+
+            var title = MetaUI.Text(bg, "SECONDE CHANCE ?", 96, UIKit.Gold, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 520), new Vector2(940, 140), FontStyle.Bold);
+            title.resizeTextForBestFit = true;
+            title.resizeTextMaxSize = title.fontSize;
+            title.resizeTextMinSize = 56;
+            title.verticalOverflow = VerticalWrapMode.Truncate;
             UIAnim.SlideIn(title.rectTransform, new Vector2(0, 80), 0f, 0.35f, 1.4f);
 
             var gm = GameManager.Instance;
@@ -76,11 +90,15 @@ namespace Survivor
             MetaUI.Text(bg, progress, 38, Color.white, TextAnchor.MiddleCenter, UIKit.Center, new Vector2(0, 385), new Vector2(1000, 110));
 
             // Countdown ring
+            // Countdown dial: dark bezel, track, gold sweep, recessed face.
             var circle = UIKit.Rect("Countdown", bg);
             UIKit.Place(circle, UIKit.Center, new Vector2(0, 130), new Vector2(300, 300));
-            UIKit.Image(circle, new Color(1f, 1f, 1f, 0.12f), UIKit.Circle).raycastTarget = false;
+            UIKit.Image(circle, UIKit.Bg, UIKit.Circle).raycastTarget = false;
+            var track = UIKit.Rect("Track", circle);
+            UIKit.Stretch(track, 6f);
+            UIKit.Image(track, UIKit.Line, UIKit.Circle).raycastTarget = false;
             var fill = UIKit.Rect("Fill", circle);
-            UIKit.Stretch(fill);
+            UIKit.Stretch(fill, 6f);
             ring = UIKit.Image(fill, UIKit.Gold, UIKit.Circle);
             ring.raycastTarget = false;
             ring.type = Image.Type.Filled;
@@ -88,8 +106,11 @@ namespace Survivor
             ring.fillOrigin = (int)Image.Origin360.Top;
             ring.fillClockwise = false;
             var inner = UIKit.Rect("Inner", circle);
-            UIKit.Stretch(inner, 22f);
-            UIKit.Image(inner, new Color(0.08f, 0.08f, 0.09f, 1f), UIKit.Circle).raycastTarget = false;
+            UIKit.Stretch(inner, 26f);
+            UIKit.Image(inner, UIKit.Bg, UIKit.Circle).raycastTarget = false;
+            var face = UIKit.Rect("Face", circle);
+            UIKit.Stretch(face, 32f);
+            UIKit.Image(face, UIKit.Dark, UIKit.Circle).raycastTarget = false;
             count = UIKit.Label(circle, "", 130, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
             UIKit.Stretch(count.rectTransform);
 

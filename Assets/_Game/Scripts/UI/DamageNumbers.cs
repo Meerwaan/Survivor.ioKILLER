@@ -49,6 +49,7 @@ namespace Survivor
             for (int i = 0; i < poolSize; i++)
             {
                 var t = UIKit.Label(canvasRect, "", 40, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
+                t.font = UIKit.Display; // heavy face: numbers stay readable over the fight at any size
                 t.rectTransform.sizeDelta = new Vector2(260, 80);
                 t.horizontalOverflow = HorizontalWrapMode.Overflow;
                 t.gameObject.SetActive(false);

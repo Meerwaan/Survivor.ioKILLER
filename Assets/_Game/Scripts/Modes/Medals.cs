@@ -113,21 +113,42 @@ namespace Survivor
             return n < 0 ? "-" + sb : sb.ToString();
         }
 
-        /// <summary>Round medal icon (colored disc, initial in the middle). Greyed for None.</summary>
+        /// <summary>
+        /// Round medal: dark edge, bright rim, recessed face with a top light, embossed initial. Greyed for None.
+        /// </summary>
         public static RectTransform Icon(Transform parent, Vector2 anchor, Vector2 position, float size, Medal m)
         {
             Color c = ColorOf(m);
             var r = UIKit.Rect("Medal", parent);
             UIKit.Place(r, anchor, position, new Vector2(size, size));
-            UIKit.Image(r, new Color(c.r * 0.45f, c.g * 0.45f, c.b * 0.45f, 1f), UIKit.Circle).raycastTarget = false;
-            var inner = UIKit.Rect("Inner", r);
-            UIKit.Stretch(inner, size * 0.1f);
-            UIKit.Image(inner, c, UIKit.Circle).raycastTarget = false;
+            Disc(r, "Edge", 0f, Shade(c, 0.38f));
+            Disc(r, "Rim", 0.05f, Lighten(c, 0.25f));
+            Disc(r, "Face", 0.15f, Shade(c, 0.78f));
+            // Top light: a faint disc shifted up; the groove drawn over it leaves a thin lit crescent at the top.
+            var light = Disc(r, "Light", 0.2f, new Color(1f, 1f, 1f, 0.16f));
+            light.anchoredPosition = new Vector2(0f, size * 0.06f);
+            Disc(r, "Groove", 0.2f, Shade(c, 0.62f));
+            Disc(r, "Inner", 0.23f, c);
             string letter = m == Medal.None ? "-" : Name(m).Substring(0, 1);
-            var l = UIKit.Label(r, letter, Mathf.RoundToInt(size * 0.5f), new Color(0.08f, 0.06f, 0.05f), TextAnchor.MiddleCenter, FontStyle.Bold);
-            l.GetComponent<UnityEngine.UI.Shadow>().enabled = false;
+            var l = UIKit.Label(r, letter, Mathf.RoundToInt(size * 0.46f), Shade(c, 0.3f), TextAnchor.MiddleCenter, FontStyle.Bold);
+            var shadow = l.GetComponent<UnityEngine.UI.Shadow>();
+            shadow.effectColor = new Color(1f, 1f, 1f, 0.35f); // embossed: light below the dark letter
+            shadow.effectDistance = new Vector2(0f, -Mathf.Max(1f, size * 0.015f));
+            var outline = l.GetComponent<UnityEngine.UI.Outline>();
+            if (outline) outline.enabled = false;
             UIKit.Stretch(l.rectTransform);
             return r;
         }
+
+        static RectTransform Disc(RectTransform parent, string name, float inset, Color color)
+        {
+            var d = UIKit.Rect(name, parent);
+            UIKit.Stretch(d, parent.sizeDelta.x * inset);
+            UIKit.Image(d, color, UIKit.Circle).raycastTarget = false;
+            return d;
+        }
+
+        static Color Shade(Color c, float k) => new(c.r * k, c.g * k, c.b * k, 1f);
+        static Color Lighten(Color c, float k) => new(c.r + (1f - c.r) * k, c.g + (1f - c.g) * k, c.b + (1f - c.b) * k, 1f);
     }
 }

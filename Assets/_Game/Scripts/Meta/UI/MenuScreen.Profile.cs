@@ -14,7 +14,10 @@ namespace Survivor
         bool resetConfirm;
 #endif
         static readonly string[] ProfileTabNames = { "TENUES", "TITRES", "GUICHET", "STATS" };
-        static readonly Color EquippedCard = new(0.1f, 0.2f, 0.12f, 0.97f);
+        static readonly Color EquippedCard = UIKit.Hex(0x1A2B23, 0.97f);
+        /// <summary>Outline of what is worn (green, like the "ÉQUIPÉ" label).</summary>
+        static readonly Color EquippedRim = new(0.37f, 0.82f, 0.54f, 0.75f);
+        static int statRow;
 
         int profileTab;
         /// <summary>Gold cosmetic waiting for a second tap ("SÛR ?") before being bought.</summary>
@@ -48,7 +51,7 @@ namespace Survivor
             for (int i = 0; i < ProfileTabNames.Length; i++)
             {
                 int tab = i;
-                var b = UIKit.Button(page, ProfileTabNames[i], i == profileTab ? UIKit.Blood : UIKit.Dark, UIKit.Center,
+                var b = PageTab(page, ProfileTabNames[i], i == profileTab,
                     new Vector2(-363 + i * 242, 628), new Vector2(232, 84), () =>
                     {
                         if (profileTab == tab) return;
@@ -70,9 +73,14 @@ namespace Survivor
 
             // What the others see: the equipped look, name and title.
             var hero = MetaUI.Card(content, "Equipped", UIKit.Top, new Vector2(0, -y), new Vector2(960, 300), UIKit.Card);
-            SkinPreview.Draw(hero, equipped, UIKit.Left, new Vector2(20, 0), 270f, UIKit.Card);
-            MetaUI.Text(hero, "ÉQUIPÉ", 28, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(310, -28), new Vector2(620, 40), FontStyle.Bold);
-            MetaUI.Text(hero, equipped.name, 56, Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(310, -66), new Vector2(620, 70), FontStyle.Bold);
+            UIKit.DropShadow(hero, 16f, 0.45f, -8f);
+            PanelRim(hero, new Color(UIKit.Accent.r, UIKit.Accent.g, UIKit.Accent.b, 0.55f));
+            MetaUI.Strip(hero, UIKit.Accent);
+            // Plate backing behind the figure: a darker inset, like the stamped part of a dog tag.
+            MetaUI.Card(hero, "Plate", UIKit.Left, new Vector2(22, 0), new Vector2(266, 266), new Color(0.07f, 0.08f, 0.095f, 0.9f));
+            SkinPreview.Draw(hero, equipped, UIKit.Left, new Vector2(20, 0), 270f, new Color(0.07f, 0.08f, 0.095f, 1f));
+            MetaUI.Text(hero, "ÉQUIPÉ", 28, UIKit.Accent, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(310, -28), new Vector2(620, 40), FontStyle.Bold);
+            FitText(MetaUI.Text(hero, equipped.name, 56, Color.white, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(310, -66), new Vector2(620, 70), FontStyle.Bold), 36);
             MetaUI.Text(hero, equipped.description, 28, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(310, -142), new Vector2(620, 80));
             var title = Cosmetics.EquippedTitle;
             MetaUI.Text(hero, title != null ? $"Au Registre : {PlayerProfile.Name}  « {title.name} »" : $"Au Registre : {PlayerProfile.Name}",
@@ -99,12 +107,13 @@ namespace Survivor
             bool owned = Cosmetics.IsOwned(s);
             Color bg = equipped ? EquippedCard : owned ? UIKit.Card : MetaUI.Locked;
             var card = MetaUI.Card(content, "Skin " + s.name, UIKit.Top, pos, new Vector2(312, 450), bg);
+            if (equipped) PanelRim(card, EquippedRim);
 
             SkinPreview.Draw(card, s, UIKit.Top, new Vector2(0, -14), 200f, bg);
             if (Cosmetics.IsNew(s)) NewTag(card);
             SourceTag(card, s);
 
-            MetaUI.Text(card, s.name, 36, owned ? Color.white : UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -218), new Vector2(300, 46), FontStyle.Bold);
+            FitText(MetaUI.Text(card, s.name, 36, owned ? Color.white : UIKit.Muted, TextAnchor.MiddleCenter, UIKit.Top, new Vector2(0, -218), new Vector2(300, 46), FontStyle.Bold), 24);
             MetaUI.Text(card, ProfileInfo(s, owned), 23, UIKit.Muted, TextAnchor.UpperCenter, UIKit.Top, new Vector2(0, -264), new Vector2(296, 60));
             if (!owned && s.source == CosmeticSource.Achievement && s.progress != null)
                 MetaUI.Bar(card, UIKit.Top, new Vector2(0, -328), new Vector2(260, 14), UIKit.Gold, s.progress());
@@ -124,9 +133,10 @@ namespace Survivor
 
             // "No title" row
             var none = MetaUI.Card(content, "No title", UIKit.Top, new Vector2(0, -y), new Vector2(960, 110), equipped == null ? EquippedCard : UIKit.Card);
+            if (equipped == null) PanelRim(none, EquippedRim);
             MetaUI.Text(none, "Aucun titre", 36, Color.white, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(30, 0), new Vector2(600, 60), FontStyle.Bold);
             if (equipped == null)
-                MetaUI.Button(none, "ÉQUIPÉ", UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(260, 86), () => { }, 32, false);
+                WornButton(MetaUI.Button(none, "ÉQUIPÉ", UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(260, 86), () => { }, 32, false));
             else
                 MetaUI.Button(none, "RETIRER", UIKit.Dark, UIKit.Right, new Vector2(-18, 0), new Vector2(260, 86), () =>
                 {
@@ -140,7 +150,8 @@ namespace Survivor
                 bool owned = Cosmetics.IsOwned(t), isEquipped = t == equipped;
                 Color bg = isEquipped ? EquippedCard : owned ? UIKit.Card : MetaUI.Locked;
                 var row = MetaUI.Card(content, "Title " + t.name, UIKit.Top, new Vector2(0, -y), new Vector2(960, 150), bg);
-                MetaUI.Text(row, $"« {t.name} »", 40, owned ? UIKit.Gold : UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(30, -16), new Vector2(620, 54), FontStyle.Bold);
+                if (isEquipped) PanelRim(row, EquippedRim);
+                FitText(MetaUI.Text(row, $"« {t.name} »", 40, owned ? UIKit.Gold : UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(30, -16), new Vector2(620, 54), FontStyle.Bold), 28);
                 MetaUI.Text(row, ProfileInfo(t, owned), 26, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(30, -74), new Vector2(620, 40));
                 if (!owned && t.source == CosmeticSource.Achievement && t.progress != null)
                     MetaUI.Bar(row, UIKit.TopLeft, new Vector2(30, -118), new Vector2(560, 14), UIKit.Gold, t.progress());
@@ -183,7 +194,7 @@ namespace Survivor
         {
             if (equipped)
             {
-                MetaUI.Button(parent, "ÉQUIPÉ", UIKit.Dark, anchor, pos, size, () => { }, font, false);
+                WornButton(MetaUI.Button(parent, "ÉQUIPÉ", UIKit.Dark, anchor, pos, size, () => { }, font, false));
                 return;
             }
             if (owned)
@@ -247,13 +258,25 @@ namespace Survivor
             }
         }
 
+        /// <summary>The disabled "ÉQUIPÉ" button reads as a state, not a greyed action: green label.</summary>
+        static void WornButton(Button b)
+        {
+            var t = b ? b.GetComponentInChildren<Text>() : null;
+            if (t) t.color = MetaUI.LightGreen;
+        }
+
+        /// <summary>Red rubber stamp on a dark backing, tilted ("NOUVEAU").</summary>
         static void NewTag(RectTransform card)
         {
-            var tag = UIKit.Rect("New", card);
-            UIKit.Place(tag, UIKit.TopLeft, new Vector2(10, -10), new Vector2(150, 40));
-            UIKit.Image(tag, new Color(0.9f, 0.15f, 0.1f)).raycastTarget = false;
-            var t = UIKit.Label(tag, "NOUVEAU", 26, Color.white, TextAnchor.MiddleCenter, FontStyle.Bold);
-            UIKit.Stretch(t.rectTransform);
+            var red = new Color(0.93f, 0.3f, 0.24f);
+            var tag = UIKit.Stamp(card, "NOUVEAU", red, 22, -5f);
+            tag.name = "New";
+            tag.anchorMin = tag.anchorMax = tag.pivot = UIKit.TopLeft;
+            tag.anchoredPosition = new Vector2(12, -16);
+            var back = UIKit.Image(tag, new Color(0.16f, 0.04f, 0.035f, 0.88f), UIKit.ChipSprite);
+            back.type = Image.Type.Sliced;
+            back.pixelsPerUnitMultiplier = 0.6f; // same cut as the stamp frame
+            back.raycastTarget = false;
         }
 
         static void SourceTag(RectTransform card, CosmeticDef c)
@@ -317,6 +340,8 @@ namespace Survivor
         {
             bool owned = Store.Owns(p.id);
             var card = MetaUI.Card(content, p.name, UIKit.Top, new Vector2(0, -y), new Vector2(960, 284), owned ? EquippedCard : UIKit.Card);
+            if (owned) PanelRim(card, EquippedRim);
+            else MetaUI.Strip(card, MonetizationUI.Premium);
 
             // Preview: the pack's skin, or a "no ads" sign.
             var skin = Cosmetics.Skins.Find(s => s.source == CosmeticSource.Premium && s.product == p.id);
@@ -343,12 +368,12 @@ namespace Survivor
             }
 
             float width = 960f - textX - 300f;
-            MetaUI.Text(card, p.name, 44, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(textX, -22), new Vector2(width, 56), FontStyle.Bold);
-            MetaUI.Text(card, p.description, 26, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(textX, -86), new Vector2(width, 180));
+            FitText(MetaUI.Text(card, p.name, 44, UIKit.Gold, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(textX, -22), new Vector2(width, 56), FontStyle.Bold), 30);
+            FitText(MetaUI.Text(card, p.description, 26, UIKit.Muted, TextAnchor.UpperLeft, UIKit.TopLeft, new Vector2(textX, -86), new Vector2(width, 180)), 20);
 
             if (owned)
             {
-                MetaUI.Button(card, "ACHETÉ", UIKit.Dark, UIKit.Right, new Vector2(-20, 0), new Vector2(270, 130), () => { }, 38, false);
+                WornButton(MetaUI.Button(card, "ACHETÉ", UIKit.Dark, UIKit.Right, new Vector2(-20, 0), new Vector2(270, 130), () => { }, 38, false));
                 return;
             }
             Button buy = null;
@@ -375,6 +400,7 @@ namespace Survivor
             float y = 0f;
             SectionTitle(content, "STATISTIQUES", y);
             y += 72f;
+            statRow = 0;
             var life = MetaSave.Data.life;
             StatLine(content, "Sorties", life.runs.ToString(), ref y);
             StatLine(content, "Ambrés tués", life.kills.ToString(), ref y);
@@ -408,6 +434,7 @@ namespace Survivor
                 ProfileToggle(content, "Pubs de test avant partie", Ads.TestInterstitials, v => Ads.TestInterstitials = v, ref y);
                 ProfileToggle(content, "Simuler : aucune pub disponible", Ads.TestUnavailable, v => Ads.TestUnavailable = v, ref y);
                 string pre = Ads.InterstitialBlocker();
+                statRow = 0;
                 StatLine(content, "Pub avant la prochaine partie", pre == null ? "oui" : $"non ({pre})", ref y);
                 StatLine(content, "Seconde chance (carte d'Ostrov)", ReviveOffer.RunsUntilNextOffer == 0 ? "à la prochaine mort" : $"dans {ReviveOffer.RunsUntilNextOffer} partie(s)", ref y);
                 StatLine(content, "Parties aujourd'hui", Monetization.RunsToday.ToString(), ref y);
@@ -449,10 +476,9 @@ namespace Survivor
 
         void ProfileToggle(RectTransform content, string label, bool value, System.Action<bool> set, ref float y)
         {
-            var row = UIKit.Rect("Toggle", content);
-            UIKit.Place(row, UIKit.Top, new Vector2(0, -y), new Vector2(960, 86));
-            UIKit.Image(row, new Color(1f, 1f, 1f, 0.04f)).raycastTarget = false;
-            MetaUI.Text(row, label, 32, UIKit.Muted, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(24, 0), new Vector2(660, 80));
+            var row = MetaUI.Card(content, "Toggle", UIKit.Top, new Vector2(0, -y), new Vector2(960, 86), UIKit.Card);
+            if (value) MetaUI.Strip(row, MetaUI.LightGreen, 6f);
+            MetaUI.Text(row, label, 32, value ? Color.white : UIKit.Muted, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(24, 0), new Vector2(660, 80));
             UIKit.Button(row, value ? "OUI" : "NON", value ? MetaUI.Green : UIKit.Dark, UIKit.Right, new Vector2(-14, 0), new Vector2(200, 72), () =>
             {
                 set(!value);
@@ -461,13 +487,15 @@ namespace Survivor
             y += 94f;
         }
 
+        /// <summary>Ledger line: label left, value right, every other row lightly shaded, a thin rule under each.</summary>
         static void StatLine(RectTransform content, string label, string value, ref float y)
         {
-            var row = UIKit.Rect("Line", content);
+            var row = UIKit.Rect("Stat", content);
             UIKit.Place(row, UIKit.Top, new Vector2(0, -y), new Vector2(960, 62));
-            UIKit.Image(row, new Color(1f, 1f, 1f, 0.04f)).raycastTarget = false;
-            MetaUI.Text(row, label, 32, UIKit.Muted, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(24, 0), new Vector2(560, 60));
-            MetaUI.Text(row, value, 34, Color.white, TextAnchor.MiddleRight, UIKit.Right, new Vector2(-24, 0), new Vector2(380, 60), FontStyle.Bold);
+            UIKit.Image(row, new Color(1f, 1f, 1f, statRow++ % 2 == 0 ? 0.045f : 0.012f)).raycastTarget = false;
+            LedgerRule(row, 960f, -4f);
+            FitText(MetaUI.Text(row, label, 32, UIKit.Muted, TextAnchor.MiddleLeft, UIKit.Left, new Vector2(24, 0), new Vector2(560, 60)), 22);
+            FitText(MetaUI.Text(row, value, 34, Color.white, TextAnchor.MiddleRight, UIKit.Right, new Vector2(-24, 0), new Vector2(380, 60), FontStyle.Bold), 22);
             y += 68f;
         }
     }

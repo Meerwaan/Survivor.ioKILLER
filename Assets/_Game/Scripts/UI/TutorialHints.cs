@@ -33,16 +33,16 @@ namespace Survivor
 
         static readonly Dictionary<Hint, string> Texts = new()
         {
-            [Hint.Move] = "Glisse ton doigt n'importe où pour bouger.\n<color=#FFD94D>Tes armes tirent toutes seules !</color>",
+            [Hint.Move] = "Glisse ton doigt n'importe où pour bouger.\n<color=#F4C84A>Tes armes tirent toutes seules !</color>",
             [Hint.Gems] = "Ramasse les <color=#E58E2B>éclats</color> d'ambre :\nton injecteur les change en niveaux.",
-            [Hint.Choices] = "Chaque niveau = un choix (jusqu'au stuff complet). Mêmes chances pour tous :\n<color=#FFD94D>c'est ton stuff qui fait la différence.</color>",
-            [Hint.Evolution] = "Arme au <color=#FFD94D>Nv 5</color> + son bonus partenaire (indiqué sur la carte)\n= <color=#D973FF>ÉVOLUTION</color> surpuissante !",
-            [Hint.SetBonus] = "<color=#FFD94D>Synergie !</color> 2 objets de la même famille (Feu, Lame, Poison…)\n= palier I. Va jusqu'à 4 pour le palier II.",
+            [Hint.Choices] = "Chaque niveau = un choix (jusqu'au stuff complet). Mêmes chances pour tous :\n<color=#F4C84A>c'est ton stuff qui fait la différence.</color>",
+            [Hint.Evolution] = "Arme au <color=#F4C84A>Nv 5</color> + son bonus partenaire (indiqué sur la carte)\n= <color=#D973FF>ÉVOLUTION</color> surpuissante !",
+            [Hint.SetBonus] = "<color=#F4C84A>Synergie !</color> 2 objets de la même famille (Feu, Lame, Poison…)\n= palier I. Va jusqu'à 4 pour le palier II.",
             [Hint.LowHealth] = "<color=#FF5544>Vie basse !</color> Bouge, ne reste pas encerclé.\nLes <color=#FF8866>Rations</color> et les caisses soignent.",
             [Hint.Boss] = "<color=#FF5544>SOUCHE !</color> Suis la flèche rouge.\nAbats-la : sa caisse rapporte gros.",
-            [Hint.Reroll] = "Pas de bonne carte ? <color=#FFD94D>RELANCER</color> tire une nouvelle main,\n<color=#FFD94D>BANNIR</color> retire un objet pour toute la partie.",
+            [Hint.Reroll] = "Pas de bonne carte ? <color=#F4C84A>RELANCER</color> tire une nouvelle main,\n<color=#F4C84A>BANNIR</color> retire un objet pour toute la partie.",
             [Hint.Pause] = "Le bouton pause montre ton stuff complet\net tes synergies actives.",
-            [Hint.Stuff] = "Ton <color=#FFD94D>STUFF</color> a 20 niveaux max (jauge sous les cartes).\nSpécialise-toi : <color=#FFD94D>armes Nv 5 + partenaires</color> !",
+            [Hint.Stuff] = "Ton <color=#F4C84A>STUFF</color> a 20 niveaux max (jauge sous les cartes).\nSpécialise-toi : <color=#F4C84A>armes Nv 5 + partenaires</color> !",
             [Hint.Danger] = "Le <color=#FF7A50>DANGER</color> monte toutes les 2:30 (sous le chrono).\nEn haut à droite : ton score <color=#8CFF7A>contre ton record</color>.",
         };
 
@@ -74,10 +74,11 @@ namespace Survivor
             box = UIKit.Rect("Hint", canvas);
             // Lower half: the event banners and multi-kill callouts use the upper half.
             UIKit.Place(box, UIKit.Center, new Vector2(0, -300), new Vector2(980, 190));
-            UIKit.Image(box, new Color(0f, 0f, 0f, 0.72f)).raycastTarget = false;
-            var stripe = UIKit.Rect("Stripe", box);
-            UIKit.Place(stripe, UIKit.Left, new Vector2(6, 0), new Vector2(12, 190));
-            UIKit.Image(stripe, UIKit.Gold).raycastTarget = false;
+            // Device readout: dark cut-corner panel, cyan rim and strip (REGEN hardware), gold highlights in the text.
+            UIKit.Panel(box, new Color(0.035f, 0.04f, 0.05f, 0.82f)).raycastTarget = false;
+            var rim = box.Find("Line");
+            if (rim) rim.GetComponent<Image>().color = new Color(UIKit.Accent.r, UIKit.Accent.g, UIKit.Accent.b, 0.55f);
+            MetaUI.Strip(box, UIKit.Accent, 8f);
             label = UIKit.Label(box, "", 40, Color.white, TextAnchor.MiddleCenter);
             UIKit.Stretch(label.rectTransform, 24f);
             group = box.gameObject.AddComponent<CanvasGroup>();
